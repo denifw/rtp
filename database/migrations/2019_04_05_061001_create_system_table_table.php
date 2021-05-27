@@ -14,18 +14,17 @@ class CreateSystemTableTable extends Migration
     public function up()
     {
         Schema::create('system_table', function (Blueprint $table) {
-            $table->bigIncrements('st_id');
+            $table->uuid('prd_uid')->primary();
             $table->string('st_name', 255);
             $table->string('st_prefix', 255);
             $table->string('st_path', 255);
             $table->char('st_active', 1)->default('Y');
-            $table->bigInteger('st_created_by');
+            $table->uuid('st_created_by');
             $table->dateTime('st_created_on');
-            $table->bigInteger('st_updated_by')->nullable();
+            $table->uuid('st_updated_by')->nullable();
             $table->dateTime('st_updated_on')->nullable();
-            $table->bigInteger('st_deleted_by')->nullable();
+            $table->uuid('st_deleted_by')->nullable();
             $table->dateTime('st_deleted_on')->nullable();
-            $table->unique('st_prefix', 'tbl_st_prefix_unique');
         });
         \Illuminate\Support\Facades\Artisan::call('db:seed', [
             '--class' => SystemTableSeeder::class,
