@@ -1,0 +1,5 @@
+-- for cascade table
+TRUNCATE someTable RESTART IDENTITY CASCADE;
+
+-- for normal table.
+TRUNCATE someTable RESTART IDENTITY;

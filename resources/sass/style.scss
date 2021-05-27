@@ -1,0 +1,44 @@
+// Variables
+@import 'variables';
+
+.label-dark {
+  background-color: $dark;
+}
+
+.label-gray {
+  background-color: $gray;
+}
+
+.label-aqua {
+  background-color: $aqua;
+}
+
+/* ***** buttons ********/
+a.btn-gray, a.btn-aqua {
+  color: $white;
+}
+
+.btn-gray {
+  background: $gray;
+  color: $white;
+  border: 1px solid $dim_gray;
+}
+.btn-gray:hover, .btn-gray:focus, .btn-gray:active, .btn-gray.active, .open .dropdown-toggle.btn-gray {
+  color: $white;
+  background: $dim_gray;
+}
+
+
+.btn-aqua {
+  background: $aqua;
+  color: $white;
+  border: 1px solid $darkturquoise;
+}
+.btn-aqua:hover, .btn-aqua:focus, .btn-aqua:active, .btn-aqua.active, .open .dropdown-toggle.btn-aqua {
+  background: $darkturquoise;
+  color: $white;
+}
+
+/* ***** buttons ********/
+
+

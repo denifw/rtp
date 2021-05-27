@@ -1,0 +1,70 @@
+public function doCopyDocument()
+    {
+        $docs = $this->loadDocument();
+        $number = 0;
+        $thumbs = 0;
+        $basePath = 'public';
+        $images = ['jpeg', 'png', 'jpg', 'gif'];
+        $noPath = [];
+        $fail = 0;
+        foreach ($docs as $doc) {
+            $ns = StringFormatter::replaceSpecialCharacter(strtolower($doc->ss_name_space), '');
+            $group = StringFormatter::replaceSpecialCharacter(strtolower($doc->dcg_code), '');
+            $type = StringFormatter::replaceSpecialCharacter(strtolower($doc->dct_code), '');
+            $dcg = str_replace(' ', '', strtolower($doc->dcg_code));
+            $dct = str_replace(' ', '', strtolower($doc->dct_code));
+            $name = $doc->doc_file_name;
+            $old = $basePath . '/' . $dcg . '/' . $dct . '/' . $name;
+            $new = $basePath . '/' . $ns . '/' . $group . '/' . $type . '/' . $name;
+            $oldPath = storage_path('app/' . $old);
+            $newPath = storage_path('app/' . $new);
+            if ($this->isFileExist($oldPath)) {
+                if ($this->isFileExist($newPath) === false) {
+                    Storage::copy($old, $new);
+                    $number++;
+                }
+            } else {
+                if ($fail <= 20) {
+                    $noPath[] = $old;
+                }
+                $fail++;
+            }
+            if (in_array($doc->doc_file_type, $images, true) === true) {
+                $oldThumbs = $basePath . '/' . $dcg . '/' . $dct . '/thumbs/' . $name;
+                $newThumbs = $basePath . '/' . $ns . '/' . $group . '/' . $type . '/thumbs/' . $name;
+                $oldThumbsPath = storage_path('app/' . $oldThumbs);
+                $newThumbsPath = storage_path('app/' . $newThumbs);
+                if ($this->isFileExist($oldThumbsPath) && $this->isFileExist($newThumbsPath) === false) {
+                    Storage::copy($oldThumbs, $newThumbs);
+                    $thumbs++;
+                }
+            }
+        }
+        var_dump($noPath);
+        exit;
+    }
+
+    public function isFileExist($path): bool
+    {
+        return File::exists($path);
+    }
+
+    /**
+     * Show the application dashboard.
+     *
+     * @return array
+     */
+    public function loadDocument($deleted = true): array
+    {
+        $query = 'select doc.doc_id, doc.doc_ss_id, ss.ss_name_space, dcg.dcg_code, dct.dct_code, doc.doc_file_name, doc.doc_file_type
+                from document as doc INNER JOIN
+                    document_type as dct ON doc.doc_dct_id = dct.dct_id INNER JOIN
+                    document_group as dcg ON dct.dct_dcg_id = dcg.dcg_id INNER JOIN
+                    system_setting as ss  ON doc.doc_ss_id = ss.ss_id ';
+        if ($deleted === false) {
+            $query .= ' WHERE (doc.doc_deleted_on IS NULL)';
+        }
+
+        return DB::select($query);
+
+    }

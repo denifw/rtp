@@ -1,0 +1,14 @@
+update job_inbound_receive set jir_lot_number = j.ji_ata_date
+from (select jo.jo_number, jo.jo_ss_id, ji.ji_id, ji.ji_ata_date
+        FROM job_order as jo
+            INNER JOIN job_inbound as ji ON jo.jo_id = ji.ji_jo_id
+        WHERE (jo.jo_ss_id IN (4, 6)) and (jo.jo_deleted_on IS NULL)
+          and (jo.jo_id NOT IN (select jtr_ji_jo_id from job_stock_transfer))) as j WHERE jir_ji_id = j.ji_id;
+
+update job_inbound_detail set jid_lot_number = j.ji_ata_date
+from (select jo.jo_number, jo.jo_ss_id, ji.ji_id, ji.ji_ata_date
+        FROM job_order as jo
+            INNER JOIN job_inbound as ji ON jo.jo_id = ji.ji_jo_id
+        WHERE (jo.jo_ss_id IN (4, 6)) and (jo.jo_deleted_on IS NULL) and jo.jo_id = 6951
+          and (jo.jo_id NOT IN (select jtr_ji_jo_id from job_stock_transfer))) as j WHERE jid_ji_id = j.ji_id
+

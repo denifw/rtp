@@ -1,0 +1,32 @@
+.form-group {
+  margin-bottom: 13px !important;
+}
+
+.x_panel {
+  padding: 3px 10px !important;
+}
+
+.x_title {
+  border-bottom: 1px solid #E6E9ED;
+  padding: 1px 0;
+  margin-bottom: 5px;
+}
+
+.x_content {
+  padding: 0 0 4px 0;
+  position: relative;
+  width: 100%;
+  float: left;
+  clear: both;
+  margin-top: 0;
+}
+.x_title h4 {
+  margin: 7px 0 6px;
+  float: left;
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: bold;
+}

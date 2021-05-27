@@ -1,0 +1,15 @@
+update job_inbound_stock set jis_deleted_by = 1, jis_deleted_on = '2020-01-04 00:01:00' where jis_id IN (1598, 1616, 1629, 1630);
+update job_inbound_detail set jid_deleted_by = 1, jid_deleted_on = '2020-01-04 00:01:00' where jid_id IN (643, 647, 654, 655);
+update job_order set jo_deleted_by = 1, jo_deleted_on = '2020-01-04 00:01:00', jo_deleted_reason = 'Deleted by system based on request by Rian WLOG' where jo_id IN (1122, 1147, 1162, 1161);
+
+
+SELECT * FROM job_inbound_stock where jis_jid_id IN (643, 647, 654, 655) AND (jis_deleted_on IS NULL);
+
+SELECT jo.jo_id, jo.jo_number, jo.jo_deleted_by, jo.jo_deleted_on, ji.ji_id, jid.jid_id, jid.jid_quantity
+FROM job_order as jo INNER JOIN
+job_inbound as ji ON jo.jo_id = ji.ji_jo_id INNER JOIN
+job_inbound_detail as jid ON ji.ji_id = jid.jid_ji_id
+WHERE jo.jo_number IN ('IN-BLP-191200002', 'IN-BLP-191200004', 'IN-BLP-191200005', 'IN-BLP-191200006') AND (jid.jid_deleted_on IS NULL);
+
+select jo_number, jo_deleted_reason, jo_deleted_by, jo_deleted_on from job_order
+where jo_number IN ('IN-BLP-191200002', 'IN-BLP-191200004', 'IN-BLP-191200005', 'IN-BLP-191200006');

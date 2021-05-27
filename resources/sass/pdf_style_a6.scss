@@ -1,0 +1,148 @@
+// Variables
+@import 'helper';
+
+
+.pdf-header {
+  font-family: Arial, Helvetica, sans-serif;;
+  width: 100%;
+  border-bottom: solid 1px #000;
+  vertical-align: middle;
+}
+
+.pdf-header .head-logo {
+  width: 30%;
+  text-align: left;
+}
+
+.company-logo {
+  width: 50px !important;
+  max-width: 100px;
+}
+
+.pdf-header .head-company {
+  width: 70%;
+  text-align: right;
+  vertical-align: bottom;
+}
+
+.company-name {
+  text-align: right;
+  font-size: 12px
+}
+
+.pdf-header .head-company .address {
+  text-align: right;
+  font-size: 8px;
+}
+
+.pdf-footer {
+  font-family: Arial, Helvetica, sans-serif;;
+  border-top: 1px solid #000000;
+  vertical-align: bottom;
+  color: #000088;
+  width: 100%;
+}
+
+.pdf-footer .page-no {
+  text-align: right;
+  font-size: 8px;
+}
+
+
+.title-4 {
+  font-family: Arial, Helvetica, sans-serif;;
+  font-size: 10px;
+  font-weight: bold;
+  color: #2a3f54;
+  margin-top: 1px !important;
+  margin-bottom: 1px !important;
+}
+
+.content-table {
+  font-family: Arial, Helvetica, sans-serif;;
+  width: 100%;
+  border: solid 1px #ddd;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.content-table thead th {
+  background-color: #2a3f54;
+  border: solid 1px #ddd;
+  color: #FFF;
+  padding: 4px;
+  text-align: center;
+  font-size:8px !important;
+}
+
+.content-table tbody td {
+  border: solid 1px #ddd;
+  color: #333;
+  padding: 4px;
+  font-size: 8px !important;
+}
+
+.content-table tbody .even {
+  background-color: #F2F2F2;
+}
+
+.table-info {
+  font-family: Arial, Helvetica, sans-serif;;
+  width: 100%;
+  font-size: 8px;
+  vertical-align: top;
+}
+
+.table-signature {
+  font-family: Arial, Helvetica, sans-serif;;
+  width: 100%;
+  font-size: 8px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.title {
+  font-family: Arial, Helvetica, sans-serif;;
+  text-align: center;
+  font-size: 10px;
+}
+
+.pdf-date-label {
+  font-family: Arial, Helvetica, sans-serif;;
+  text-align: right;
+  font-size: 8px !important;
+  margin-bottom: 0 !important;
+}
+
+.div-info {
+  font-family: Arial, Helvetica, sans-serif;;
+  font-size: 8px;
+  vertical-align: top;
+  font-weight: bold;
+}
+
+.col-lg {
+  width: 100%;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+.col-md {
+  width: 48%;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+.col-sm {
+  width: 32%;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+.pull-right {
+  float: right;
+}
+
+.pull-left {
+  float: left;
+}

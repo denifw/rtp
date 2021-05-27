@@ -1,0 +1,90 @@
+    /**
+     * Function to do the transaction of database.;
+     *
+     * @return void
+     */
+    public function doTransaction(): void
+    {
+        $this->loadValidationRole();
+
+        if ($this->isValidPostValues() === true) {
+            // $log = $this->loadUserLog();
+            // $ulDao = new UserLogDao();
+            # Read This if you cant update the data
+            # Change isLogRegistered fuction to only match the log with the last log, not to all logs.
+            // if ($ulDao->isLogRegistered($log['ul_route'], $log['ul_action'], $log['ul_token']) === false) {
+            DB::beginTransaction();
+            try {
+                if ($this->isUpdate() === true) {
+                    $this->doUpdate();
+                    $this->addSuccessMessage(Trans::getWord('successUpdate', 'message'));
+                }
+                if ($this->isInsert() === true) {
+                    $lastInsertId = $this->doInsert();
+                    $this->setDetailReferenceValue($lastInsertId);
+                    $log['ul_ref_id'] = $lastInsertId;
+                    $this->addSuccessMessage(Trans::getWord('successInsert', 'message'));
+                }
+                // $ulDao->doInsertTransaction($log);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                if ($this->isUpdate() === true) {
+                    $this->addErrorMessage(Trans::getWord('failedUpdate', 'message'));
+                }
+                if ($this->isInsert() === true) {
+                    $this->addErrorMessage(Trans::getWord('failedInsert', 'message'));
+                }
+                $this->addErrorMessage($this->doPrepareSqlErrorMessage($e->getMessage()));
+            }
+            // } else {
+            //     if ($this->isInsert() === true) {
+            //         $this->addSuccessMessage(Trans::getWord('successInsert', 'message'));
+            //     }
+            //     if ($this->isUpdate() === true) {
+            //         $this->addSuccessMessage(Trans::getWord('successUpdate', 'message'));
+            //     }
+            // }
+        } else {
+            # Set the error messages.
+            if ($this->isInsert() === true) {
+                $this->addErrorMessage(Trans::getWord('failedInsert', 'message'));
+            }
+            if ($this->isUpdate() === true) {
+                $this->addErrorMessage(Trans::getWord('failedUpdate', 'message'));
+            }
+        }
+    }
+
+    /**
+     * Function to do the transaction of database.;
+     *
+     * @return array
+     */
+    private function loadUserLog(): array
+    {
+        $log = [];
+        $log['ul_route'] = $this->PageSetting->getPageRoute();
+        $log['ul_media'] = 'Web App';
+        $action = 'doInsert';
+        if ($this->isUpdate()) {
+            $action = $this->getFormAction();
+            if (empty($action) === true) {
+                $action = 'doUpdate';
+            }
+        }
+        $log['ul_action'] = $action;
+        $log['ul_ref_id'] = $this->getDetailReferenceValue();
+        $ignoreds = ['_token', 'main_form_action', 'mainTabActive'];
+        $param = $this->getAllParameters();
+        $results = [];
+        foreach ($param as $key => $val) {
+            if (in_array($key, $ignoreds, true) === false) {
+                $results[$key] = $val;
+            }
+        }
+        $jsonData = json_encode($results);
+        $log['ul_token'] = md5($jsonData . $this->User->getId());
+        $log['ul_param'] = $jsonData;
+        return $log;
+    }

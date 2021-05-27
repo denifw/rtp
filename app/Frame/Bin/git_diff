@@ -1,0 +1,11 @@
+Menggabungkan Update dari Master Frame ke local branch
+======================================================
+1. Check out as local brand dari project (bukan master frame)
+2. git diff <local_branch>..<frame_branch> <file_name>.patch
+3. git apply <file_name>.patch
+
+TO Revert apply
+
+git apply -R <file_name>.patch
+
+Setelah di apply, remove dlu file <file_name>.patch sblum di commit.

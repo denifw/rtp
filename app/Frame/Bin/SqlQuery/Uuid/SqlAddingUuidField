@@ -1,0 +1,2078 @@
+-- Enable uuid extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- ========= START action ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.action ADD COLUMN ac_uid uuid;
+-- Fill in Column
+UPDATE action SET ac_uid = uuid_generate_v3(uuid_ns_url(), 'action_' || ac_id);
+-- Alter Column
+ALTER TABLE public.action ALTER COLUMN ac_uid SET NOT NULL, ADD CONSTRAINT tbl_ac_uid_unique UNIQUE (ac_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.action ADD COLUMN ac_deleted_reason varchar(255);
+-- ========= END action ================
+
+-- ========= START api_access ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.api_access ADD COLUMN aa_uid uuid;
+-- Fill in Column
+UPDATE api_access SET aa_uid = uuid_generate_v3(uuid_ns_url(), 'api_access_' || aa_id);
+-- Alter Column
+ALTER TABLE public.api_access ALTER COLUMN aa_uid SET NOT NULL, ADD CONSTRAINT tbl_aa_uid_unique UNIQUE (aa_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.api_access ADD COLUMN aa_deleted_reason varchar(255);
+-- ========= END api_access ================
+
+-- ========= START bank ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.bank ADD COLUMN bn_uid uuid;
+-- Fill in Column
+UPDATE bank SET bn_uid = uuid_generate_v3(uuid_ns_url(), 'bank_' || bn_id);
+-- Alter Column
+ALTER TABLE public.bank ALTER COLUMN bn_uid SET NOT NULL, ADD CONSTRAINT tbl_bn_uid_unique UNIQUE (bn_uid);
+-- ========= Adding Delete Reason ================
+-- ========= END bank ================
+
+-- ========= START brand ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.brand ADD COLUMN br_uid uuid;
+-- Fill in Column
+UPDATE brand SET br_uid = uuid_generate_v3(uuid_ns_url(), 'brand_' || br_id);
+-- Alter Column
+ALTER TABLE public.brand ALTER COLUMN br_uid SET NOT NULL, ADD CONSTRAINT tbl_br_uid_unique UNIQUE (br_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.brand ADD COLUMN br_deleted_reason varchar(255);
+-- ========= END brand ================
+
+-- ========= START cash_account ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.cash_account ADD COLUMN cac_uid uuid;
+-- Fill in Column
+UPDATE cash_account SET cac_uid = uuid_generate_v3(uuid_ns_url(), 'cash_account_' || cac_id);
+-- Alter Column
+ALTER TABLE public.cash_account ALTER COLUMN cac_uid SET NOT NULL, ADD CONSTRAINT tbl_cac_uid_unique UNIQUE (cac_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.cash_account ADD COLUMN cac_deleted_reason varchar(255);
+-- ========= END cash_account ================
+
+-- ========= START cash_advance ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.cash_advance ADD COLUMN ca_uid uuid;
+-- Fill in Column
+UPDATE cash_advance SET ca_uid = uuid_generate_v3(uuid_ns_url(), 'cash_advance_' || ca_id);
+-- Alter Column
+ALTER TABLE public.cash_advance ALTER COLUMN ca_uid SET NOT NULL, ADD CONSTRAINT tbl_ca_uid_unique UNIQUE (ca_uid);
+-- ========= Adding Delete Reason ================
+-- ========= END cash_advance ================
+
+-- ========= START cash_advance_received ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.cash_advance_received ADD COLUMN carc_uid uuid;
+-- Fill in Column
+UPDATE cash_advance_received SET carc_uid = uuid_generate_v3(uuid_ns_url(), 'cash_advance_received_' || carc_id);
+-- Alter Column
+ALTER TABLE public.cash_advance_received ALTER COLUMN carc_uid SET NOT NULL, ADD CONSTRAINT tbl_carc_uid_unique UNIQUE (carc_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.cash_advance_received ADD COLUMN carc_deleted_reason varchar(255);
+-- ========= END cash_advance_received ================
+
+-- ========= START cash_advance_returned ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.cash_advance_returned ADD COLUMN cart_uid uuid;
+-- Fill in Column
+UPDATE cash_advance_returned SET cart_uid = uuid_generate_v3(uuid_ns_url(), 'cash_advance_returned_' || cart_id);
+-- Alter Column
+ALTER TABLE public.cash_advance_returned ALTER COLUMN cart_uid SET NOT NULL, ADD CONSTRAINT tbl_cart_uid_unique UNIQUE (cart_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.cash_advance_returned ADD COLUMN cart_deleted_reason varchar(255);
+-- ========= END cash_advance_returned ================
+
+-- ========= START cash_balance ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.cash_balance ADD COLUMN cb_uid uuid;
+-- Fill in Column
+UPDATE cash_balance SET cb_uid = uuid_generate_v3(uuid_ns_url(), 'cash_balance_' || cb_id);
+-- Alter Column
+ALTER TABLE public.cash_balance ALTER COLUMN cb_uid SET NOT NULL, ADD CONSTRAINT tbl_cb_uid_unique UNIQUE (cb_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.cash_balance ADD COLUMN cb_deleted_reason varchar(255);
+-- ========= END cash_balance ================
+
+-- ========= START city ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.city ADD COLUMN cty_uid uuid;
+-- Fill in Column
+UPDATE city SET cty_uid = uuid_generate_v3(uuid_ns_url(), 'city_' || cty_id);
+-- Alter Column
+ALTER TABLE public.city ALTER COLUMN cty_uid SET NOT NULL, ADD CONSTRAINT tbl_cty_uid_unique UNIQUE (cty_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.city ADD COLUMN cty_deleted_reason varchar(255);
+-- ========= END city ================
+
+-- ========= START contact_person ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.contact_person ADD COLUMN cp_uid uuid;
+-- Fill in Column
+UPDATE contact_person SET cp_uid = uuid_generate_v3(uuid_ns_url(), 'contact_person_' || cp_id);
+-- Alter Column
+ALTER TABLE public.contact_person ALTER COLUMN cp_uid SET NOT NULL, ADD CONSTRAINT tbl_cp_uid_unique UNIQUE (cp_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.contact_person ADD COLUMN cp_deleted_reason varchar(255);
+-- ========= END contact_person ================
+
+-- ========= START container ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.container ADD COLUMN ct_uid uuid;
+-- Fill in Column
+UPDATE container SET ct_uid = uuid_generate_v3(uuid_ns_url(), 'container_' || ct_id);
+-- Alter Column
+ALTER TABLE public.container ALTER COLUMN ct_uid SET NOT NULL, ADD CONSTRAINT tbl_ct_uid_unique UNIQUE (ct_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.container ADD COLUMN ct_deleted_reason varchar(255);
+-- ========= END container ================
+
+-- ========= START cost_code ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.cost_code ADD COLUMN cc_uid uuid;
+-- Fill in Column
+UPDATE cost_code SET cc_uid = uuid_generate_v3(uuid_ns_url(), 'cost_code_' || cc_id);
+-- Alter Column
+ALTER TABLE public.cost_code ALTER COLUMN cc_uid SET NOT NULL, ADD CONSTRAINT tbl_cc_uid_unique UNIQUE (cc_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.cost_code ADD COLUMN cc_deleted_reason varchar(255);
+-- ========= END cost_code ================
+
+-- ========= START cost_code_group ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.cost_code_group ADD COLUMN ccg_uid uuid;
+-- Fill in Column
+UPDATE cost_code_group SET ccg_uid = uuid_generate_v3(uuid_ns_url(), 'cost_code_group_' || ccg_id);
+-- Alter Column
+ALTER TABLE public.cost_code_group ALTER COLUMN ccg_uid SET NOT NULL, ADD CONSTRAINT tbl_ccg_uid_unique UNIQUE (ccg_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.cost_code_group ADD COLUMN ccg_deleted_reason varchar(255);
+-- ========= END cost_code_group ================
+
+-- ========= START cost_code_service ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.cost_code_service ADD COLUMN ccs_uid uuid;
+-- Fill in Column
+UPDATE cost_code_service SET ccs_uid = uuid_generate_v3(uuid_ns_url(), 'cost_code_service_' || ccs_id);
+-- Alter Column
+ALTER TABLE public.cost_code_service ALTER COLUMN ccs_uid SET NOT NULL, ADD CONSTRAINT tbl_ccs_uid_unique UNIQUE (ccs_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.cost_code_service ADD COLUMN ccs_deleted_reason varchar(255);
+-- ========= END cost_code_service ================
+
+-- ========= START country ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.country ADD COLUMN cnt_uid uuid;
+-- Fill in Column
+UPDATE country SET cnt_uid = uuid_generate_v3(uuid_ns_url(), 'country_' || cnt_id);
+-- Alter Column
+ALTER TABLE public.country ALTER COLUMN cnt_uid SET NOT NULL, ADD CONSTRAINT tbl_cnt_uid_unique UNIQUE (cnt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.country ADD COLUMN cnt_deleted_reason varchar(255);
+-- ========= END country ================
+
+-- ========= START currency ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.currency ADD COLUMN cur_uid uuid;
+-- Fill in Column
+UPDATE currency SET cur_uid = uuid_generate_v3(uuid_ns_url(), 'currency_' || cur_id);
+-- Alter Column
+ALTER TABLE public.currency ALTER COLUMN cur_uid SET NOT NULL, ADD CONSTRAINT tbl_cur_uid_unique UNIQUE (cur_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.currency ADD COLUMN cur_deleted_reason varchar(255);
+-- ========= END currency ================
+
+-- ========= START customs_clearance_type ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.customs_clearance_type ADD COLUMN cct_uid uuid;
+-- Fill in Column
+UPDATE customs_clearance_type SET cct_uid = uuid_generate_v3(uuid_ns_url(), 'customs_clearance_type_' || cct_id);
+-- Alter Column
+ALTER TABLE public.customs_clearance_type ALTER COLUMN cct_uid SET NOT NULL, ADD CONSTRAINT tbl_cct_uid_unique UNIQUE (cct_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.customs_clearance_type ADD COLUMN cct_deleted_reason varchar(255);
+-- ========= END customs_clearance_type ================
+
+-- ========= START customs_document_type ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.customs_document_type ADD COLUMN cdt_uid uuid;
+-- Fill in Column
+UPDATE customs_document_type SET cdt_uid = uuid_generate_v3(uuid_ns_url(), 'customs_document_type_' || cdt_id);
+-- Alter Column
+ALTER TABLE public.customs_document_type ALTER COLUMN cdt_uid SET NOT NULL, ADD CONSTRAINT tbl_cdt_uid_unique UNIQUE (cdt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.customs_document_type ADD COLUMN cdt_deleted_reason varchar(255);
+-- ========= END customs_document_type ================
+
+-- ========= START dashboard ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.dashboard ADD COLUMN dsh_uid uuid;
+-- Fill in Column
+UPDATE dashboard SET dsh_uid = uuid_generate_v3(uuid_ns_url(), 'dashboard_' || dsh_id);
+-- Alter Column
+ALTER TABLE public.dashboard ALTER COLUMN dsh_uid SET NOT NULL, ADD CONSTRAINT tbl_dsh_uid_unique UNIQUE (dsh_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.dashboard ADD COLUMN dsh_deleted_reason varchar(255);
+-- ========= END dashboard ================
+
+-- ========= START dashboard_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.dashboard_detail ADD COLUMN dsd_uid uuid;
+-- Fill in Column
+UPDATE dashboard_detail SET dsd_uid = uuid_generate_v3(uuid_ns_url(), 'dashboard_detail_' || dsd_id);
+-- Alter Column
+ALTER TABLE public.dashboard_detail ALTER COLUMN dsd_uid SET NOT NULL, ADD CONSTRAINT tbl_dsd_uid_unique UNIQUE (dsd_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.dashboard_detail ADD COLUMN dsd_deleted_reason varchar(255);
+-- ========= END dashboard_detail ================
+
+-- ========= START dashboard_item ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.dashboard_item ADD COLUMN dsi_uid uuid;
+-- Fill in Column
+UPDATE dashboard_item SET dsi_uid = uuid_generate_v3(uuid_ns_url(), 'dashboard_item_' || dsi_id);
+-- Alter Column
+ALTER TABLE public.dashboard_item ALTER COLUMN dsi_uid SET NOT NULL, ADD CONSTRAINT tbl_dsi_uid_unique UNIQUE (dsi_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.dashboard_item ADD COLUMN dsi_deleted_reason varchar(255);
+-- ========= END dashboard_item ================
+
+-- ========= START district ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.district ADD COLUMN dtc_uid uuid;
+-- Fill in Column
+UPDATE district SET dtc_uid = uuid_generate_v3(uuid_ns_url(), 'district_' || dtc_id);
+-- Alter Column
+ALTER TABLE public.district ALTER COLUMN dtc_uid SET NOT NULL, ADD CONSTRAINT tbl_dtc_uid_unique UNIQUE (dtc_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.district ADD COLUMN dtc_deleted_reason varchar(255);
+-- ========= END district ================
+
+-- ========= START document ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.document ADD COLUMN doc_uid uuid;
+-- Fill in Column
+UPDATE document SET doc_uid = uuid_generate_v3(uuid_ns_url(), 'document_' || doc_id);
+-- Alter Column
+ALTER TABLE public.document ALTER COLUMN doc_uid SET NOT NULL, ADD CONSTRAINT tbl_doc_uid_unique UNIQUE (doc_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.document ADD COLUMN doc_deleted_reason varchar(255);
+-- ========= END document ================
+
+-- ========= START document_group ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.document_group ADD COLUMN dcg_uid uuid;
+-- Fill in Column
+UPDATE document_group SET dcg_uid = uuid_generate_v3(uuid_ns_url(), 'document_group_' || dcg_id);
+-- Alter Column
+ALTER TABLE public.document_group ALTER COLUMN dcg_uid SET NOT NULL, ADD CONSTRAINT tbl_dcg_uid_unique UNIQUE (dcg_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.document_group ADD COLUMN dcg_deleted_reason varchar(255);
+-- ========= END document_group ================
+
+-- ========= START document_signature ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.document_signature ADD COLUMN ds_uid uuid;
+-- Fill in Column
+UPDATE document_signature SET ds_uid = uuid_generate_v3(uuid_ns_url(), 'document_signature_' || ds_id);
+-- Alter Column
+ALTER TABLE public.document_signature ALTER COLUMN ds_uid SET NOT NULL, ADD CONSTRAINT tbl_ds_uid_unique UNIQUE (ds_uid);
+-- ========= Adding Delete Reason ================
+-- ========= END document_signature ================
+
+-- ========= START document_template ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.document_template ADD COLUMN dt_uid uuid;
+-- Fill in Column
+UPDATE document_template SET dt_uid = uuid_generate_v3(uuid_ns_url(), 'document_template_' || dt_id);
+-- Alter Column
+ALTER TABLE public.document_template ALTER COLUMN dt_uid SET NOT NULL, ADD CONSTRAINT tbl_dt_uid_unique UNIQUE (dt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.document_template ADD COLUMN dt_deleted_reason varchar(255);
+-- ========= END document_template ================
+
+-- ========= START document_template_type ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.document_template_type ADD COLUMN dtt_uid uuid;
+-- Fill in Column
+UPDATE document_template_type SET dtt_uid = uuid_generate_v3(uuid_ns_url(), 'document_template_type_' || dtt_id);
+-- Alter Column
+ALTER TABLE public.document_template_type ALTER COLUMN dtt_uid SET NOT NULL, ADD CONSTRAINT tbl_dtt_uid_unique UNIQUE (dtt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.document_template_type ADD COLUMN dtt_deleted_reason varchar(255);
+-- ========= END document_template_type ================
+
+-- ========= START document_type ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.document_type ADD COLUMN dct_uid uuid;
+-- Fill in Column
+UPDATE document_type SET dct_uid = uuid_generate_v3(uuid_ns_url(), 'document_type_' || dct_id);
+-- Alter Column
+ALTER TABLE public.document_type ALTER COLUMN dct_uid SET NOT NULL, ADD CONSTRAINT tbl_dct_uid_unique UNIQUE (dct_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.document_type ADD COLUMN dct_deleted_reason varchar(255);
+-- ========= END document_type ================
+
+-- ========= START equipment ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.equipment ADD COLUMN eq_uid uuid;
+-- Fill in Column
+UPDATE equipment SET eq_uid = uuid_generate_v3(uuid_ns_url(), 'equipment_' || eq_id);
+-- Alter Column
+ALTER TABLE public.equipment ALTER COLUMN eq_uid SET NOT NULL, ADD CONSTRAINT tbl_eq_uid_unique UNIQUE (eq_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.equipment ADD COLUMN eq_deleted_reason varchar(255);
+-- ========= END equipment ================
+
+-- ========= START equipment_fuel ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.equipment_fuel ADD COLUMN eqf_uid uuid;
+-- Fill in Column
+UPDATE equipment_fuel SET eqf_uid = uuid_generate_v3(uuid_ns_url(), 'equipment_fuel_' || eqf_id);
+-- Alter Column
+ALTER TABLE public.equipment_fuel ALTER COLUMN eqf_uid SET NOT NULL, ADD CONSTRAINT tbl_eqf_uid_unique UNIQUE (eqf_uid);
+-- ========= Adding Delete Reason ================
+ALTER TABLE public.equipment_fuel RENAME COLUMN eqf_delete_reason TO eqf_deleted_reason;
+-- ========= END equipment_fuel ================
+
+-- ========= START equipment_group ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.equipment_group ADD COLUMN eg_uid uuid;
+-- Fill in Column
+UPDATE equipment_group SET eg_uid = uuid_generate_v3(uuid_ns_url(), 'equipment_group_' || eg_id);
+-- Alter Column
+ALTER TABLE public.equipment_group ALTER COLUMN eg_uid SET NOT NULL, ADD CONSTRAINT tbl_eg_uid_unique UNIQUE (eg_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.equipment_group ADD COLUMN eg_deleted_reason varchar(255);
+-- ========= END equipment_group ================
+
+-- ========= START equipment_meter ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.equipment_meter ADD COLUMN eqm_uid uuid;
+-- Fill in Column
+UPDATE equipment_meter SET eqm_uid = uuid_generate_v3(uuid_ns_url(), 'equipment_meter_' || eqm_id);
+-- Alter Column
+ALTER TABLE public.equipment_meter ALTER COLUMN eqm_uid SET NOT NULL, ADD CONSTRAINT tbl_eqm_uid_unique UNIQUE (eqm_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.equipment_meter ADD COLUMN eqm_deleted_reason varchar(255);
+-- ========= END equipment_meter ================
+
+-- ========= START equipment_status ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.equipment_status ADD COLUMN eqs_uid uuid;
+-- Fill in Column
+UPDATE equipment_status SET eqs_uid = uuid_generate_v3(uuid_ns_url(), 'equipment_status_' || eqs_id);
+-- Alter Column
+ALTER TABLE public.equipment_status ALTER COLUMN eqs_uid SET NOT NULL, ADD CONSTRAINT tbl_eqs_uid_unique UNIQUE (eqs_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.equipment_status ADD COLUMN eqs_deleted_reason varchar(255);
+-- ========= END equipment_status ================
+
+-- ========= START equipment_usage ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.equipment_usage ADD COLUMN equ_uid uuid;
+-- Fill in Column
+UPDATE equipment_usage SET equ_uid = uuid_generate_v3(uuid_ns_url(), 'equipment_usage_' || equ_id);
+-- Alter Column
+ALTER TABLE public.equipment_usage ALTER COLUMN equ_uid SET NOT NULL, ADD CONSTRAINT tbl_equ_uid_unique UNIQUE (equ_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.equipment_usage ADD COLUMN equ_deleted_reason varchar(255);
+-- ========= END equipment_usage ================
+
+-- ========= START goods ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.goods ADD COLUMN gd_uid uuid;
+-- Fill in Column
+UPDATE goods SET gd_uid = uuid_generate_v3(uuid_ns_url(), 'goods_' || gd_id);
+-- Alter Column
+ALTER TABLE public.goods ALTER COLUMN gd_uid SET NOT NULL, ADD CONSTRAINT tbl_gd_uid_unique UNIQUE (gd_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.goods ADD COLUMN gd_deleted_reason varchar(255);
+-- ========= END goods ================
+
+-- ========= START goods_category ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.goods_category ADD COLUMN gdc_uid uuid;
+-- Fill in Column
+UPDATE goods_category SET gdc_uid = uuid_generate_v3(uuid_ns_url(), 'goods_category_' || gdc_id);
+-- Alter Column
+ALTER TABLE public.goods_category ALTER COLUMN gdc_uid SET NOT NULL, ADD CONSTRAINT tbl_gdc_uid_unique UNIQUE (gdc_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.goods_category ADD COLUMN gdc_deleted_reason varchar(255);
+-- ========= END goods_category ================
+
+-- ========= START goods_cause_damage ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.goods_cause_damage ADD COLUMN gcd_uid uuid;
+-- Fill in Column
+UPDATE goods_cause_damage SET gcd_uid = uuid_generate_v3(uuid_ns_url(), 'goods_cause_damage_' || gcd_id);
+-- Alter Column
+ALTER TABLE public.goods_cause_damage ALTER COLUMN gcd_uid SET NOT NULL, ADD CONSTRAINT tbl_gcd_uid_unique UNIQUE (gcd_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.goods_cause_damage ADD COLUMN gcd_deleted_reason varchar(255);
+-- ========= END goods_cause_damage ================
+
+-- ========= START goods_damage_type ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.goods_damage_type ADD COLUMN gdt_uid uuid;
+-- Fill in Column
+UPDATE goods_damage_type SET gdt_uid = uuid_generate_v3(uuid_ns_url(), 'goods_damage_type_' || gdt_id);
+-- Alter Column
+ALTER TABLE public.goods_damage_type ALTER COLUMN gdt_uid SET NOT NULL, ADD CONSTRAINT tbl_gdt_uid_unique UNIQUE (gdt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.goods_damage_type ADD COLUMN gdt_deleted_reason varchar(255);
+-- ========= END goods_damage_type ================
+
+-- ========= START goods_material ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.goods_material ADD COLUMN gm_uid uuid;
+-- Fill in Column
+UPDATE goods_material SET gm_uid = uuid_generate_v3(uuid_ns_url(), 'goods_material_' || gm_id);
+-- Alter Column
+ALTER TABLE public.goods_material ALTER COLUMN gm_uid SET NOT NULL, ADD CONSTRAINT tbl_gm_uid_unique UNIQUE (gm_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.goods_material ADD COLUMN gm_deleted_reason varchar(255);
+-- ========= END goods_material ================
+
+-- ========= START goods_number_history ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.goods_number_history ADD COLUMN gnh_uid uuid;
+-- Fill in Column
+UPDATE goods_number_history SET gnh_uid = uuid_generate_v3(uuid_ns_url(), 'goods_number_history_' || gnh_id);
+-- Alter Column
+ALTER TABLE public.goods_number_history ALTER COLUMN gnh_uid SET NOT NULL, ADD CONSTRAINT tbl_gnh_uid_unique UNIQUE (gnh_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.goods_number_history ADD COLUMN gnh_deleted_reason varchar(255);
+-- ========= END goods_number_history ================
+
+-- ========= START goods_prefix ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.goods_prefix ADD COLUMN gpf_uid uuid;
+-- Fill in Column
+UPDATE goods_prefix SET gpf_uid = uuid_generate_v3(uuid_ns_url(), 'goods_prefix_' || gpf_id);
+-- Alter Column
+ALTER TABLE public.goods_prefix ALTER COLUMN gpf_uid SET NOT NULL, ADD CONSTRAINT tbl_gpf_uid_unique UNIQUE (gpf_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.goods_prefix ADD COLUMN gpf_deleted_reason varchar(255);
+-- ========= END goods_prefix ================
+
+-- ========= START goods_unit ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.goods_unit ADD COLUMN gdu_uid uuid;
+-- Fill in Column
+UPDATE goods_unit SET gdu_uid = uuid_generate_v3(uuid_ns_url(), 'goods_unit_' || gdu_id);
+-- Alter Column
+ALTER TABLE public.goods_unit ALTER COLUMN gdu_uid SET NOT NULL, ADD CONSTRAINT tbl_gdu_uid_unique UNIQUE (gdu_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.goods_unit ADD COLUMN gdu_deleted_reason varchar(255);
+-- ========= END goods_unit ================
+
+-- ========= START job_action ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_action ADD COLUMN jac_uid uuid;
+-- Fill in Column
+UPDATE job_action SET jac_uid = uuid_generate_v3(uuid_ns_url(), 'job_action_' || jac_id);
+-- Alter Column
+ALTER TABLE public.job_action ALTER COLUMN jac_uid SET NOT NULL, ADD CONSTRAINT tbl_jac_uid_unique UNIQUE (jac_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_action ADD COLUMN jac_deleted_reason varchar(255);
+-- ========= END job_action ================
+
+-- ========= START job_action_event ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_action_event ADD COLUMN jae_uid uuid;
+-- Fill in Column
+UPDATE job_action_event SET jae_uid = uuid_generate_v3(uuid_ns_url(), 'job_action_event_' || jae_id);
+-- Alter Column
+ALTER TABLE public.job_action_event ALTER COLUMN jae_uid SET NOT NULL, ADD CONSTRAINT tbl_jae_uid_unique UNIQUE (jae_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_action_event ADD COLUMN jae_deleted_reason varchar(255);
+-- ========= END job_action_event ================
+
+-- ========= START job_adjustment ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_adjustment ADD COLUMN ja_uid uuid;
+-- Fill in Column
+UPDATE job_adjustment SET ja_uid = uuid_generate_v3(uuid_ns_url(), 'job_adjustment_' || ja_id);
+-- Alter Column
+ALTER TABLE public.job_adjustment ALTER COLUMN ja_uid SET NOT NULL, ADD CONSTRAINT tbl_ja_uid_unique UNIQUE (ja_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_adjustment ADD COLUMN ja_deleted_reason varchar(255);
+-- ========= END job_adjustment ================
+
+-- ========= START job_adjustment_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_adjustment_detail ADD COLUMN jad_uid uuid;
+-- Fill in Column
+UPDATE job_adjustment_detail SET jad_uid = uuid_generate_v3(uuid_ns_url(), 'job_adjustment_detail_' || jad_id);
+-- Alter Column
+ALTER TABLE public.job_adjustment_detail ALTER COLUMN jad_uid SET NOT NULL, ADD CONSTRAINT tbl_jad_uid_unique UNIQUE (jad_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_adjustment_detail ADD COLUMN jad_deleted_reason varchar(255);
+-- ========= END job_adjustment_detail ================
+
+-- ========= START job_bundling ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_bundling ADD COLUMN jb_uid uuid;
+-- Fill in Column
+UPDATE job_bundling SET jb_uid = uuid_generate_v3(uuid_ns_url(), 'job_bundling_' || jb_id);
+-- Alter Column
+ALTER TABLE public.job_bundling ALTER COLUMN jb_uid SET NOT NULL, ADD CONSTRAINT tbl_jb_uid_unique UNIQUE (jb_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_bundling ADD COLUMN jb_deleted_reason varchar(255);
+-- ========= END job_bundling ================
+
+-- ========= START job_bundling_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_bundling_detail ADD COLUMN jbd_uid uuid;
+-- Fill in Column
+UPDATE job_bundling_detail SET jbd_uid = uuid_generate_v3(uuid_ns_url(), 'job_bundling_detail_' || jbd_id);
+-- Alter Column
+ALTER TABLE public.job_bundling_detail ALTER COLUMN jbd_uid SET NOT NULL, ADD CONSTRAINT tbl_jbd_uid_unique UNIQUE (jbd_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_bundling_detail ADD COLUMN jbd_deleted_reason varchar(255);
+-- ========= END job_bundling_detail ================
+
+-- ========= START job_bundling_material ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_bundling_material ADD COLUMN jbm_uid uuid;
+-- Fill in Column
+UPDATE job_bundling_material SET jbm_uid = uuid_generate_v3(uuid_ns_url(), 'job_bundling_material_' || jbm_id);
+-- Alter Column
+ALTER TABLE public.job_bundling_material ALTER COLUMN jbm_uid SET NOT NULL, ADD CONSTRAINT tbl_jbm_uid_unique UNIQUE (jbm_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_bundling_material ADD COLUMN jbm_deleted_reason varchar(255);
+-- ========= END job_bundling_material ================
+
+-- ========= START job_container ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_container ADD COLUMN joc_uid uuid;
+-- Fill in Column
+UPDATE job_container SET joc_uid = uuid_generate_v3(uuid_ns_url(), 'job_container_' || joc_id);
+-- Alter Column
+ALTER TABLE public.job_container ALTER COLUMN joc_uid SET NOT NULL, ADD CONSTRAINT tbl_joc_uid_unique UNIQUE (joc_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_container ADD COLUMN joc_deleted_reason varchar(255);
+-- ========= END job_container ================
+
+-- ========= START job_deposit ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_deposit ADD COLUMN jd_uid uuid;
+-- Fill in Column
+UPDATE job_deposit SET jd_uid = uuid_generate_v3(uuid_ns_url(), 'job_deposit_' || jd_id);
+-- Alter Column
+ALTER TABLE public.job_deposit ALTER COLUMN jd_uid SET NOT NULL, ADD CONSTRAINT tbl_jd_uid_unique UNIQUE (jd_uid);
+-- ========= Adding Delete Reason ================
+-- ========= END job_deposit ================
+
+-- ========= START job_deposit_approval ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_deposit_approval ADD COLUMN jda_uid uuid;
+-- Fill in Column
+UPDATE job_deposit_approval SET jda_uid = uuid_generate_v3(uuid_ns_url(), 'job_deposit_approval_' || jda_id);
+-- Alter Column
+ALTER TABLE public.job_deposit_approval ALTER COLUMN jda_uid SET NOT NULL, ADD CONSTRAINT tbl_jda_uid_unique UNIQUE (jda_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_deposit_approval ADD COLUMN jda_deleted_reason varchar(255);
+-- ========= END job_deposit_approval ================
+
+-- ========= START job_deposit_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_deposit_detail ADD COLUMN jdd_uid uuid;
+-- Fill in Column
+UPDATE job_deposit_detail SET jdd_uid = uuid_generate_v3(uuid_ns_url(), 'job_deposit_detail_' || jdd_id);
+-- Alter Column
+ALTER TABLE public.job_deposit_detail ALTER COLUMN jdd_uid SET NOT NULL, ADD CONSTRAINT tbl_jdd_uid_unique UNIQUE (jdd_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_deposit_detail ADD COLUMN jdd_deleted_reason varchar(255);
+-- ========= END job_deposit_detail ================
+
+-- ========= START job_goods ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_goods ADD COLUMN jog_uid uuid;
+-- Fill in Column
+UPDATE job_goods SET jog_uid = uuid_generate_v3(uuid_ns_url(), 'job_goods_' || jog_id);
+-- Alter Column
+ALTER TABLE public.job_goods ALTER COLUMN jog_uid SET NOT NULL, ADD CONSTRAINT tbl_jog_uid_unique UNIQUE (jog_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_goods ADD COLUMN jog_deleted_reason varchar(255);
+-- ========= END job_goods ================
+
+-- ========= START job_inbound ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_inbound ADD COLUMN ji_uid uuid;
+-- Fill in Column
+UPDATE job_inbound SET ji_uid = uuid_generate_v3(uuid_ns_url(), 'job_inbound_' || ji_id);
+-- Alter Column
+ALTER TABLE public.job_inbound ALTER COLUMN ji_uid SET NOT NULL, ADD CONSTRAINT tbl_ji_uid_unique UNIQUE (ji_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_inbound ADD COLUMN ji_deleted_reason varchar(255);
+-- ========= END job_inbound ================
+
+-- ========= START job_inbound_damage ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_inbound_damage ADD COLUMN jidm_uid uuid;
+-- Fill in Column
+UPDATE job_inbound_damage SET jidm_uid = uuid_generate_v3(uuid_ns_url(), 'job_inbound_damage_' || jidm_id);
+-- Alter Column
+ALTER TABLE public.job_inbound_damage ALTER COLUMN jidm_uid SET NOT NULL, ADD CONSTRAINT tbl_jidm_uid_unique UNIQUE (jidm_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_inbound_damage ADD COLUMN jidm_deleted_reason varchar(255);
+-- ========= END job_inbound_damage ================
+
+-- ========= START job_inbound_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_inbound_detail ADD COLUMN jid_uid uuid;
+-- Fill in Column
+UPDATE job_inbound_detail SET jid_uid = uuid_generate_v3(uuid_ns_url(), 'job_inbound_detail_' || jid_id);
+-- Alter Column
+ALTER TABLE public.job_inbound_detail ALTER COLUMN jid_uid SET NOT NULL, ADD CONSTRAINT tbl_jid_uid_unique UNIQUE (jid_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_inbound_detail ADD COLUMN jid_deleted_reason varchar(255);
+-- ========= END job_inbound_detail ================
+
+-- ========= START job_inbound_receive ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_inbound_receive ADD COLUMN jir_uid uuid;
+-- Fill in Column
+UPDATE job_inbound_receive SET jir_uid = uuid_generate_v3(uuid_ns_url(), 'job_inbound_receive_' || jir_id);
+-- Alter Column
+ALTER TABLE public.job_inbound_receive ALTER COLUMN jir_uid SET NOT NULL, ADD CONSTRAINT tbl_jir_uid_unique UNIQUE (jir_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_inbound_receive ADD COLUMN jir_deleted_reason varchar(255);
+-- ========= END job_inbound_receive ================
+
+-- ========= START job_inbound_stock ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_inbound_stock ADD COLUMN jis_uid uuid;
+-- Fill in Column
+UPDATE job_inbound_stock SET jis_uid = uuid_generate_v3(uuid_ns_url(), 'job_inbound_stock_' || jis_id);
+-- Alter Column
+ALTER TABLE public.job_inbound_stock ALTER COLUMN jis_uid SET NOT NULL, ADD CONSTRAINT tbl_jis_uid_unique UNIQUE (jis_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_inbound_stock ADD COLUMN jis_deleted_reason varchar(255);
+-- ========= END job_inbound_stock ================
+
+-- ========= START job_inklaring ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_inklaring ADD COLUMN jik_uid uuid;
+-- Fill in Column
+UPDATE job_inklaring SET jik_uid = uuid_generate_v3(uuid_ns_url(), 'job_inklaring_' || jik_id);
+-- Alter Column
+ALTER TABLE public.job_inklaring ALTER COLUMN jik_uid SET NOT NULL, ADD CONSTRAINT tbl_jik_uid_unique UNIQUE (jik_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_inklaring ADD COLUMN jik_deleted_reason varchar(255);
+-- ========= END job_inklaring ================
+
+-- ========= START job_inklaring_release ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_inklaring_release ADD COLUMN jikr_uid uuid;
+-- Fill in Column
+UPDATE job_inklaring_release SET jikr_uid = uuid_generate_v3(uuid_ns_url(), 'job_inklaring_release_' || jikr_id);
+-- Alter Column
+ALTER TABLE public.job_inklaring_release ALTER COLUMN jikr_uid SET NOT NULL, ADD CONSTRAINT tbl_jikr_uid_unique UNIQUE (jikr_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_inklaring_release ADD COLUMN jikr_deleted_reason varchar(255);
+-- ========= END job_inklaring_release ================
+
+-- ========= START job_movement ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_movement ADD COLUMN jm_uid uuid;
+-- Fill in Column
+UPDATE job_movement SET jm_uid = uuid_generate_v3(uuid_ns_url(), 'job_movement_' || jm_id);
+-- Alter Column
+ALTER TABLE public.job_movement ALTER COLUMN jm_uid SET NOT NULL, ADD CONSTRAINT tbl_jm_uid_unique UNIQUE (jm_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_movement ADD COLUMN jm_deleted_reason varchar(255);
+-- ========= END job_movement ================
+
+-- ========= START job_movement_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_movement_detail ADD COLUMN jmd_uid uuid;
+-- Fill in Column
+UPDATE job_movement_detail SET jmd_uid = uuid_generate_v3(uuid_ns_url(), 'job_movement_detail_' || jmd_id);
+-- Alter Column
+ALTER TABLE public.job_movement_detail ALTER COLUMN jmd_uid SET NOT NULL, ADD CONSTRAINT tbl_jmd_uid_unique UNIQUE (jmd_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_movement_detail ADD COLUMN jmd_deleted_reason varchar(255);
+-- ========= END job_movement_detail ================
+
+-- ========= START job_officer ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_officer ADD COLUMN joo_uid uuid;
+-- Fill in Column
+UPDATE job_officer SET joo_uid = uuid_generate_v3(uuid_ns_url(), 'job_officer_' || joo_id);
+-- Alter Column
+ALTER TABLE public.job_officer ALTER COLUMN joo_uid SET NOT NULL, ADD CONSTRAINT tbl_joo_uid_unique UNIQUE (joo_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_officer ADD COLUMN joo_deleted_reason varchar(255);
+-- ========= END job_officer ================
+
+-- ========= START job_order ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_order ADD COLUMN jo_uid uuid;
+-- Fill in Column
+UPDATE job_order SET jo_uid = uuid_generate_v3(uuid_ns_url(), 'job_order_' || jo_id);
+-- Alter Column
+ALTER TABLE public.job_order ALTER COLUMN jo_uid SET NOT NULL, ADD CONSTRAINT tbl_jo_uid_unique UNIQUE (jo_uid);
+-- ========= Adding Delete Reason ================
+ALTER TABLE public.job_order RENAME COLUMN jo_delete_reason TO jo_deleted_reason;
+-- ========= END job_order ================
+
+-- ========= START job_order_archive ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_order_archive ADD COLUMN joa_uid uuid;
+-- Fill in Column
+UPDATE job_order_archive SET joa_uid = uuid_generate_v3(uuid_ns_url(), 'job_order_archive_' || joa_id);
+-- Alter Column
+ALTER TABLE public.job_order_archive ALTER COLUMN joa_uid SET NOT NULL, ADD CONSTRAINT tbl_joa_uid_unique UNIQUE (joa_uid);
+-- ========= Adding Delete Reason ================
+-- ========= END job_order_archive ================
+
+-- ========= START job_order_hold ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_order_hold ADD COLUMN joh_uid uuid;
+-- Fill in Column
+UPDATE job_order_hold SET joh_uid = uuid_generate_v3(uuid_ns_url(), 'job_order_hold_' || joh_id);
+-- Alter Column
+ALTER TABLE public.job_order_hold ALTER COLUMN joh_uid SET NOT NULL, ADD CONSTRAINT tbl_joh_uid_unique UNIQUE (joh_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_order_hold ADD COLUMN joh_deleted_reason varchar(255);
+-- ========= END job_order_hold ================
+
+-- ========= START job_outbound ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_outbound ADD COLUMN job_uid uuid;
+-- Fill in Column
+UPDATE job_outbound SET job_uid = uuid_generate_v3(uuid_ns_url(), 'job_outbound_' || job_id);
+-- Alter Column
+ALTER TABLE public.job_outbound ALTER COLUMN job_uid SET NOT NULL, ADD CONSTRAINT tbl_job_uid_unique UNIQUE (job_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_outbound ADD COLUMN job_deleted_reason varchar(255);
+-- ========= END job_outbound ================
+
+-- ========= START job_outbound_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_outbound_detail ADD COLUMN jod_uid uuid;
+-- Fill in Column
+UPDATE job_outbound_detail SET jod_uid = uuid_generate_v3(uuid_ns_url(), 'job_outbound_detail_' || jod_id);
+-- Alter Column
+ALTER TABLE public.job_outbound_detail ALTER COLUMN jod_uid SET NOT NULL, ADD CONSTRAINT tbl_jod_uid_unique UNIQUE (jod_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_outbound_detail ADD COLUMN jod_deleted_reason varchar(255);
+-- ========= END job_outbound_detail ================
+
+-- ========= START job_purchase ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_purchase ADD COLUMN jop_uid uuid;
+-- Fill in Column
+UPDATE job_purchase SET jop_uid = uuid_generate_v3(uuid_ns_url(), 'job_purchase_' || jop_id);
+-- Alter Column
+ALTER TABLE public.job_purchase ALTER COLUMN jop_uid SET NOT NULL, ADD CONSTRAINT tbl_jop_uid_unique UNIQUE (jop_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_purchase ADD COLUMN jop_deleted_reason varchar(255);
+-- ========= END job_purchase ================
+
+-- ========= START job_sales ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_sales ADD COLUMN jos_uid uuid;
+-- Fill in Column
+UPDATE job_sales SET jos_uid = uuid_generate_v3(uuid_ns_url(), 'job_sales_' || jos_id);
+-- Alter Column
+ALTER TABLE public.job_sales ALTER COLUMN jos_uid SET NOT NULL, ADD CONSTRAINT tbl_jos_uid_unique UNIQUE (jos_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_sales ADD COLUMN jos_deleted_reason varchar(255);
+-- ========= END job_sales ================
+
+-- ========= START job_stock_transfer ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_stock_transfer ADD COLUMN jtr_uid uuid;
+-- Fill in Column
+UPDATE job_stock_transfer SET jtr_uid = uuid_generate_v3(uuid_ns_url(), 'job_stock_transfer_' || jtr_id);
+-- Alter Column
+ALTER TABLE public.job_stock_transfer ALTER COLUMN jtr_uid SET NOT NULL, ADD CONSTRAINT tbl_jtr_uid_unique UNIQUE (jtr_uid);
+-- ========= Adding Delete Reason ================
+ALTER TABLE public.job_stock_transfer RENAME COLUMN jtr_delete_reason TO jtr_deleted_reason;
+-- ========= END job_stock_transfer ================
+
+-- ========= START job_stock_transfer_goods ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_stock_transfer_goods ADD COLUMN jtg_uid uuid;
+-- Fill in Column
+UPDATE job_stock_transfer_goods SET jtg_uid = uuid_generate_v3(uuid_ns_url(), 'job_stock_transfer_goods_' || jtg_id);
+-- Alter Column
+ALTER TABLE public.job_stock_transfer_goods ALTER COLUMN jtg_uid SET NOT NULL, ADD CONSTRAINT tbl_jtg_uid_unique UNIQUE (jtg_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_stock_transfer_goods ADD COLUMN jtg_deleted_reason varchar(255);
+-- ========= END job_stock_transfer_goods ================
+
+-- ========= START job_trucking ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_trucking ADD COLUMN jt_uid uuid;
+-- Fill in Column
+UPDATE job_trucking SET jt_uid = uuid_generate_v3(uuid_ns_url(), 'job_trucking_' || jt_id);
+-- Alter Column
+ALTER TABLE public.job_trucking ALTER COLUMN jt_uid SET NOT NULL, ADD CONSTRAINT tbl_jt_uid_unique UNIQUE (jt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_trucking ADD COLUMN jt_deleted_reason varchar(255);
+-- ========= END job_trucking ================
+
+-- ========= START job_trucking_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.job_trucking_detail ADD COLUMN jtd_uid uuid;
+-- Fill in Column
+UPDATE job_trucking_detail SET jtd_uid = uuid_generate_v3(uuid_ns_url(), 'job_trucking_detail_' || jtd_id);
+-- Alter Column
+ALTER TABLE public.job_trucking_detail ALTER COLUMN jtd_uid SET NOT NULL, ADD CONSTRAINT tbl_jtd_uid_unique UNIQUE (jtd_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.job_trucking_detail ADD COLUMN jtd_deleted_reason varchar(255);
+-- ========= END job_trucking_detail ================
+
+-- ========= START languages ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.languages ADD COLUMN lg_uid uuid;
+-- Fill in Column
+UPDATE languages SET lg_uid = uuid_generate_v3(uuid_ns_url(), 'languages_' || lg_id);
+-- Alter Column
+ALTER TABLE public.languages ALTER COLUMN lg_uid SET NOT NULL, ADD CONSTRAINT tbl_lg_uid_unique UNIQUE (lg_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.languages ADD COLUMN lg_deleted_reason varchar(255);
+-- ========= END languages ================
+
+-- ========= START menu ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.menu ADD COLUMN mn_uid uuid;
+-- Fill in Column
+UPDATE menu SET mn_uid = uuid_generate_v3(uuid_ns_url(), 'menu_' || mn_id);
+-- Alter Column
+ALTER TABLE public.menu ALTER COLUMN mn_uid SET NOT NULL, ADD CONSTRAINT tbl_mn_uid_unique UNIQUE (mn_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.menu ADD COLUMN mn_deleted_reason varchar(255);
+-- ========= END menu ================
+
+-- ========= START notification ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.notification ADD COLUMN nf_uid uuid;
+-- Fill in Column
+UPDATE notification SET nf_uid = uuid_generate_v3(uuid_ns_url(), 'notification_' || nf_id);
+-- Alter Column
+ALTER TABLE public.notification ALTER COLUMN nf_uid SET NOT NULL, ADD CONSTRAINT tbl_nf_uid_unique UNIQUE (nf_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.notification ADD COLUMN nf_deleted_reason varchar(255);
+-- ========= END notification ================
+
+-- ========= START notification_receiver ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.notification_receiver ADD COLUMN nfr_uid uuid;
+-- Fill in Column
+UPDATE notification_receiver SET nfr_uid = uuid_generate_v3(uuid_ns_url(), 'notification_receiver_' || nfr_id);
+-- Alter Column
+ALTER TABLE public.notification_receiver ALTER COLUMN nfr_uid SET NOT NULL, ADD CONSTRAINT tbl_nfr_uid_unique UNIQUE (nfr_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.notification_receiver ADD COLUMN nfr_deleted_reason varchar(255);
+-- ========= END notification_receiver ================
+
+-- ========= START office ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.office ADD COLUMN of_uid uuid;
+-- Fill in Column
+UPDATE office SET of_uid = uuid_generate_v3(uuid_ns_url(), 'office_' || of_id);
+-- Alter Column
+ALTER TABLE public.office ALTER COLUMN of_uid SET NOT NULL, ADD CONSTRAINT tbl_of_uid_unique UNIQUE (of_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.office ADD COLUMN of_deleted_reason varchar(255);
+-- ========= END office ================
+
+-- ========= START ownership_type ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.ownership_type ADD COLUMN owt_uid uuid;
+-- Fill in Column
+UPDATE ownership_type SET owt_uid = uuid_generate_v3(uuid_ns_url(), 'ownership_type_' || owt_id);
+-- Alter Column
+ALTER TABLE public.ownership_type ALTER COLUMN owt_uid SET NOT NULL, ADD CONSTRAINT tbl_owt_uid_unique UNIQUE (owt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.ownership_type ADD COLUMN owt_deleted_reason varchar(255);
+-- ========= END ownership_type ================
+
+-- ========= START page ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.page ADD COLUMN pg_uid uuid;
+-- Fill in Column
+UPDATE page SET pg_uid = uuid_generate_v3(uuid_ns_url(), 'page_' || pg_id);
+-- Alter Column
+ALTER TABLE public.page ALTER COLUMN pg_uid SET NOT NULL, ADD CONSTRAINT tbl_pg_uid_unique UNIQUE (pg_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.page ADD COLUMN pg_deleted_reason varchar(255);
+-- ========= END page ================
+
+-- ========= START page_category ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.page_category ADD COLUMN pc_uid uuid;
+-- Fill in Column
+UPDATE page_category SET pc_uid = uuid_generate_v3(uuid_ns_url(), 'page_category_' || pc_id);
+-- Alter Column
+ALTER TABLE public.page_category ALTER COLUMN pc_uid SET NOT NULL, ADD CONSTRAINT tbl_pc_uid_unique UNIQUE (pc_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.page_category ADD COLUMN pc_deleted_reason varchar(255);
+-- ========= END page_category ================
+
+-- ========= START page_notification ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.page_notification ADD COLUMN pn_uid uuid;
+-- Fill in Column
+UPDATE page_notification SET pn_uid = uuid_generate_v3(uuid_ns_url(), 'page_notification_' || pn_id);
+-- Alter Column
+ALTER TABLE public.page_notification ALTER COLUMN pn_uid SET NOT NULL, ADD CONSTRAINT tbl_pn_uid_unique UNIQUE (pn_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.page_notification ADD COLUMN pn_deleted_reason varchar(255);
+-- ========= END page_notification ================
+
+-- ========= START page_right ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.page_right ADD COLUMN pr_uid uuid;
+-- Fill in Column
+UPDATE page_right SET pr_uid = uuid_generate_v3(uuid_ns_url(), 'page_right_' || pr_id);
+-- Alter Column
+ALTER TABLE public.page_right ALTER COLUMN pr_uid SET NOT NULL, ADD CONSTRAINT tbl_pr_uid_unique UNIQUE (pr_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.page_right ADD COLUMN pr_deleted_reason varchar(255);
+-- ========= END page_right ================
+
+-- ========= START payment_method ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.payment_method ADD COLUMN pm_uid uuid;
+-- Fill in Column
+UPDATE payment_method SET pm_uid = uuid_generate_v3(uuid_ns_url(), 'payment_method_' || pm_id);
+-- Alter Column
+ALTER TABLE public.payment_method ALTER COLUMN pm_uid SET NOT NULL, ADD CONSTRAINT tbl_pm_uid_unique UNIQUE (pm_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.payment_method ADD COLUMN pm_deleted_reason varchar(255);
+-- ========= END payment_method ================
+
+-- ========= START payment_terms ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.payment_terms ADD COLUMN pt_uid uuid;
+-- Fill in Column
+UPDATE payment_terms SET pt_uid = uuid_generate_v3(uuid_ns_url(), 'payment_terms_' || pt_id);
+-- Alter Column
+ALTER TABLE public.payment_terms ALTER COLUMN pt_uid SET NOT NULL, ADD CONSTRAINT tbl_pt_uid_unique UNIQUE (pt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.payment_terms ADD COLUMN pt_deleted_reason varchar(255);
+-- ========= END payment_terms ================
+
+-- ========= START petty_cash ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.petty_cash ADD COLUMN ptc_uid uuid;
+-- Fill in Column
+UPDATE petty_cash SET ptc_uid = uuid_generate_v3(uuid_ns_url(), 'petty_cash_' || ptc_id);
+-- Alter Column
+ALTER TABLE public.petty_cash ALTER COLUMN ptc_uid SET NOT NULL, ADD CONSTRAINT tbl_ptc_uid_unique UNIQUE (ptc_uid);
+-- ========= Adding Delete Reason ================
+ALTER TABLE public.petty_cash RENAME COLUMN ptc_delete_reason TO ptc_deleted_reason;
+-- ========= END petty_cash ================
+
+-- ========= START petty_cash_request ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.petty_cash_request ADD COLUMN pcr_uid uuid;
+-- Fill in Column
+UPDATE petty_cash_request SET pcr_uid = uuid_generate_v3(uuid_ns_url(), 'petty_cash_request_' || pcr_id);
+-- Alter Column
+ALTER TABLE public.petty_cash_request ALTER COLUMN pcr_uid SET NOT NULL, ADD CONSTRAINT tbl_pcr_uid_unique UNIQUE (pcr_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.petty_cash_request ADD COLUMN pcr_deleted_reason varchar(255);
+-- ========= END petty_cash_request ================
+
+-- ========= START port ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.port ADD COLUMN po_uid uuid;
+-- Fill in Column
+UPDATE port SET po_uid = uuid_generate_v3(uuid_ns_url(), 'port_' || po_id);
+-- Alter Column
+ALTER TABLE public.port ALTER COLUMN po_uid SET NOT NULL, ADD CONSTRAINT tbl_po_uid_unique UNIQUE (po_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.port ADD COLUMN po_deleted_reason varchar(255);
+-- ========= END port ================
+
+-- ========= START purchase_invoice ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.purchase_invoice ADD COLUMN pi_uid uuid;
+-- Fill in Column
+UPDATE purchase_invoice SET pi_uid = uuid_generate_v3(uuid_ns_url(), 'purchase_invoice_' || pi_id);
+-- Alter Column
+ALTER TABLE public.purchase_invoice ALTER COLUMN pi_uid SET NOT NULL, ADD CONSTRAINT tbl_pi_uid_unique UNIQUE (pi_uid);
+-- ========= Adding Delete Reason ================
+-- ========= END purchase_invoice ================
+
+-- ========= START purchase_invoice_approval ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.purchase_invoice_approval ADD COLUMN pia_uid uuid;
+-- Fill in Column
+UPDATE purchase_invoice_approval SET pia_uid = uuid_generate_v3(uuid_ns_url(), 'purchase_invoice_approval_' || pia_id);
+-- Alter Column
+ALTER TABLE public.purchase_invoice_approval ALTER COLUMN pia_uid SET NOT NULL, ADD CONSTRAINT tbl_pia_uid_unique UNIQUE (pia_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.purchase_invoice_approval ADD COLUMN pia_deleted_reason varchar(255);
+-- ========= END purchase_invoice_approval ================
+
+-- ========= START purchase_invoice_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.purchase_invoice_detail ADD COLUMN pid_uid uuid;
+-- Fill in Column
+UPDATE purchase_invoice_detail SET pid_uid = uuid_generate_v3(uuid_ns_url(), 'purchase_invoice_detail_' || pid_id);
+-- Alter Column
+ALTER TABLE public.purchase_invoice_detail ALTER COLUMN pid_uid SET NOT NULL, ADD CONSTRAINT tbl_pid_uid_unique UNIQUE (pid_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.purchase_invoice_detail ADD COLUMN pid_deleted_reason varchar(255);
+-- ========= END purchase_invoice_detail ================
+
+-- ========= START quotation ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.quotation ADD COLUMN qtn_uid uuid;
+-- Fill in Column
+UPDATE quotation SET qtn_uid = uuid_generate_v3(uuid_ns_url(), 'quotation_' || qtn_id);
+-- Alter Column
+ALTER TABLE public.quotation ALTER COLUMN qtn_uid SET NOT NULL, ADD CONSTRAINT tbl_qtn_uid_unique UNIQUE (qtn_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.quotation ADD COLUMN qtn_deleted_reason varchar(255);
+-- ========= END quotation ================
+
+-- ========= START quotation_clearance ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.quotation_clearance ADD COLUMN qtnc_uid uuid;
+-- Fill in Column
+UPDATE quotation_clearance SET qtnc_uid = uuid_generate_v3(uuid_ns_url(), 'quotation_clearance_' || qtnc_id);
+-- Alter Column
+ALTER TABLE public.quotation_clearance ALTER COLUMN qtnc_uid SET NOT NULL, ADD CONSTRAINT tbl_qtnc_uid_unique UNIQUE (qtnc_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.quotation_clearance ADD COLUMN qtnc_deleted_reason varchar(255);
+-- ========= END quotation_clearance ================
+
+-- ========= START quotation_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.quotation_detail ADD COLUMN qtnd_uid uuid;
+-- Fill in Column
+UPDATE quotation_detail SET qtnd_uid = uuid_generate_v3(uuid_ns_url(), 'quotation_detail_' || qtnd_id);
+-- Alter Column
+ALTER TABLE public.quotation_detail ALTER COLUMN qtnd_uid SET NOT NULL, ADD CONSTRAINT tbl_qtnd_uid_unique UNIQUE (qtnd_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.quotation_detail ADD COLUMN qtnd_deleted_reason varchar(255);
+-- ========= END quotation_detail ================
+
+-- ========= START quotation_forwarding ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.quotation_forwarding ADD COLUMN qtnf_uid uuid;
+-- Fill in Column
+UPDATE quotation_forwarding SET qtnf_uid = uuid_generate_v3(uuid_ns_url(), 'quotation_forwarding_' || qtnf_id);
+-- Alter Column
+ALTER TABLE public.quotation_forwarding ALTER COLUMN qtnf_uid SET NOT NULL, ADD CONSTRAINT tbl_qtnf_uid_unique UNIQUE (qtnf_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.quotation_forwarding ADD COLUMN qtnf_deleted_reason varchar(255);
+-- ========= END quotation_forwarding ================
+
+-- ========= START quotation_request ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.quotation_request ADD COLUMN qtnr_uid uuid;
+-- Fill in Column
+UPDATE quotation_request SET qtnr_uid = uuid_generate_v3(uuid_ns_url(), 'quotation_request_' || qtnr_id);
+-- Alter Column
+ALTER TABLE public.quotation_request ALTER COLUMN qtnr_uid SET NOT NULL, ADD CONSTRAINT tbl_qtnr_uid_unique UNIQUE (qtnr_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.quotation_request ADD COLUMN qtnr_deleted_reason varchar(255);
+-- ========= END quotation_request ================
+
+-- ========= START quotation_truck ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.quotation_truck ADD COLUMN qtnt_uid uuid;
+-- Fill in Column
+UPDATE quotation_truck SET qtnt_uid = uuid_generate_v3(uuid_ns_url(), 'quotation_truck_' || qtnt_id);
+-- Alter Column
+ALTER TABLE public.quotation_truck ALTER COLUMN qtnt_uid SET NOT NULL, ADD CONSTRAINT tbl_qtnt_uid_unique UNIQUE (qtnt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.quotation_truck ADD COLUMN qtnt_deleted_reason varchar(255);
+-- ========= END quotation_truck ================
+
+-- ========= START quotation_warehouse ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.quotation_warehouse ADD COLUMN qtnw_uid uuid;
+-- Fill in Column
+UPDATE quotation_warehouse SET qtnw_uid = uuid_generate_v3(uuid_ns_url(), 'quotation_warehouse_' || qtnw_id);
+-- Alter Column
+ALTER TABLE public.quotation_warehouse ALTER COLUMN qtnw_uid SET NOT NULL, ADD CONSTRAINT tbl_qtnw_uid_unique UNIQUE (qtnw_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.quotation_warehouse ADD COLUMN qtnw_deleted_reason varchar(255);
+-- ========= END quotation_warehouse ================
+
+-- ========= START relation ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.relation ADD COLUMN rel_uid uuid;
+-- Fill in Column
+UPDATE relation SET rel_uid = uuid_generate_v3(uuid_ns_url(), 'relation_' || rel_id);
+-- Alter Column
+ALTER TABLE public.relation ALTER COLUMN rel_uid SET NOT NULL, ADD CONSTRAINT tbl_rel_uid_unique UNIQUE (rel_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.relation ADD COLUMN rel_deleted_reason varchar(255);
+-- ========= END relation ================
+
+-- ========= START relation_bank ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.relation_bank ADD COLUMN rb_uid uuid;
+-- Fill in Column
+UPDATE relation_bank SET rb_uid = uuid_generate_v3(uuid_ns_url(), 'relation_bank_' || rb_id);
+-- Alter Column
+ALTER TABLE public.relation_bank ALTER COLUMN rb_uid SET NOT NULL, ADD CONSTRAINT tbl_rb_uid_unique UNIQUE (rb_uid);
+-- ========= Adding Delete Reason ================
+-- ========= END relation_bank ================
+
+-- ========= START renewal_fulfillment ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.renewal_fulfillment ADD COLUMN rnf_uid uuid;
+-- Fill in Column
+UPDATE renewal_fulfillment SET rnf_uid = uuid_generate_v3(uuid_ns_url(), 'renewal_fulfillment_' || rnf_id);
+-- Alter Column
+ALTER TABLE public.renewal_fulfillment ALTER COLUMN rnf_uid SET NOT NULL, ADD CONSTRAINT tbl_rnf_uid_unique UNIQUE (rnf_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.renewal_fulfillment ADD COLUMN rnf_deleted_reason varchar(255);
+-- ========= END renewal_fulfillment ================
+
+-- ========= START renewal_order ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.renewal_order ADD COLUMN rno_uid uuid;
+-- Fill in Column
+UPDATE renewal_order SET rno_uid = uuid_generate_v3(uuid_ns_url(), 'renewal_order_' || rno_id);
+-- Alter Column
+ALTER TABLE public.renewal_order ALTER COLUMN rno_uid SET NOT NULL, ADD CONSTRAINT tbl_rno_uid_unique UNIQUE (rno_uid);
+-- ========= Adding Delete Reason ================
+ALTER TABLE public.renewal_order RENAME COLUMN rno_delete_reason TO rno_deleted_reason;
+-- ========= END renewal_order ================
+
+-- ========= START renewal_order_cost ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.renewal_order_cost ADD COLUMN rnc_uid uuid;
+-- Fill in Column
+UPDATE renewal_order_cost SET rnc_uid = uuid_generate_v3(uuid_ns_url(), 'renewal_order_cost_' || rnc_id);
+-- Alter Column
+ALTER TABLE public.renewal_order_cost ALTER COLUMN rnc_uid SET NOT NULL, ADD CONSTRAINT tbl_rnc_uid_unique UNIQUE (rnc_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.renewal_order_cost ADD COLUMN rnc_deleted_reason varchar(255);
+-- ========= END renewal_order_cost ================
+
+-- ========= START renewal_order_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.renewal_order_detail ADD COLUMN rnd_uid uuid;
+-- Fill in Column
+UPDATE renewal_order_detail SET rnd_uid = uuid_generate_v3(uuid_ns_url(), 'renewal_order_detail_' || rnd_id);
+-- Alter Column
+ALTER TABLE public.renewal_order_detail ALTER COLUMN rnd_uid SET NOT NULL, ADD CONSTRAINT tbl_rnd_uid_unique UNIQUE (rnd_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.renewal_order_detail ADD COLUMN rnd_deleted_reason varchar(255);
+-- ========= END renewal_order_detail ================
+
+-- ========= START renewal_order_request ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.renewal_order_request ADD COLUMN rnr_uid uuid;
+-- Fill in Column
+UPDATE renewal_order_request SET rnr_uid = uuid_generate_v3(uuid_ns_url(), 'renewal_order_request_' || rnr_id);
+-- Alter Column
+ALTER TABLE public.renewal_order_request ALTER COLUMN rnr_uid SET NOT NULL, ADD CONSTRAINT tbl_rnr_uid_unique UNIQUE (rnr_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.renewal_order_request ADD COLUMN rnr_deleted_reason varchar(255);
+-- ========= END renewal_order_request ================
+
+-- ========= START renewal_reminder ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.renewal_reminder ADD COLUMN rnrm_uid uuid;
+-- Fill in Column
+UPDATE renewal_reminder SET rnrm_uid = uuid_generate_v3(uuid_ns_url(), 'renewal_reminder_' || rnrm_id);
+-- Alter Column
+ALTER TABLE public.renewal_reminder ALTER COLUMN rnrm_uid SET NOT NULL, ADD CONSTRAINT tbl_rnrm_uid_unique UNIQUE (rnrm_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.renewal_reminder ADD COLUMN rnrm_deleted_reason varchar(255);
+-- ========= END renewal_reminder ================
+
+-- ========= START renewal_type ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.renewal_type ADD COLUMN rnt_uid uuid;
+-- Fill in Column
+UPDATE renewal_type SET rnt_uid = uuid_generate_v3(uuid_ns_url(), 'renewal_type_' || rnt_id);
+-- Alter Column
+ALTER TABLE public.renewal_type ALTER COLUMN rnt_uid SET NOT NULL, ADD CONSTRAINT tbl_rnt_uid_unique UNIQUE (rnt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.renewal_type ADD COLUMN rnt_deleted_reason varchar(255);
+-- ========= END renewal_type ================
+
+-- ========= START route_delivery ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.route_delivery ADD COLUMN rd_uid uuid;
+-- Fill in Column
+UPDATE route_delivery SET rd_uid = uuid_generate_v3(uuid_ns_url(), 'route_delivery_' || rd_id);
+-- Alter Column
+ALTER TABLE public.route_delivery ALTER COLUMN rd_uid SET NOT NULL, ADD CONSTRAINT tbl_rd_uid_unique UNIQUE (rd_uid);
+-- ========= Adding Delete Reason ================
+-- ========= END route_delivery ================
+
+-- ========= START sales_invoice ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.sales_invoice ADD COLUMN si_uid uuid;
+-- Fill in Column
+UPDATE sales_invoice SET si_uid = uuid_generate_v3(uuid_ns_url(), 'sales_invoice_' || si_id);
+-- Alter Column
+ALTER TABLE public.sales_invoice ALTER COLUMN si_uid SET NOT NULL, ADD CONSTRAINT tbl_si_uid_unique UNIQUE (si_uid);
+-- ========= Adding Delete Reason ================
+-- ========= END sales_invoice ================
+
+-- ========= START sales_invoice_approval ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.sales_invoice_approval ADD COLUMN sia_uid uuid;
+-- Fill in Column
+UPDATE sales_invoice_approval SET sia_uid = uuid_generate_v3(uuid_ns_url(), 'sales_invoice_approval_' || sia_id);
+-- Alter Column
+ALTER TABLE public.sales_invoice_approval ALTER COLUMN sia_uid SET NOT NULL, ADD CONSTRAINT tbl_sia_uid_unique UNIQUE (sia_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.sales_invoice_approval ADD COLUMN sia_deleted_reason varchar(255);
+-- ========= END sales_invoice_approval ================
+
+-- ========= START sales_invoice_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.sales_invoice_detail ADD COLUMN sid_uid uuid;
+-- Fill in Column
+UPDATE sales_invoice_detail SET sid_uid = uuid_generate_v3(uuid_ns_url(), 'sales_invoice_detail_' || sid_id);
+-- Alter Column
+ALTER TABLE public.sales_invoice_detail ALTER COLUMN sid_uid SET NOT NULL, ADD CONSTRAINT tbl_sid_uid_unique UNIQUE (sid_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.sales_invoice_detail ADD COLUMN sid_deleted_reason varchar(255);
+-- ========= END sales_invoice_detail ================
+
+-- ========= START sales_order ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.sales_order ADD COLUMN so_uid uuid;
+-- Fill in Column
+UPDATE sales_order SET so_uid = uuid_generate_v3(uuid_ns_url(), 'sales_order_' || so_id);
+-- Alter Column
+ALTER TABLE public.sales_order ALTER COLUMN so_uid SET NOT NULL, ADD CONSTRAINT tbl_so_uid_unique UNIQUE (so_uid);
+-- ========= Adding Delete Reason ================
+ALTER TABLE public.sales_order RENAME COLUMN so_delete_reason TO so_deleted_reason;
+-- ========= END sales_order ================
+
+-- ========= START sales_order_archive ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.sales_order_archive ADD COLUMN soa_uid uuid;
+-- Fill in Column
+UPDATE sales_order_archive SET soa_uid = uuid_generate_v3(uuid_ns_url(), 'sales_order_archive_' || soa_id);
+-- Alter Column
+ALTER TABLE public.sales_order_archive ALTER COLUMN soa_uid SET NOT NULL, ADD CONSTRAINT tbl_soa_uid_unique UNIQUE (soa_uid);
+-- ========= Adding Delete Reason ================
+-- ========= END sales_order_archive ================
+
+-- ========= START sales_order_goods ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.sales_order_goods ADD COLUMN sog_uid uuid;
+-- Fill in Column
+UPDATE sales_order_goods SET sog_uid = uuid_generate_v3(uuid_ns_url(), 'sales_order_goods_' || sog_id);
+-- Alter Column
+ALTER TABLE public.sales_order_goods ALTER COLUMN sog_uid SET NOT NULL, ADD CONSTRAINT tbl_sog_uid_unique UNIQUE (sog_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.sales_order_goods ADD COLUMN sog_deleted_reason varchar(255);
+-- ========= END sales_order_goods ================
+
+-- ========= START sales_order_hold ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.sales_order_hold ADD COLUMN soh_uid uuid;
+-- Fill in Column
+UPDATE sales_order_hold SET soh_uid = uuid_generate_v3(uuid_ns_url(), 'sales_order_hold_' || soh_id);
+-- Alter Column
+ALTER TABLE public.sales_order_hold ALTER COLUMN soh_uid SET NOT NULL, ADD CONSTRAINT tbl_soh_uid_unique UNIQUE (soh_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.sales_order_hold ADD COLUMN soh_deleted_reason varchar(255);
+-- ========= END sales_order_hold ================
+
+-- ========= START sales_order_issue ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.sales_order_issue ADD COLUMN soi_uid uuid;
+-- Fill in Column
+UPDATE sales_order_issue SET soi_uid = uuid_generate_v3(uuid_ns_url(), 'sales_order_issue_' || soi_id);
+-- Alter Column
+ALTER TABLE public.sales_order_issue ALTER COLUMN soi_uid SET NOT NULL, ADD CONSTRAINT tbl_soi_uid_unique UNIQUE (soi_uid);
+-- ========= Adding Delete Reason ================
+-- ========= END sales_order_issue ================
+
+-- ========= START sales_order_sales ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.sales_order_sales ADD COLUMN sosl_uid uuid;
+-- Fill in Column
+UPDATE sales_order_sales SET sosl_uid = uuid_generate_v3(uuid_ns_url(), 'sales_order_sales_' || sosl_id);
+-- Alter Column
+ALTER TABLE public.sales_order_sales ALTER COLUMN sosl_uid SET NOT NULL, ADD CONSTRAINT tbl_sosl_uid_unique UNIQUE (sosl_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.sales_order_sales ADD COLUMN sosl_deleted_reason varchar(255);
+-- ========= END sales_order_sales ================
+
+-- ========= START sales_order_service ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.sales_order_service ADD COLUMN sos_uid uuid;
+-- Fill in Column
+UPDATE sales_order_service SET sos_uid = uuid_generate_v3(uuid_ns_url(), 'sales_order_service_' || sos_id);
+-- Alter Column
+ALTER TABLE public.sales_order_service ALTER COLUMN sos_uid SET NOT NULL, ADD CONSTRAINT tbl_sos_uid_unique UNIQUE (sos_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.sales_order_service ADD COLUMN sos_deleted_reason varchar(255);
+-- ========= END sales_order_service ================
+
+-- ========= START serial_code ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.serial_code ADD COLUMN sc_uid uuid;
+-- Fill in Column
+UPDATE serial_code SET sc_uid = uuid_generate_v3(uuid_ns_url(), 'serial_code_' || sc_id);
+-- Alter Column
+ALTER TABLE public.serial_code ALTER COLUMN sc_uid SET NOT NULL, ADD CONSTRAINT tbl_sc_uid_unique UNIQUE (sc_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.serial_code ADD COLUMN sc_deleted_reason varchar(255);
+-- ========= END serial_code ================
+
+-- ========= START serial_history ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.serial_history ADD COLUMN sh_uid uuid;
+-- Fill in Column
+UPDATE serial_history SET sh_uid = uuid_generate_v3(uuid_ns_url(), 'serial_history_' || sh_id);
+-- Alter Column
+ALTER TABLE public.serial_history ALTER COLUMN sh_uid SET NOT NULL, ADD CONSTRAINT tbl_sh_uid_unique UNIQUE (sh_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.serial_history ADD COLUMN sh_deleted_reason varchar(255);
+-- ========= END serial_history ================
+
+-- ========= START serial_number ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.serial_number ADD COLUMN sn_uid uuid;
+-- Fill in Column
+UPDATE serial_number SET sn_uid = uuid_generate_v3(uuid_ns_url(), 'serial_number_' || sn_id);
+-- Alter Column
+ALTER TABLE public.serial_number ALTER COLUMN sn_uid SET NOT NULL, ADD CONSTRAINT tbl_sn_uid_unique UNIQUE (sn_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.serial_number ADD COLUMN sn_deleted_reason varchar(255);
+-- ========= END serial_number ================
+
+-- ========= START service ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.service ADD COLUMN srv_uid uuid;
+-- Fill in Column
+UPDATE service SET srv_uid = uuid_generate_v3(uuid_ns_url(), 'service_' || srv_id);
+-- Alter Column
+ALTER TABLE public.service ALTER COLUMN srv_uid SET NOT NULL, ADD CONSTRAINT tbl_srv_uid_unique UNIQUE (srv_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.service ADD COLUMN srv_deleted_reason varchar(255);
+-- ========= END service ================
+
+-- ========= START service_order ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.service_order ADD COLUMN svo_uid uuid;
+-- Fill in Column
+UPDATE service_order SET svo_uid = uuid_generate_v3(uuid_ns_url(), 'service_order_' || svo_id);
+-- Alter Column
+ALTER TABLE public.service_order ALTER COLUMN svo_uid SET NOT NULL, ADD CONSTRAINT tbl_svo_uid_unique UNIQUE (svo_uid);
+-- ========= Adding Delete Reason ================
+ALTER TABLE public.service_order RENAME COLUMN svo_delete_reason TO svo_deleted_reason;
+-- ========= END service_order ================
+
+-- ========= START service_order_cost ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.service_order_cost ADD COLUMN svc_uid uuid;
+-- Fill in Column
+UPDATE service_order_cost SET svc_uid = uuid_generate_v3(uuid_ns_url(), 'service_order_cost_' || svc_id);
+-- Alter Column
+ALTER TABLE public.service_order_cost ALTER COLUMN svc_uid SET NOT NULL, ADD CONSTRAINT tbl_svc_uid_unique UNIQUE (svc_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.service_order_cost ADD COLUMN svc_deleted_reason varchar(255);
+-- ========= END service_order_cost ================
+
+-- ========= START service_order_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.service_order_detail ADD COLUMN svd_uid uuid;
+-- Fill in Column
+UPDATE service_order_detail SET svd_uid = uuid_generate_v3(uuid_ns_url(), 'service_order_detail_' || svd_id);
+-- Alter Column
+ALTER TABLE public.service_order_detail ALTER COLUMN svd_uid SET NOT NULL, ADD CONSTRAINT tbl_svd_uid_unique UNIQUE (svd_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.service_order_detail ADD COLUMN svd_deleted_reason varchar(255);
+-- ========= END service_order_detail ================
+
+-- ========= START service_order_request ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.service_order_request ADD COLUMN svr_uid uuid;
+-- Fill in Column
+UPDATE service_order_request SET svr_uid = uuid_generate_v3(uuid_ns_url(), 'service_order_request_' || svr_id);
+-- Alter Column
+ALTER TABLE public.service_order_request ALTER COLUMN svr_uid SET NOT NULL, ADD CONSTRAINT tbl_svr_uid_unique UNIQUE (svr_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.service_order_request ADD COLUMN svr_deleted_reason varchar(255);
+-- ========= END service_order_request ================
+
+-- ========= START service_reminder ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.service_reminder ADD COLUMN svrm_uid uuid;
+-- Fill in Column
+UPDATE service_reminder SET svrm_uid = uuid_generate_v3(uuid_ns_url(), 'service_reminder_' || svrm_id);
+-- Alter Column
+ALTER TABLE public.service_reminder ALTER COLUMN svrm_uid SET NOT NULL, ADD CONSTRAINT tbl_svrm_uid_unique UNIQUE (svrm_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.service_reminder ADD COLUMN svrm_deleted_reason varchar(255);
+-- ========= END service_reminder ================
+
+-- ========= START service_task ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.service_task ADD COLUMN svt_uid uuid;
+-- Fill in Column
+UPDATE service_task SET svt_uid = uuid_generate_v3(uuid_ns_url(), 'service_task_' || svt_id);
+-- Alter Column
+ALTER TABLE public.service_task ALTER COLUMN svt_uid SET NOT NULL, ADD CONSTRAINT tbl_svt_uid_unique UNIQUE (svt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.service_task ADD COLUMN svt_deleted_reason varchar(255);
+-- ========= END service_task ================
+
+-- ========= START service_term ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.service_term ADD COLUMN srt_uid uuid;
+-- Fill in Column
+UPDATE service_term SET srt_uid = uuid_generate_v3(uuid_ns_url(), 'service_term_' || srt_id);
+-- Alter Column
+ALTER TABLE public.service_term ALTER COLUMN srt_uid SET NOT NULL, ADD CONSTRAINT tbl_srt_uid_unique UNIQUE (srt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.service_term ADD COLUMN srt_deleted_reason varchar(255);
+-- ========= END service_term ================
+
+-- ========= START service_term_document ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.service_term_document ADD COLUMN std_uid uuid;
+-- Fill in Column
+UPDATE service_term_document SET std_uid = uuid_generate_v3(uuid_ns_url(), 'service_term_document_' || std_id);
+-- Alter Column
+ALTER TABLE public.service_term_document ALTER COLUMN std_uid SET NOT NULL, ADD CONSTRAINT tbl_std_uid_unique UNIQUE (std_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.service_term_document ADD COLUMN std_deleted_reason varchar(255);
+-- ========= END service_term_document ================
+
+-- ========= START state ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.state ADD COLUMN stt_uid uuid;
+-- Fill in Column
+UPDATE state SET stt_uid = uuid_generate_v3(uuid_ns_url(), 'state_' || stt_id);
+-- Alter Column
+ALTER TABLE public.state ALTER COLUMN stt_uid SET NOT NULL, ADD CONSTRAINT tbl_stt_uid_unique UNIQUE (stt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.state ADD COLUMN stt_deleted_reason varchar(255);
+-- ========= END state ================
+
+-- ========= START stock_adjustment_type ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.stock_adjustment_type ADD COLUMN sat_uid uuid;
+-- Fill in Column
+UPDATE stock_adjustment_type SET sat_uid = uuid_generate_v3(uuid_ns_url(), 'stock_adjustment_type_' || sat_id);
+-- Alter Column
+ALTER TABLE public.stock_adjustment_type ALTER COLUMN sat_uid SET NOT NULL, ADD CONSTRAINT tbl_sat_uid_unique UNIQUE (sat_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.stock_adjustment_type ADD COLUMN sat_deleted_reason varchar(255);
+-- ========= END stock_adjustment_type ================
+
+-- ========= START stock_opname ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.stock_opname ADD COLUMN sop_uid uuid;
+-- Fill in Column
+UPDATE stock_opname SET sop_uid = uuid_generate_v3(uuid_ns_url(), 'stock_opname_' || sop_id);
+-- Alter Column
+ALTER TABLE public.stock_opname ALTER COLUMN sop_uid SET NOT NULL, ADD CONSTRAINT tbl_sop_uid_unique UNIQUE (sop_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.stock_opname ADD COLUMN sop_deleted_reason varchar(255);
+-- ========= END stock_opname ================
+
+-- ========= START stock_opname_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.stock_opname_detail ADD COLUMN sod_uid uuid;
+-- Fill in Column
+UPDATE stock_opname_detail SET sod_uid = uuid_generate_v3(uuid_ns_url(), 'stock_opname_detail_' || sod_id);
+-- Alter Column
+ALTER TABLE public.stock_opname_detail ALTER COLUMN sod_uid SET NOT NULL, ADD CONSTRAINT tbl_sod_uid_unique UNIQUE (sod_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.stock_opname_detail ADD COLUMN sod_deleted_reason varchar(255);
+-- ========= END stock_opname_detail ================
+
+-- ========= START system_action ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.system_action ADD COLUMN sac_uid uuid;
+-- Fill in Column
+UPDATE system_action SET sac_uid = uuid_generate_v3(uuid_ns_url(), 'system_action_' || sac_id);
+-- Alter Column
+ALTER TABLE public.system_action ALTER COLUMN sac_uid SET NOT NULL, ADD CONSTRAINT tbl_sac_uid_unique UNIQUE (sac_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.system_action ADD COLUMN sac_deleted_reason varchar(255);
+-- ========= END system_action ================
+
+-- ========= START system_action_event ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.system_action_event ADD COLUMN sae_uid uuid;
+-- Fill in Column
+UPDATE system_action_event SET sae_uid = uuid_generate_v3(uuid_ns_url(), 'system_action_event_' || sae_id);
+-- Alter Column
+ALTER TABLE public.system_action_event ALTER COLUMN sae_uid SET NOT NULL, ADD CONSTRAINT tbl_sae_uid_unique UNIQUE (sae_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.system_action_event ADD COLUMN sae_deleted_reason varchar(255);
+-- ========= END system_action_event ================
+
+-- ========= START system_service ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.system_service ADD COLUMN ssr_uid uuid;
+-- Fill in Column
+UPDATE system_service SET ssr_uid = uuid_generate_v3(uuid_ns_url(), 'system_service_' || ssr_id);
+-- Alter Column
+ALTER TABLE public.system_service ALTER COLUMN ssr_uid SET NOT NULL, ADD CONSTRAINT tbl_ssr_uid_unique UNIQUE (ssr_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.system_service ADD COLUMN ssr_deleted_reason varchar(255);
+-- ========= END system_service ================
+
+-- ========= START system_setting ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.system_setting ADD COLUMN ss_uid uuid;
+-- Fill in Column
+UPDATE system_setting SET ss_uid = uuid_generate_v3(uuid_ns_url(), 'system_setting_' || ss_id);
+-- Alter Column
+ALTER TABLE public.system_setting ALTER COLUMN ss_uid SET NOT NULL, ADD CONSTRAINT tbl_ss_uid_unique UNIQUE (ss_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.system_setting ADD COLUMN ss_deleted_reason varchar(255);
+-- ========= END system_setting ================
+
+-- ========= START system_setting_key ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.system_setting_key ADD COLUMN ssk_uid uuid;
+-- Fill in Column
+UPDATE system_setting_key SET ssk_uid = uuid_generate_v3(uuid_ns_url(), 'system_setting_key_' || ssk_id);
+-- Alter Column
+ALTER TABLE public.system_setting_key ALTER COLUMN ssk_uid SET NOT NULL, ADD CONSTRAINT tbl_ssk_uid_unique UNIQUE (ssk_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.system_setting_key ADD COLUMN ssk_deleted_reason varchar(255);
+-- ========= END system_setting_key ================
+
+-- ========= START system_table ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.system_table ADD COLUMN st_uid uuid;
+-- Fill in Column
+UPDATE system_table SET st_uid = uuid_generate_v3(uuid_ns_url(), 'system_table_' || st_id);
+-- Alter Column
+ALTER TABLE public.system_table ALTER COLUMN st_uid SET NOT NULL, ADD CONSTRAINT tbl_st_uid_unique UNIQUE (st_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.system_table ADD COLUMN st_deleted_reason varchar(255);
+-- ========= END system_table ================
+
+-- ========= START system_type ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.system_type ADD COLUMN sty_uid uuid;
+-- Fill in Column
+UPDATE system_type SET sty_uid = uuid_generate_v3(uuid_ns_url(), 'system_type_' || sty_id);
+-- Alter Column
+ALTER TABLE public.system_type ALTER COLUMN sty_uid SET NOT NULL, ADD CONSTRAINT tbl_sty_uid_unique UNIQUE (sty_uid);
+-- ========= Adding Delete Reason ================
+-- ========= END system_type ================
+
+-- ========= START tax ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.tax ADD COLUMN tax_uid uuid;
+-- Fill in Column
+UPDATE tax SET tax_uid = uuid_generate_v3(uuid_ns_url(), 'tax_' || tax_id);
+-- Alter Column
+ALTER TABLE public.tax ALTER COLUMN tax_uid SET NOT NULL, ADD CONSTRAINT tbl_tax_uid_unique UNIQUE (tax_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.tax ADD COLUMN tax_deleted_reason varchar(255);
+-- ========= END tax ================
+
+-- ========= START tax_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.tax_detail ADD COLUMN td_uid uuid;
+-- Fill in Column
+UPDATE tax_detail SET td_uid = uuid_generate_v3(uuid_ns_url(), 'tax_detail_' || td_id);
+-- Alter Column
+ALTER TABLE public.tax_detail ALTER COLUMN td_uid SET NOT NULL, ADD CONSTRAINT tbl_td_uid_unique UNIQUE (td_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.tax_detail ADD COLUMN td_deleted_reason varchar(255);
+-- ========= END tax_detail ================
+
+-- ========= START transport_module ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.transport_module ADD COLUMN tm_uid uuid;
+-- Fill in Column
+UPDATE transport_module SET tm_uid = uuid_generate_v3(uuid_ns_url(), 'transport_module_' || tm_id);
+-- Alter Column
+ALTER TABLE public.transport_module ALTER COLUMN tm_uid SET NOT NULL, ADD CONSTRAINT tbl_tm_uid_unique UNIQUE (tm_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.transport_module ADD COLUMN tm_deleted_reason varchar(255);
+-- ========= END transport_module ================
+
+-- ========= START unit ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.unit ADD COLUMN uom_uid uuid;
+-- Fill in Column
+UPDATE unit SET uom_uid = uuid_generate_v3(uuid_ns_url(), 'unit_' || uom_id);
+-- Alter Column
+ALTER TABLE public.unit ALTER COLUMN uom_uid SET NOT NULL, ADD CONSTRAINT tbl_uom_uid_unique UNIQUE (uom_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.unit ADD COLUMN uom_deleted_reason varchar(255);
+-- ========= END unit ================
+
+-- ========= START user_group ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.user_group ADD COLUMN usg_uid uuid;
+-- Fill in Column
+UPDATE user_group SET usg_uid = uuid_generate_v3(uuid_ns_url(), 'user_group_' || usg_id);
+-- Alter Column
+ALTER TABLE public.user_group ALTER COLUMN usg_uid SET NOT NULL, ADD CONSTRAINT tbl_usg_uid_unique UNIQUE (usg_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.user_group ADD COLUMN usg_deleted_reason varchar(255);
+-- ========= END user_group ================
+
+-- ========= START user_group_api_access ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.user_group_api_access ADD COLUMN uga_uid uuid;
+-- Fill in Column
+UPDATE user_group_api_access SET uga_uid = uuid_generate_v3(uuid_ns_url(), 'user_group_api_access_' || uga_id);
+-- Alter Column
+ALTER TABLE public.user_group_api_access ALTER COLUMN uga_uid SET NOT NULL, ADD CONSTRAINT tbl_uga_uid_unique UNIQUE (uga_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.user_group_api_access ADD COLUMN uga_deleted_reason varchar(255);
+-- ========= END user_group_api_access ================
+
+-- ========= START user_group_dashboard_item ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.user_group_dashboard_item ADD COLUMN ugds_uid uuid;
+-- Fill in Column
+UPDATE user_group_dashboard_item SET ugds_uid = uuid_generate_v3(uuid_ns_url(), 'user_group_dashboard_item_' || ugds_id);
+-- Alter Column
+ALTER TABLE public.user_group_dashboard_item ALTER COLUMN ugds_uid SET NOT NULL, ADD CONSTRAINT tbl_ugds_uid_unique UNIQUE (ugds_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.user_group_dashboard_item ADD COLUMN ugds_deleted_reason varchar(255);
+-- ========= END user_group_dashboard_item ================
+
+-- ========= START user_group_detail ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.user_group_detail ADD COLUMN ugd_uid uuid;
+-- Fill in Column
+UPDATE user_group_detail SET ugd_uid = uuid_generate_v3(uuid_ns_url(), 'user_group_detail_' || ugd_id);
+-- Alter Column
+ALTER TABLE public.user_group_detail ALTER COLUMN ugd_uid SET NOT NULL, ADD CONSTRAINT tbl_ugd_uid_unique UNIQUE (ugd_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.user_group_detail ADD COLUMN ugd_deleted_reason varchar(255);
+-- ========= END user_group_detail ================
+
+-- ========= START user_group_notification ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.user_group_notification ADD COLUMN ugn_uid uuid;
+-- Fill in Column
+UPDATE user_group_notification SET ugn_uid = uuid_generate_v3(uuid_ns_url(), 'user_group_notification_' || ugn_id);
+-- Alter Column
+ALTER TABLE public.user_group_notification ALTER COLUMN ugn_uid SET NOT NULL, ADD CONSTRAINT tbl_ugn_uid_unique UNIQUE (ugn_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.user_group_notification ADD COLUMN ugn_deleted_reason varchar(255);
+-- ========= END user_group_notification ================
+
+-- ========= START user_group_page ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.user_group_page ADD COLUMN ugp_uid uuid;
+-- Fill in Column
+UPDATE user_group_page SET ugp_uid = uuid_generate_v3(uuid_ns_url(), 'user_group_page_' || ugp_id);
+-- Alter Column
+ALTER TABLE public.user_group_page ALTER COLUMN ugp_uid SET NOT NULL, ADD CONSTRAINT tbl_ugp_uid_unique UNIQUE (ugp_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.user_group_page ADD COLUMN ugp_deleted_reason varchar(255);
+-- ========= END user_group_page ================
+
+-- ========= START user_group_right ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.user_group_right ADD COLUMN ugr_uid uuid;
+-- Fill in Column
+UPDATE user_group_right SET ugr_uid = uuid_generate_v3(uuid_ns_url(), 'user_group_right_' || ugr_id);
+-- Alter Column
+ALTER TABLE public.user_group_right ALTER COLUMN ugr_uid SET NOT NULL, ADD CONSTRAINT tbl_ugr_uid_unique UNIQUE (ugr_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.user_group_right ADD COLUMN ugr_deleted_reason varchar(255);
+-- ========= END user_group_right ================
+
+-- ========= START user_log ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.user_log ADD COLUMN ul_uid uuid;
+-- Fill in Column
+UPDATE user_log SET ul_uid = uuid_generate_v3(uuid_ns_url(), 'user_log_' || ul_id);
+-- Alter Column
+ALTER TABLE public.user_log ALTER COLUMN ul_uid SET NOT NULL, ADD CONSTRAINT tbl_ul_uid_unique UNIQUE (ul_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.user_log ADD COLUMN ul_deleted_reason varchar(255);
+-- ========= END user_log ================
+
+-- ========= START user_mapping ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.user_mapping ADD COLUMN ump_uid uuid;
+-- Fill in Column
+UPDATE user_mapping SET ump_uid = uuid_generate_v3(uuid_ns_url(), 'user_mapping_' || ump_id);
+-- Alter Column
+ALTER TABLE public.user_mapping ALTER COLUMN ump_uid SET NOT NULL, ADD CONSTRAINT tbl_ump_uid_unique UNIQUE (ump_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.user_mapping ADD COLUMN ump_deleted_reason varchar(255);
+-- ========= END user_mapping ================
+
+-- ========= START user_mobile_token ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.user_mobile_token ADD COLUMN umt_uid uuid;
+-- Fill in Column
+UPDATE user_mobile_token SET umt_uid = uuid_generate_v3(uuid_ns_url(), 'user_mobile_token_' || umt_id);
+-- Alter Column
+ALTER TABLE public.user_mobile_token ALTER COLUMN umt_uid SET NOT NULL, ADD CONSTRAINT tbl_umt_uid_unique UNIQUE (umt_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.user_mobile_token ADD COLUMN umt_deleted_reason varchar(255);
+-- ========= END user_mobile_token ================
+
+-- ========= START user_token ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.user_token ADD COLUMN ut_uid uuid;
+-- Fill in Column
+UPDATE user_token SET ut_uid = uuid_generate_v3(uuid_ns_url(), 'user_token_' || ut_id);
+-- Alter Column
+ALTER TABLE public.user_token ALTER COLUMN ut_uid SET NOT NULL, ADD CONSTRAINT tbl_ut_uid_unique UNIQUE (ut_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.user_token ADD COLUMN ut_deleted_reason varchar(255);
+-- ========= END user_token ================
+
+-- ========= START users ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.users ADD COLUMN us_uid uuid;
+-- Fill in Column
+UPDATE users SET us_uid = uuid_generate_v3(uuid_ns_url(), 'users_' || us_id);
+-- Alter Column
+ALTER TABLE public.users ALTER COLUMN us_uid SET NOT NULL, ADD CONSTRAINT tbl_us_uid_unique UNIQUE (us_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.users ADD COLUMN us_deleted_reason varchar(255);
+-- ========= END users ================
+
+-- ========= START warehouse ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.warehouse ADD COLUMN wh_uid uuid;
+-- Fill in Column
+UPDATE warehouse SET wh_uid = uuid_generate_v3(uuid_ns_url(), 'warehouse_' || wh_id);
+-- Alter Column
+ALTER TABLE public.warehouse ALTER COLUMN wh_uid SET NOT NULL, ADD CONSTRAINT tbl_wh_uid_unique UNIQUE (wh_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.warehouse ADD COLUMN wh_deleted_reason varchar(255);
+-- ========= END warehouse ================
+
+-- ========= START warehouse_storage ================
+-- ========= Adding UID ================
+-- Adding Column
+ALTER TABLE public.warehouse_storage ADD COLUMN whs_uid uuid;
+-- Fill in Column
+UPDATE warehouse_storage SET whs_uid = uuid_generate_v3(uuid_ns_url(), 'warehouse_storage_' || whs_id);
+-- Alter Column
+ALTER TABLE public.warehouse_storage ALTER COLUMN whs_uid SET NOT NULL, ADD CONSTRAINT tbl_whs_uid_unique UNIQUE (whs_uid);
+-- ========= Adding Delete Reason ================
+-- Adding Column
+ALTER TABLE public.warehouse_storage ADD COLUMN whs_deleted_reason varchar(255);
+-- ========= END warehouse_storage ================
+

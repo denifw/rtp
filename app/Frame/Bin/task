@@ -1,0 +1,23 @@
+SO FREIGHT
+===========
+1. Add page ringt on so detail AllowSelectOtherOrderOffice
+
+
+SIMULTAN JOB
+Create simultan job to link the data between job order such as in :
+OUtbound + Trucking Delivery =>
+    - Outbound Warehouse should become Lading Location on Delivery Job.
+    - Outbound Consignee become the Unload location on delivery Job.
+    - Outbound Customer Ref become the ref in loading / Unload Location
+
+
+
+
+[8:48 PM, 4/22/2020] Pak Likas: supaya istilah tdk sama dgn optilog
+JOD jadi JOC Job Order Confirmation
+VI jadi DI Delivery Instructions
+TC jadi DC Delivery Confirmation
+[8:49 PM, 4/22/2020] Deni Firdaus Waruwu: Ok pak
+[8:49 PM, 4/22/2020] Pak Likas: sorry yg VI jadi DN aja...Delivery Note
+[8:49 PM, 4/22/2020] Pak Likas: fimiliar bagi vendor
+[8:50 PM, 4/22/2020] Pak Likas: atau JOC diganti JC Job Confirmation jadi singkatan smua 2 huruf cukup

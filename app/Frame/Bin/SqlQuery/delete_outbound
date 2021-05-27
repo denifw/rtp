@@ -1,0 +1,20 @@
+
+update job_inbound_stock set jis_deleted_by = 1, jis_deleted_on = '2020-01-04 00:01:00'
+where jis_id IN (1871, 1882, 1883, 1884, 1885);
+
+update job_outbound_detail set jod_deleted_by = 1, jod_deleted_on = '2020-01-04 00:01:00'
+where jod_id IN (1161, 1168, 1169, 1170, 1171);
+
+update job_order set jo_deleted_by = 1, jo_deleted_on = '2020-01-04 00:01:00', jo_deleted_reason = 'Deleted by system based on request by Rian WLOG'
+where jo_id IN (1164, 1342);
+
+SELECT * FROM job_inbound_stock where jis_id IN (1871, 1882, 1883, 1884, 1885);
+
+select jo_id, jo_number, jo_deleted_reason, jo_deleted_by, jo_deleted_on, job.job_id, jod.jod_id, jod.jod_quantity, jod.jod_jid_id, jod.jod_jis_id, jod.jod_deleted_on
+from job_outbound as job INNER JOIN
+job_order as jo ON jo.jo_id = job.job_jo_id INNER JOIN
+job_outbound_detail as jod on jod.jod_job_id = job.job_id
+ where jo.jo_number IN ('OUT-BLP-191200004', 'OUT-BLP-191200009') and jod.jod_deleted_on IS NULL;
+
+select jo_number, jo_deleted_reason, jo_deleted_by, jo_deleted_on from job_order
+where jo_number IN ('OUT-BLP-191200004', 'OUT-BLP-191200009');

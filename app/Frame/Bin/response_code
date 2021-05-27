@@ -1,0 +1,10 @@
+100 -> Not match creadential
+101 -> Invalid user mapping
+102 -> Token not match
+103 -> Token has been deleted or used by another device
+200 -> OK
+400 -> Bad Request such as not all parameter was given.
+401 -> The request did not include an authentication token or the authentication token was expired.
+500 -> Error from server side.
+
+

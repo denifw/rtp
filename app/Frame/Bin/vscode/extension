@@ -1,0 +1,47 @@
+Extention
+=========
+Bootstrap
+ESLint
+HTML Css Support
+
+Laravel 5 snippet
+laravel artisan
+laravel blade snippets
+
+Git Tools
+Git History
+
+PHP intellisense atau PHP intelephense
+PHP Debug
+PHP extention pack
+
+
+SFTP (From Liximomo)
+===================
+- Install extention
+- Setup sftp Config
+    -> Ctrl + Shif + P
+    -> Search for SFTP:Config
+    -> Set the config like below
+    +++ Start Config +++
+    {
+        "name": "Connection Name",
+        "host": "IP/Domain",
+        "protocol": "sftp",
+        "port": 0000,
+        "username": "user_name",
+        "remotePath": "path_of_file",
+        "uploadOnSave": false
+    }
+    +++ END CONFIG +++
+
+
+THEME
+=====
+One Dark Pro
+
+FONT
+====
+1. Download font 'Source Code Pro' from internet
+2. Install the font on your windows by selecting all .tff file and install
+3. Open vscode setting, search for 'font' and inside the font family add 'Source Code Pro' ex : 'Source Code Pro', Consolas, 'Courier New', monospace

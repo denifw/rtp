@@ -1,0 +1,11 @@
+1. Go to File -> Preferences -> User Snippets -> javascript
+
+2. Copy this code into javascript.json file.
+++ Start Code ++
+{
+    "Console Log" : {
+		"prefix": "clog", 
+		"body": "console.log($1);"
+	}
+}
+++ End Code ++

@@ -1,0 +1,47 @@
+-- ============== job_order =========================
+UPDATE job_order SET
+                     jo_jae_id = j.last_jae_id,
+                     jo_joa_id = j.last_joa,
+                     jo_joh_id = j.last_joh
+FROM (SELECT jo.jo_id as joid, joh.last_joh, ljac.last_jae_id, joa.last_joa
+      FROM job_order as jo
+               LEFT OUTER JOIN (SELECT joh_jo_id, max(joh_id) last_joh
+                                FROM job_order_hold
+                                WHERE (joh_deleted_on IS NULL)
+                                GROUP BY joh_jo_id) as joh ON jo.jo_id = joh.joh_jo_id
+               LEFT OUTER JOIN (select jac_jo_id, max(jae_id) as last_jae_id
+                                FROM job_action as jac INNER JOIN
+                                     job_action_event jae on jac.jac_id = jae.jae_jac_id
+                                WHERE  (jac_updated_on IS NOT NULL) AND (jac_active = 'Y')
+                                  AND (jae.jae_deleted_on IS NULL) AND (jae.jae_active = 'Y')
+                                GROUP by jac_jo_id) as ljac ON jo.jo_id = ljac.jac_jo_id
+               LEFT OUTER JOIN (SELECT joa_jo_id, max(joa_id) last_joa
+                                FROM job_order_archive
+                                WHERE (joa_deleted_on IS NULL)
+                                GROUP BY joa_jo_id) as joa ON jo.jo_id = joa.joa_jo_id) as j WHERE j.joid = jo_id;
+
+-- ============== job_action_event =========================
+UPDATE job_action_event
+SET jae_doc_id = d.doc_id
+FROM (select doc.doc_id, doc.doc_group_reference, doc.doc_type_reference
+      from document as doc
+               INNER JOIN document_type as dct ON doc.doc_dct_id = dct.dct_id
+               INNER JOIN document_group as dcg ON dct.dct_dcg_id = dcg.dcg_id
+      WHERE dcg.dcg_code = 'joborder'
+        and dct.dct_code = 'actionevent') as d
+WHERE jae_id = d.doc_type_reference;
+
+-- ============== sales_order =========================
+UPDATE sales_order
+SET so_start_by = s.jo_start_by, so_start_on = s.jo_start_on, so_soh_id = s.last_soh
+FROM (SELECT so.so_id as soid, soh.last_soh, jo.jo_start_on, jo.jo_start_by
+      FROM sales_order as so
+               LEFT OUTER JOIN (SELECT soh_so_id, max(soh_id) as last_soh
+                                FROM sales_order_hold
+                                WHERE (soh_deleted_on IS NULL)
+                                GROUP BY soh_so_id) as soh ON so.so_id = soh.soh_so_id
+               LEFT JOIN LATERAL (SELECT jo_so_id, jo_id, jo_start_by, jo_start_on
+                                  FROM job_order
+                                  WHERE (jo_start_on IS NOT NULL) AND (jo_deleted_on IS NULL) AND (so.so_id = jo_so_id)
+                                  ORDER BY jo_start_on
+                                  LIMIT 1 OFFSET 0) as jo ON so.so_id = jo.jo_so_id) as s WHERE so_id = s.soid;

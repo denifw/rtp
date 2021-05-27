@@ -1,0 +1,40 @@
+<?php
+/**
+ * Contains code written by the PT Makmur Berkat Teknologi.
+ * Any other use of this code is in violation of copy rights.
+ *
+ * @package   Matalogix
+ * @author    Yoel Pieter Sumihar <pieter@mbteknologi.com>
+ * @copyright ${YEAR} PT Makmur Berkat Teknologi.
+ */
+namespace App\Model\Ajax\\${Name_Space};
+
+use App\Frame\Formatter\StringFormatter;
+use App\Frame\Mvc\AbstractBaseAjaxModel;
+use App\Model\Dao\\${Name_Space}\\${Class_Name}Dao;
+
+/**
+ * Class to handle the ajax request fo ${Class_Name}.
+ *
+ * @package    app
+ * @subpackage Model\Ajax\\${Name_Space}
+ * @author     Yoel Pieter Sumihar <pieter@mbteknologi.com>
+ * @copyright  ${YEAR} PT Makmur Berkat Teknologi.
+ */
+class ${Class_Name} extends AbstractBaseAjaxModel
+{
+
+    /**
+     * Function to load the data for single select for ${Class_Name}
+     *
+     * @return array
+     */
+    public function loadSingleSelectData(): array
+    {
+        ${DS}wheres = [];
+        ${DS}wheres[] = StringFormatter::generateLikeQuery('', ${DS}this->getStringParameter('search_key'));
+        # TODO Add additional wheres here.
+
+        return ${Class_Name}Dao::loadSingleSelectData(${DS}wheres);
+    }
+}

@@ -1,0 +1,27 @@
+1. Create Migration Table
+2. Create Seeder Table
+3. Create Dao Class
+4. Create Listing class
+    - Add listing class to page System
+    - Add page right for the listing class.
+    - Add the translation for the page inside page_title and page_description.
+5. Create Detail Class
+    - Add detail class to page System
+    - Add page right for the detail class.
+    - Add the translation for the page inside page_title and page_description.
+
+SERIAL NUMBER
+SO-GT-EXP-1809087-party-INK
+
+
+MODAL
+=====
+1. Create A controller and Model for Modal System
+    - Modal for form
+    - Modal for Confirmation
+    - Modal for selection
+2. Create a modal javascript class like single select
+3. Add new Button Field for modal trigger that contain javascript to create javascript modal object.
+3. for the field that need javascript, ex: single select, set the parameter in the javascript modal object and
+    create the javascript from javascript modal class.
+5. every modal must have success action, for the form (success mean after submit success.)

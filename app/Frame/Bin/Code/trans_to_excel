@@ -1,0 +1,78 @@
+/**
+     * Show the application dashboard.
+     *
+     * @return mixed
+     */
+    public function test()
+    {
+        $sheetName = 'global';
+        $fileName = $sheetName.'.php';
+        $rows = $this->loadTranslationData('en', $fileName);
+        $table = $this->loadTable();
+        $table->addRows($rows);
+        $excel = new Excel();
+        $excel->addSheet($sheetName, $sheetName);
+        $excel->setFileName('Matalogix Dictionary '.$sheetName.'.xlsx');
+        $sheet = $excel->getSheet($sheetName, true);
+        $excelTable = new ExcelTable($excel, $sheet);
+        $excelTable->setTable($table);
+        $excelTable->writeTable();
+        $excel->setActiveSheet($sheetName);
+        $excel->createExcel();
+        exit;
+    }
+
+    /**
+     * Show the application dashboard.
+     *
+     * @return mixed
+     */
+    public function loadTable()
+    {
+        $table = new Table('test');
+        $table->setHeaderRow([
+            'group' => 'Key Word Group',
+            'item' => 'Key Word Item',
+            'en' => 'EN',
+            'id' => 'ID',
+        ]);
+        return $table;
+    }
+
+    /**
+     * Show the application dashboard.
+     *
+     * @return mixed
+     */
+    public function loadTranslationData($locale, $fileName)
+    {
+        $path = resource_path('lang\\' . $locale . '\\' . $fileName);
+        $data = include $path;
+        $results = [];
+        $keys = array_keys($data);
+        sort($keys);
+        foreach ($keys as $key) {
+            $row = $data[$key];
+            if (is_array($row) === true) {
+                $rowKeys = array_keys($row);
+                sort($rowKeys);
+                foreach ($rowKeys as $rowKey) {
+                    $results[] = [
+                        'group' => $key,
+                        'item' => $rowKey,
+                        'en' => $row[$rowKey],
+                        'id' => '',
+                    ];
+                }
+            } else {
+                $results[] = [
+                    'group' => '',
+                    'item' => $key,
+                    'en' => $row,
+                    'id' => '',
+                ];
+            }
+        }
+        return $results;
+    }
+
