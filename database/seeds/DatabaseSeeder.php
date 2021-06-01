@@ -14,7 +14,20 @@ class DatabaseSeeder extends Seeder
 
         # Already run at trial system.
         $this->call([
-            SystemTableSeeder::class,
+            MenuSeeder::class,
+            PageCategorySeeder::class,
+            PageSeeder::class,
+            CountrySeeder::class,
+            StateSeeder::class,
+            CitySeeder::class,
+            DistrictSeeder::class,
+            LanguageSeeder::class,
+            CurrencySeeder::class,
+            SystemSettingSeeder::class,
+            RelationSeeder::class,
+            OfficeSeeder::class,
+            ContactPersonSeeder::class,
+            UserSeeder::class
         ]);
     }
 }

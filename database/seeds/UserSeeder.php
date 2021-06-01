@@ -12,19 +12,18 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $uidKey = microtime() . 'us10';
         DB::table('users')->insert([
-            'us_name' => 'Ega',
-            'us_username' => 'ega@mbs-logistik.com',
-            'us_password' => bcrypt('MBS2021'),
-            'us_allow_mail' => 'N',
-            'us_lg_id' => 1,
+            'us_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1'),
+            'us_name' => 'System Administrator',
+            'us_username' => 'system@spada-informatika.com',
+            'us_password' => bcrypt('localhost'),
+            'us_lg_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'lg2'),
+            'us_menu_style' => 'nav-md',
             'us_system' => 'N',
             'us_confirm' => 'Y',
             'us_active' => 'Y',
             'us_created_on' => date('Y-m-d H:i:s'),
-            'us_created_by' => 1,
-            'us_uid' => Uuid::uuid3(Uuid::NAMESPACE_URL, $uidKey)
+            'us_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1'),
         ]);
     }
 }

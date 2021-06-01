@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Ramsey\Uuid\Uuid;
 
 class CurrencySeeder extends Seeder
 {
@@ -11,8 +12,13 @@ class CurrencySeeder extends Seeder
      */
     public function run()
     {
-        DB::table('currency')->insert(['cur_cnt_id' => 104, 'cur_name' => 'Indonesia Rupiah', 'cur_iso' => 'IDR', 'cur_active' => 'Y', 'cur_created_on' => date('Y-m-d H:i:s'), 'cur_created_by' => 1]);
-        DB::table('currency')->insert(['cur_cnt_id' => 236, 'cur_name' => 'United States Dollar', 'cur_iso' => 'USD', 'cur_active' => 'Y', 'cur_created_on' => date('Y-m-d H:i:s'), 'cur_created_by' => 1]);
-        DB::table('currency')->insert(['cur_cnt_id' => 200, 'cur_name' => 'Singapore Dollar', 'cur_iso' => 'SGD', 'cur_active' => 'Y', 'cur_created_on' => date('Y-m-d H:i:s'), 'cur_created_by' => 1]);
+        DB::table('currency')->insert([
+            'cur_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'cur1'),
+            'cur_cnt_id' => '3c79f2bd-d52b-3e02-85dc-c77399fcff82',
+            'cur_name' => 'Indonesia Rupiah',
+            'cur_iso' => 'IDR',
+            'cur_active' => 'Y',
+            'cur_created_on' => date('Y-m-d H:i:s'),
+            'cur_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1')]);
     }
 }

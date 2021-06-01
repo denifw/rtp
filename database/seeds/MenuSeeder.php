@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Ramsey\Uuid\Uuid;
 
 class MenuSeeder extends Seeder
 {
@@ -11,8 +12,34 @@ class MenuSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('menu')->where('mn_id', 29)->update([
-            'mn_name' => 'Cash And Bank',
+        DB::table('menu')->insert([
+            'mn_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'mn1'),
+            'mn_name' => 'Root',
+            'mn_order' => 1,
+            'mn_icon' => 'fa fa-sitemap',
+            'mn_active' => 'Y',
+            'mn_created_on' => date('Y-m-d H:i:s'),
+            'mn_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1')
+        ]);
+        DB::table('menu')->insert([
+            'mn_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'mn2'),
+            'mn_name' => 'System',
+            'mn_parent' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'mn1'),
+            'mn_order' => 100,
+            'mn_icon' => 'fa fa-sitemap',
+            'mn_active' => 'Y',
+            'mn_created_on' => date('Y-m-d H:i:s'),
+            'mn_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1')
+        ]);
+        DB::table('menu')->insert([
+            'mn_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'mn3'),
+            'mn_name' => 'Page',
+            'mn_parent' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'mn2'),
+            'mn_order' => 1,
+            'mn_icon' => 'fa fa-tasks',
+            'mn_active' => 'Y',
+            'mn_created_on' => date('Y-m-d H:i:s'),
+            'mn_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1')
         ]);
     }
 }
