@@ -40,13 +40,14 @@ class Menu extends AbstractFormModel
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
             'mn_name' => $this->getStringParameter('mn_name'),
-            'mn_parent' => $this->getIntParameter('mn_parent'),
+            'mn_code' => $this->getStringParameter('mn_code'),
+            'mn_parent' => $this->getStringParameter('mn_parent'),
             'mn_order' => $this->getIntParameter('mn_order'),
             'mn_icon' => $this->getStringParameter('mn_icon'),
             'mn_active' => $this->getStringParameter('mn_active', 'Y')
@@ -66,7 +67,8 @@ class Menu extends AbstractFormModel
     {
         $colVal = [
             'mn_name' => $this->getStringParameter('mn_name'),
-            'mn_parent' => $this->getIntParameter('mn_parent'),
+            'mn_code' => $this->getStringParameter('mn_code'),
+            'mn_parent' => $this->getStringParameter('mn_parent'),
             'mn_order' => $this->getIntParameter('mn_order'),
             'mn_icon' => $this->getStringParameter('mn_icon'),
             'mn_active' => $this->getStringParameter('mn_active', 'Y')
@@ -92,7 +94,6 @@ class Menu extends AbstractFormModel
      */
     public function loadForm(): void
     {
-        $this->isUpdate();
         $this->Tab->addPortlet('general', $this->getGeneralFieldSet());
     }
 
@@ -100,24 +101,27 @@ class Menu extends AbstractFormModel
     /**
      * Function to get the general Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getGeneralFieldSet(): Portlet
     {
         # Create a form.
         $fieldSet = new FieldSet($this->Validation);
         $fieldSet->setGridDimension(4);
-        $parentField = $this->Field->getSingleSelect('menu', 'parent_menu', $this->getStringParameter('parent_menu'));
-        $parentField->setHiddenField('mn_parent', $this->getIntParameter('mn_parent'));
+        $parentField = $this->Field->getSingleSelect('mn', 'parent_menu', $this->getStringParameter('parent_menu'));
+        $parentField->setHiddenField('mn_parent', $this->getStringParameter('mn_parent'));
         $parentField->setEnableNewButton(false);
         $parentField->setEnableDetailButton(false);
 
         # Add field into the field set.
         $fieldSet->addField(Trans::getWord('name'), $this->Field->getText('mn_name', $this->getStringParameter('mn_name')), true);
+        $fieldSet->addField(Trans::getWord('code'), $this->Field->getText('mn_code', $this->getStringParameter('mn_code')), true);
         $fieldSet->addField(Trans::getWord('parentMenu'), $parentField);
         $fieldSet->addField(Trans::getWord('icon'), $this->Field->getText('mn_icon', $this->getStringParameter('mn_icon')), true);
         $fieldSet->addField(Trans::getWord('sortNumber'), $this->Field->getText('mn_order', $this->getIntParameter('mn_order')), true);
-        $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('mn_active', $this->getStringParameter('mn_active')));
+        if ($this->isUpdate() === true) {
+            $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('mn_active', $this->getStringParameter('mn_active')));
+        }
         # Create a portlet box.
         $portlet = new Portlet('mnGeneralPortlet', $this->getDefaultPortletTitle());
         $portlet->addFieldSet($fieldSet);
@@ -132,14 +136,15 @@ class Menu extends AbstractFormModel
      */
     public function loadValidationRole(): void
     {
-        $this->Validation->checkRequire('mn_name', 3, 125);
+        $this->Validation->checkRequire('mn_name', 3, 128);
+        $this->Validation->checkRequire('mn_code', 3, 128);
         $this->Validation->checkRequire('mn_order');
         $this->Validation->checkInt('mn_order');
         $this->Validation->checkRequire('mn_icon', 7, 125);
-        $this->Validation->checkUnique('mn_name', 'menu', [
+        $this->Validation->checkUnique('mn_code', 'menu', [
             'mn_id' => $this->getDetailReferenceValue()
         ], [
-            'mn_parent' => $this->getIntParameter('mn_parent')
+            'mn_parent' => $this->getStringParameter('mn_parent')
         ]);
     }
 }

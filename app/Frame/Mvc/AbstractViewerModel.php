@@ -22,18 +22,18 @@ abstract class AbstractViewerModel extends AbstractDetailModel
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
-        return 0;
+        return '';
     }
 
     /**
      * Base detail model constructor.
      *
-     * @param string $nameSpace           To store the name space of the page.
-     * @param string $route               To store the name space of the page.
+     * @param string $nameSpace To store the name space of the page.
+     * @param string $route To store the name space of the page.
      * @param string $detailReferenceCode To store the detail reference code.
      */
     public function __construct(string $nameSpace, string $route, string $detailReferenceCode)
@@ -89,10 +89,10 @@ abstract class AbstractViewerModel extends AbstractDetailModel
     /**
      * Function to generate table view.
      *
-     * @param array   $data       To store the data.
-     * @param integer $large      To set the grid amount for a large screen.
-     * @param integer $medium     To set the grid amount for a medium screen.
-     * @param integer $small      To set the grid amount for a small screen.
+     * @param array $data To store the data.
+     * @param integer $large To set the grid amount for a large screen.
+     * @param integer $medium To set the grid amount for a medium screen.
+     * @param integer $small To set the grid amount for a small screen.
      * @param integer $extraSmall To set the grid amount for a extra small screen.
      *
      * @return string

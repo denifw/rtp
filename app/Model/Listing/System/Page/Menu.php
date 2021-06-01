@@ -72,8 +72,7 @@ class Menu extends AbstractListingModel
         # Load the data for Menu.
         $listingData = $this->loadData();
         $this->ListingTable->addRows($listingData);
-        $this->ListingTable->setViewActionByHyperlink($this->getViewRoute(), ['mn_id']);
-        $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['mn_id'], true);
+        $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['mn_id'], false);
         $this->ListingTable->setColumnType('mn_order', 'integer');
         $this->ListingTable->setColumnType('mn_active', 'yesno');
     }

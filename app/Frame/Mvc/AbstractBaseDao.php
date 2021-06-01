@@ -116,7 +116,7 @@ abstract class AbstractBaseDao extends Model
         $colValue = array_merge($fieldData, [
             $this->TablePrefix . '_created_on' => date('Y-m-d H:i:s'),
             $this->TablePrefix . '_created_by' => $user->getId(),
-            $this->TablePrefix . '_uid' => $this->LastInsertId,
+            $this->TablePrefix . '_id' => $this->LastInsertId,
         ]);
         DB::table($this->table)->insert($colValue);
     }

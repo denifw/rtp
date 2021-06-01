@@ -14,4 +14,13 @@ return [
     'exportXls' => 'Unduh XLS',
     'reload' => 'Muat Ulang',
     'options' => 'Opsi',
+    'parentMenu' => 'Parent Menu',
+    'icon' => 'Icon',
+    'formInsert' => 'Form Penambahan Data',
+    'formUpdate' => 'Form Perubahan Data',
+    'general' => 'Umum',
+    'insert' => 'Tambahkan',
+    'close' => 'Tutup',
+    'code' => 'Kode',
+    'save' => 'Simpan',
 ];

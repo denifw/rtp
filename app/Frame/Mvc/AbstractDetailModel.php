@@ -49,9 +49,9 @@ abstract class AbstractDetailModel extends AbstractBaseLayout
     /**
      * Property to store the reference value.
      *
-     * @var int
+     * @var string
      */
-    private $DetailReferenceValue = 0;
+    private $DetailReferenceValue = '';
     /**
      * Property to store the trigger to show insert button.
      *
@@ -115,8 +115,8 @@ abstract class AbstractDetailModel extends AbstractBaseLayout
      * Base detail model constructor.
      *
      * @param string $pageCategory To store the name page category.
-     * @param string $nameSpace    To store the name space of the page.
-     * @param string $route        To store the name space of the page.
+     * @param string $nameSpace To store the name space of the page.
+     * @param string $route To store the name space of the page.
      */
     public function __construct(string $pageCategory, string $nameSpace, string $route)
     {
@@ -135,9 +135,9 @@ abstract class AbstractDetailModel extends AbstractBaseLayout
     /**
      * Abstract function to insert data into database.
      *
-     * @return null|int
+     * @return string
      */
-    abstract protected function doInsert(): ?int;
+    abstract protected function doInsert(): string;
 
     /**
      * Abstract function to update data in database.
@@ -264,26 +264,28 @@ abstract class AbstractDetailModel extends AbstractBaseLayout
     /**
      * Function to get the detail reference value.
      *
-     * @return integer
+     * @return string
      */
-    public function getDetailReferenceValue(): int
+    public function getDetailReferenceValue(): ?string
     {
         if (empty($this->DetailReferenceValue) === true && empty($this->getDetailReferenceCode()) === false) {
-            $this->DetailReferenceValue = (int)$this->getIntParameter($this->getDetailReferenceCode());
+            $this->DetailReferenceValue = $this->getStringParameter($this->getDetailReferenceCode());
         }
-
         return $this->DetailReferenceValue;
     }
 
     /**
      * Function to set the detail reference value.
      *
-     * @param integer $detailReferenceValue To store the last key value.
+     * @param string $detailReferenceValue To store the last key value.
      *
      * @return void
      */
-    public function setDetailReferenceValue($detailReferenceValue): void
+    public function setDetailReferenceValue(string $detailReferenceValue): void
     {
+        if ($detailReferenceValue === null) {
+            $detailReferenceValue = '';
+        }
         $this->DetailReferenceValue = $detailReferenceValue;
     }
 
@@ -549,11 +551,11 @@ abstract class AbstractDetailModel extends AbstractBaseLayout
     /**
      * Function to get the bank Field Set.
      *
-     * @param string $docGroup       To store the document group reference.
-     * @param int    $groupReference To store the document reference.
-     * @param string $docType        To store the document group reference.
-     * @param int    $typeReference  To store the document reference.
-     * @param bool   $allowUpdate    To set trigger to update document.
+     * @param string $docGroup To store the document group reference.
+     * @param int $groupReference To store the document reference.
+     * @param string $docType To store the document group reference.
+     * @param int $typeReference To store the document reference.
+     * @param bool $allowUpdate To set trigger to update document.
      *
      * @return Portlet
      */

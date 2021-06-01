@@ -83,7 +83,7 @@ class MenuDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT m1.mn_id, m1.mn_code, m1.mn_name, m1.mn_active, m2.mn_name AS parent_menu, m1.mn_parent,
+        $query = 'SELECT m1.mn_id, m1.mn_code, m1.mn_icon, m1.mn_name, m1.mn_active, m2.mn_name AS parent_menu, m1.mn_parent,
                         m1.mn_order, m2.mn_order as parent_order
                 FROM menu AS m1
                     LEFT OUTER JOIN menu AS m2 ON m1.mn_parent = m2.mn_id' . $strWhere;
