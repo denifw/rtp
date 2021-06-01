@@ -22,5 +22,15 @@ class OfficeSeeder extends Seeder
             'of_active' => 'Y',
             'of_created_on' => date('Y-m-d H:i:s'),
             'of_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1')]);
+        DB::table('office')->insert([
+            'of_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'of2'),
+            'of_rel_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'rel2'),
+            'of_name' => 'NC',
+            'of_invoice' => 'Y',
+            'of_cp_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'cp2'),
+            'of_address' => 'Jalan Kramat Jaya No. 48, Tugu Utara',
+            'of_active' => 'Y',
+            'of_created_on' => date('Y-m-d H:i:s'),
+            'of_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1')]);
     }
 }

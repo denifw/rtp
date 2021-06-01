@@ -9,9 +9,10 @@
 namespace App\Model\Listing\System\Page;
 
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
+use App\Model\Dao\System\Page\MenuDao;
 
 /**
  * Class to manage the creation of the listing Menu page.
@@ -32,7 +33,7 @@ class Menu extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'menu');
+        parent::__construct(get_class($this), 'mn');
         $this->setParameters($parameters);
     }
 
@@ -43,8 +44,8 @@ class Menu extends AbstractListingModel
      */
     public function loadSearchForm(): void
     {
-        $parentField = $this->Field->getSingleSelect('menu', 'parent_menu', $this->getStringParameter('parent_menu'));
-        $parentField->setHiddenField('mn_parent', $this->getIntParameter('mn_parent'));
+        $parentField = $this->Field->getSingleSelect('mn', 'parent_menu', $this->getStringParameter('parent_menu'));
+        $parentField->setHiddenField('mn_parent', $this->getStringParameter('mn_parent'));
         $parentField->setEnableNewButton(false);
         $parentField->setEnableDetailButton(false);
         $this->ListingForm->addField(Trans::getWord('name'), $this->Field->getText('mn_name', $this->getStringParameter('mn_name')));
@@ -69,11 +70,11 @@ class Menu extends AbstractListingModel
             ]
         );
         # Load the data for Menu.
-        $columns = array_merge(array_keys($this->ListingTable->getHeaderRow()), ['mn_id']);
-        $listingData = $this->loadData($columns);
+        $listingData = $this->loadData();
         $this->ListingTable->addRows($listingData);
         $this->ListingTable->setViewActionByHyperlink($this->getViewRoute(), ['mn_id']);
         $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['mn_id'], true);
+        $this->ListingTable->setColumnType('mn_order', 'integer');
         $this->ListingTable->setColumnType('mn_active', 'yesno');
     }
 
@@ -84,69 +85,44 @@ class Menu extends AbstractListingModel
      */
     protected function getTotalRows(): int
     {
-        # Set Select query;
-        $query = 'SELECT count(DISTINCT (m1.mn_id)) AS total_rows
-                   FROM menu AS m1 LEFT OUTER JOIN
-                menu AS m2 ON m1.mn_parent = m2.mn_id';
-        # Set where condition.
-        $query .= $this->getWhereCondition();
-
-        return $this->loadTotalListingRows($query);
+        return MenuDao::loadTotalData($this->getWhereCondition());
     }
 
 
     /**
      * Get query to get the listing data.
      *
-     * @param array $outFields To store the out field from selection data.
-     *
      * @return array
      */
-    private function loadData(array $outFields): array
+    private function loadData(): array
     {
-        # Set Select query;
-        $query = 'SELECT m1.mn_id, m1.mn_name, m1.mn_active, m2.mn_name AS parent_menu, m1.mn_parent, m1.mn_order , m2.mn_order as parent_order
-                FROM menu AS m1 LEFT OUTER JOIN
-                menu AS m2 ON m1.mn_parent = m2.mn_id';
-        # Set Where condition.
-        $query .= $this->getWhereCondition();
-        # Set group by query.
-        $query .= ' GROUP BY m1.mn_id, m1.mn_name, m1.mn_active, m2.mn_name, m1.mn_parent, m1.mn_order, m2.mn_order ';
-        # Set order by query.
-        if (empty($this->ListingSort->getSelectedField()) === false) {
-            $query .= $this->ListingSort->getOrderByQuery();
-        } else {
-            $query .= ' ORDER BY m2.mn_order, m1.mn_order';
-        }
-
-        return $this->loadDatabaseRow($query, $outFields);
+        return MenuDao::loadData(
+            $this->getWhereCondition(),
+            $this->ListingSort->getOrderByFields(),
+            $this->getLimitTable(),
+            $this->getLimitOffsetTable());
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return string
+     * @return array
      */
-    private function getWhereCondition(): string
+    private function getWhereCondition(): array
     {
         # Set where conditions
         $wheres = [];
         if ($this->isValidParameter('mn_name') === true) {
-            $wheres[] = StringFormatter::generateLikeQuery('m1.mn_name', $this->getStringParameter('mn_name'));
+            $wheres[] = SqlHelper::generateLikeCondition('m1.mn_name', $this->getStringParameter('mn_name'));
         }
         if ($this->isValidParameter('mn_parent') === true) {
-            $wheres[] = '(m1.mn_parent = ' . $this->getIntParameter('mn_parent') . ')';
+            $wheres[] = SqlHelper::generateStringCondition('m1.mn_parent', $this->getStringParameter('mn_parent'));
         }
         if ($this->isValidParameter('mn_active') === true) {
-            $wheres[] = "(m1.mn_active = '" . $this->getStringParameter('mn_active') . "')";
+            $wheres[] = SqlHelper::generateStringCondition('m1.mn_active', $this->getStringParameter('mn_active'));
         }
 
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
 
-        # return the where query.
-        return $strWhere;
+        return $wheres;
     }
 }

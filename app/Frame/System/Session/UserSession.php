@@ -86,19 +86,19 @@ class UserSession
     /**
      * Function to get user id
      *
-     * @return int
+     * @return string
      */
-    public function getId(): int
+    public function getId(): string
     {
-        return $this->getIntValue('us_id');
+        return $this->getStringValue('us_id');
     }
 
     /**
      * Function to get user id
      *
-     * @return int
+     * @return string
      */
-    public function getSsId(): int
+    public function getSsId(): string
     {
         return $this->Settings->getId();
     }
@@ -106,9 +106,9 @@ class UserSession
     /**
      * Function to get user id
      *
-     * @return int
+     * @return string
      */
-    public function getRelId(): int
+    public function getRelId(): string
     {
         return $this->Relation->getId();
     }
@@ -145,24 +145,23 @@ class UserSession
     }
 
     /**
-     * Function to check is user allow e-mail
+     * Function to check is relation user own system or not
      *
      * @return bool
      */
-    public function isAllowMail(): bool
+    public function isOwnSystem(): bool
     {
-        $val = $this->getStringValue('us_allow_mail');
-        return ($val === 'Y');
+        return $this->getRelId() === $this->Settings->getOwnerId();
     }
 
     /**
      * Function to get language uid
      *
-     * @return int
+     * @return string
      */
-    public function getLanguageId(): int
+    public function getLanguageId(): string
     {
-        return $this->getIntValue('us_lg_id');
+        return $this->getStringValue('us_lg_id');
     }
 
     /**
@@ -198,33 +197,11 @@ class UserSession
     /**
      * Function to get User mapping id
      *
-     * @return int
-     */
-    public function getMappingId(): int
-    {
-        return $this->getIntValue('ump_id');
-    }
-
-    /**
-     * Function to get User api token
-     *
      * @return string
      */
-    public function getApiToken(): string
+    public function getMappingId(): string
     {
-        return $this->getStringValue('us_api_token');
-    }
-
-    /**
-     * Function to get User api token
-     *
-     * @param string $token To Store the token.
-     *
-     * @return void
-     */
-    public function setApiToken(string $token): void
-    {
-        $this->Data['us_api_token'] = $token;
+        return $this->getStringValue('ump_id');
     }
 
     /**
@@ -284,21 +261,6 @@ class UserSession
             return $this->Data[$keyWord];
         }
         return '';
-    }
-
-    /**
-     * Function to get user id
-     *
-     * @param string $keyWord To store the keyword.
-     *
-     * @return int
-     */
-    private function getIntValue(string $keyWord): int
-    {
-        if (array_key_exists($keyWord, $this->Data) === true && $this->Data[$keyWord] !== null && is_numeric($this->Data[$keyWord]) === true) {
-            return (int)$this->Data[$keyWord];
-        }
-        return 0;
     }
 
 }

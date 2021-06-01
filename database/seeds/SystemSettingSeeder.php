@@ -27,5 +27,20 @@ class SystemSettingSeeder extends Seeder
             'ss_active' => 'Y',
             'ss_created_on' => date('Y-m-d H:i:s'),
             'ss_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1')]);
+        DB::table('system_setting')->insert([
+            'ss_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'ss2'),
+            'ss_relation' => 'PT Nusantara Construction',
+            'ss_lg_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'lg2'),
+            'ss_cur_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'cur1'),
+            'ss_decimal_number' => 2,
+            'ss_decimal_separator' => ',',
+            'ss_thousand_separator' => '.',
+            'ss_logo' => 'spada.png',
+            'ss_name_space' => 'nc',
+            'ss_rel_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'rel2'),
+            'ss_system' => 'Y',
+            'ss_active' => 'Y',
+            'ss_created_on' => date('Y-m-d H:i:s'),
+            'ss_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1')]);
     }
 }

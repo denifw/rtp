@@ -41,11 +41,11 @@ class SystemSettingSession
     /**
      * Function to get user id
      *
-     * @return int
+     * @return string
      */
-    public function getId(): int
+    public function getId(): string
     {
-        return $this->getIntValue('ss_id');
+        return $this->getStringValue('ss_id');
     }
 
     /**
@@ -57,6 +57,27 @@ class SystemSettingSession
     public function setData(array $data): void
     {
         $this->Data = $data;
+    }
+
+    /**
+     * Function to get system name space
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->getStringValue('ss_relation');
+    }
+
+
+    /**
+     * Function to get system name space
+     *
+     * @return string
+     */
+    public function getOwnerId(): string
+    {
+        return $this->getStringValue('ss_rel_id');
     }
 
     /**
@@ -101,11 +122,7 @@ class SystemSettingSession
      */
     public function getDecimalNumber(): int
     {
-
-        if (array_key_exists('ss_decimal_number', $this->Data) === true && $this->Data['ss_decimal_number'] !== null) {
-            return (int)$this->Data['ss_decimal_number'];
-        }
-        return 0;
+        return $this->getIntValue('ss_decimal_number');
     }
 
     /**
@@ -141,11 +158,11 @@ class SystemSettingSession
     /**
      * Function to get currency uid
      *
-     * @return int
+     * @return string
      */
-    public function getCurrencyId(): int
+    public function getCurrencyId(): string
     {
-        return $this->getIntValue('ss_cur_id');
+        return $this->getStringValue('ss_cur_id');
     }
 
     /**

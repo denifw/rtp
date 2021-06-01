@@ -24,5 +24,17 @@ class RelationSeeder extends Seeder
             'rel_created_on' => date('Y-m-d H:i:s'),
             'rel_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1')
         ]);
+        DB::table('relation')->insert([
+            'rel_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'rel2'),
+            'rel_ss_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'ss2'),
+            'rel_name' => 'PT Nusantara Construction',
+            'rel_number' => 'REL-210100001',
+            'rel_short_name' => 'NC',
+            'rel_of_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'of2'),
+            'rel_cp_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'cp2'),
+            'rel_active' => 'Y',
+            'rel_created_on' => date('Y-m-d H:i:s'),
+            'rel_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1')
+        ]);
     }
 }

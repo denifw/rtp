@@ -139,7 +139,6 @@ abstract class AbstractListingModel extends AbstractBaseLayout
         $this->View->addContent('listing_table', $portlet);
         # Add default button to the view.
         $this->loadDefaultButton();
-
         return parent::createView();
     }
 

@@ -184,7 +184,6 @@ class PageController extends Controller
             $model->addErrorMessage(Trans::getWord('invalidCheckFound', 'message'));
         }
         $content = $model->createView();
-
         if ($model->isPopupLayout() === true) {
             return view('popup_listing', $content);
         }

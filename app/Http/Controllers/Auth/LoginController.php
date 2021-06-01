@@ -68,7 +68,6 @@ class LoginController extends AbstractBaseAuthController
 
             return view('auth.login')->withErrors([$error])->with('us_username', request('us_username'));
         }
-
         try {
             $userDao = new UsersDao();
             $user = $userDao->getLoginData(request('us_username'), request('us_password'));
@@ -84,7 +83,6 @@ class LoginController extends AbstractBaseAuthController
                 Message::throwMessage(Trans::getWord('failed', 'message'));
             }
             $user = array_merge($user, $userSetting);
-
             $this->setSession($user);
 
             return redirect('/');

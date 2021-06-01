@@ -52,11 +52,11 @@ class RelationSession
     /**
      * Function to get user id
      *
-     * @return int
+     * @return string
      */
-    public function getId(): int
+    public function getId(): string
     {
-        return $this->getIntValue('rel_id');
+        return $this->getStringValue('rel_id');
     }
 
     /**
@@ -82,11 +82,11 @@ class RelationSession
     /**
      * Function to get contact person id
      *
-     * @return int
+     * @return string
      */
-    public function getPersonId(): int
+    public function getPersonId(): string
     {
-        return $this->getIntValue('cp_id');
+        return $this->getStringValue('cp_id');
     }
 
     /**
@@ -102,11 +102,11 @@ class RelationSession
     /**
      * Function to get office id
      *
-     * @return int
+     * @return string
      */
-    public function getOfficeId(): int
+    public function getOfficeId(): string
     {
-        return $this->getIntValue('of_id');
+        return $this->getStringValue('of_id');
     }
 
     /**
@@ -132,21 +132,6 @@ class RelationSession
             return $this->Data[$keyWord];
         }
         return '';
-    }
-
-    /**
-     * Function to get user id
-     *
-     * @param string $keyWord To store the keyword.
-     *
-     * @return int
-     */
-    private function getIntValue(string $keyWord): int
-    {
-        if (array_key_exists($keyWord, $this->Data) === true && $this->Data[$keyWord] !== null && is_numeric($this->Data[$keyWord]) === true) {
-            return (int)$this->Data[$keyWord];
-        }
-        return 0;
     }
 
 }

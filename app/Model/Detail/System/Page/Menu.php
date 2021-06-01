@@ -33,7 +33,7 @@ class Menu extends AbstractFormModel
      */
     public function __construct(array $parameters)
     {
-        parent::__construct(get_class($this), 'menu', 'mn_id');
+        parent::__construct(get_class($this), 'mn', 'mn_id');
         $this->setParameters($parameters);
     }
 

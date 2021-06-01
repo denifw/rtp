@@ -40,13 +40,13 @@ abstract class AbstractBaseAuthController extends Controller
     /**
      * Function to generate the user token.
      *
-     * @param array  $user      To set the user id.
+     * @param array $user To set the user id.
      * @param string $tokenType To set the type of the token.
-     * @param bool   $remember  To set the remember of the user.
+     * @param bool $remember To set the remember of the user.
      *
      * @return string
      */
-    protected function generateToken($user, $tokenType, $remember = false): string
+    protected function generateToken(array $user, string $tokenType, bool $remember = false): string
     {
 
         $userTokenDao = new UserTokenDao();
@@ -79,6 +79,7 @@ abstract class AbstractBaseAuthController extends Controller
     {
         # Set remember user.
         if (empty($user) === false) {
+            # Load all other system setting for login user.
             if ($user['us_system'] === 'N') {
                 $user['systems'] = UserMappingDao::loadAllUserMappingData($user['us_id'], $user['ss_id']);
             } else {
@@ -86,14 +87,14 @@ abstract class AbstractBaseAuthController extends Controller
             }
 
             $remember = false;
-//            if (empty(request('remember')) === false) {
-//                $remember = true;
-//            }
+            if (empty(request('remember')) === false) {
+                $remember = true;
+            }
             # Generate the token
+            $user['remember'] = $remember;
             $token = $this->generateToken($user, 'LOGIN', $remember);
             $user['ut_token'] = $token;
             $user['ut_type'] = 'LOGIN';
-            $user['remember'] = $remember;
             $settings = new SystemSettings();
             $settings->registerSystemSetting($user);
         } else {

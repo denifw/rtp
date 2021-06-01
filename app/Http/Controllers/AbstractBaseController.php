@@ -26,7 +26,7 @@ class AbstractBaseController extends Controller
     /**
      * Function to control listing screen
      *
-     * @param \App\Frame\Mvc\AbstractDashboardModel $model
+     * @param AbstractDashboardModel $model
      *
      * @return mixed
      */

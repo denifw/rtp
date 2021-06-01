@@ -10,6 +10,7 @@
 
 namespace App\Frame\Gui\Html\Fields;
 
+use App\Frame\Formatter\Trans;
 use App\Frame\Gui\Html\FieldsInterface;
 use App\Frame\Gui\Html\Html;
 
@@ -87,9 +88,9 @@ class YesNo extends Html implements FieldsInterface
         # Combine elements
         $result = '<div style = "line-height: normal" class="form-check-input" id="' . $this->Id . '">';
         $result .= $this->Yes;
-        $result .= '<label class="check-label" for="' . $this->Id . '_Y">' . trans('global.yes') . '</label>';
+        $result .= '<label class="check-label" for="' . $this->Id . '_Y">' . Trans::getWord('yes') . '</label>';
         $result .= $this->No;
-        $result .= '<label class="check-label" for="' . $this->Id . '_N">' . trans('global.no') . '</label>';
+        $result .= '<label class="check-label" for="' . $this->Id . '_N">' . Trans::getWord('no') . '</label>';
         $result .= '</div>';
 
         return $result;

@@ -27,22 +27,12 @@ class DashboardController extends AbstractBaseController
         $pages = SystemSettings::loadSettings('pages');
         $page = null;
         if ($pages !== null) {
-            foreach ($pages AS $p) {
+            foreach ($pages as $p) {
                 if ($page === null && $p['pc_name'] === 'Dashboard') {
                     $page = $p;
                 }
             }
             if ($page !== null) {
-                $user = new UserSession();
-                $wheres[] = '(dsh.dsh_ss_id = ' . $user->getSsId() . ')';
-                $wheres[] = '(dsh.dsh_us_id = ' . $user->getId() . ')';
-                $wheres[] = '(dsh.dsh_deleted_on IS NULL)';
-                $orderList[] = 'dsh.dsh_order ASC';
-                $dashboard = DashboardDao::loadData($wheres, $orderList, 1);
-                if (empty($dashboard) === false) {
-                    return redirect($page['pg_route'] . '?dsh_id=' . $dashboard[0]['dsh_id']);
-                }
-
                 return redirect($page['pg_route']);
             }
         }

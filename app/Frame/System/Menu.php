@@ -67,7 +67,7 @@ class Menu
      * @param string $activeUrl To store the url.
      *                          AdminMenu constructor.
      */
-    public function __construct($activeUrl)
+    public function __construct(string $activeUrl)
     {
         $this->ActiveUrl = $activeUrl;
         $this->User = new UserSession();
@@ -158,7 +158,7 @@ class Menu
      *
      * @return string
      */
-    private function getItemLinkMenu($menuId): string
+    private function getItemLinkMenu(string $menuId): string
     {
         $result = '';
         if (array_key_exists($menuId, $this->Pages) === true) {

@@ -13,8 +13,8 @@ class Authorize
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure                 $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
      *
      * @return mixed
      */
@@ -30,7 +30,7 @@ class Authorize
             $lg = $user->Settings->getLanguageIso();
         }
         if (empty($lg) === true) {
-            $lg = 'en';
+            $lg = 'id';
         }
         App::setLocale($lg);
 

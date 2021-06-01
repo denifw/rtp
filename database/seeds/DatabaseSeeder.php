@@ -27,7 +27,8 @@ class DatabaseSeeder extends Seeder
             RelationSeeder::class,
             OfficeSeeder::class,
             ContactPersonSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,
+            UserMappingSeeder::class
         ]);
     }
 }

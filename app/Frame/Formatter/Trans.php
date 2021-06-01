@@ -26,14 +26,14 @@ class Trans
     /**
      * Function to get the translation of the page as title.
      *
-     * @param string $wordId   To store the parameter translation.
+     * @param string $wordId To store the parameter translation.
      * @param string $fileName To store the file master translation.
-     * @param string $default  To store the default value if the translation is empty.
-     * @param array  $params   To store parameter into the translation system.
+     * @param string $default To store the default value if the translation is empty.
+     * @param array $params To store parameter into the translation system.
      *
      * @return string
      */
-    public static function getWord(string $wordId, string $fileName = 'global', $default = '', array $params = []): string
+    public static function getWord(string $wordId, string $fileName = 'default', string $default = '', array $params = []): string
     {
         if ($fileName === null || $wordId === null || $fileName === '' || $wordId === '') {
             Message::throwMessage('Invalid translation parameter for file name \'' . $fileName . '\' and param \'' . $wordId . '\'', 'DEBUG');
@@ -54,9 +54,51 @@ class Trans
     /**
      * Function to get the translation of the page as title.
      *
-     * @param string $wordId   To store the parameter translation.
-     * @param string $default  To store the default value if the translation is empty.
-     * @param array  $params   To store parameter into the translation system.
+     * @param string $wordId To store the parameter translation.
+     * @param string $default To store the default value if the translation is empty.
+     * @param array $params To store parameter into the translation system.
+     *
+     * @return string
+     */
+    public static function getMessageWord(string $wordId, string $default = '', array $params = []): string
+    {
+        return self::getWord($wordId, 'message', $default, $params);
+    }
+
+    /**
+     * Function to get the translation of the page as title.
+     *
+     * @param string $wordId To store the parameter translation.
+     * @param string $default To store the default value if the translation is empty.
+     * @param array $params To store parameter into the translation system.
+     *
+     * @return string
+     */
+    public static function getMenuWord(string $wordId, string $default = '', array $params = []): string
+    {
+        return self::getWord($wordId, 'menu', $default, $params);
+    }
+
+    /**
+     * Function to get the translation of the page as title.
+     *
+     * @param string $wordId To store the parameter translation.
+     * @param string $default To store the default value if the translation is empty.
+     * @param array $params To store parameter into the translation system.
+     *
+     * @return string
+     */
+    public static function getPageWord(string $wordId, string $default = '', array $params = []): string
+    {
+        return self::getWord($wordId, 'page', $default, $params);
+    }
+
+    /**
+     * Function to get the translation of the page as title.
+     *
+     * @param string $wordId To store the parameter translation.
+     * @param string $default To store the default value if the translation is empty.
+     * @param array $params To store parameter into the translation system.
      *
      * @return string
      */
@@ -81,9 +123,9 @@ class Trans
     /**
      * Function to get the translation of the page as title.
      *
-     * @param string $wordId   To store the parameter translation.
-     * @param string $default  To store the default value if the translation is empty.
-     * @param array  $params   To store parameter into the translation system.
+     * @param string $wordId To store the parameter translation.
+     * @param string $default To store the default value if the translation is empty.
+     * @param array $params To store parameter into the translation system.
      *
      * @return string
      */
@@ -108,9 +150,9 @@ class Trans
     /**
      * Function to get the translation of the page as title.
      *
-     * @param string $wordId   To store the parameter translation.
-     * @param string $default  To store the default value if the translation is empty.
-     * @param array  $params   To store parameter into the translation system.
+     * @param string $wordId To store the parameter translation.
+     * @param string $default To store the default value if the translation is empty.
+     * @param array $params To store parameter into the translation system.
      *
      * @return string
      */
@@ -135,9 +177,9 @@ class Trans
     /**
      * Function to get the translation of the page as title.
      *
-     * @param string $wordId   To store the parameter translation.
-     * @param string $default  To store the default value if the translation is empty.
-     * @param array  $params   To store parameter into the translation system.
+     * @param string $wordId To store the parameter translation.
+     * @param string $default To store the default value if the translation is empty.
+     * @param array $params To store parameter into the translation system.
      *
      * @return string
      */
@@ -162,36 +204,9 @@ class Trans
     /**
      * Function to get the translation of the page as title.
      *
-     * @param string $wordId   To store the parameter translation.
-     * @param string $default  To store the default value if the translation is empty.
-     * @param array  $params   To store parameter into the translation system.
-     *
-     * @return string
-     */
-    public static function getMessageWord(string $wordId, $default = '', array $params = []): string
-    {
-        if ($wordId === null || $wordId === '') {
-            Message::throwMessage('Invalid translation parameter for word id : \'' . $wordId . '\'', 'DEBUG');
-        }
-        $key = 'message.' . $wordId;
-        $result = trans($key, $params);
-        if ($result === $key) {
-            if (empty($default) === true) {
-                Message::throwMessage('Word : ' . $wordId . ' with module : \'Message\' did not translated yet.', 'DEBUG');
-            } else {
-                $result = $default;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Function to get the translation of the page as title.
-     *
-     * @param string $wordId   To store the parameter translation.
-     * @param string $default  To store the default value if the translation is empty.
-     * @param array  $params   To store parameter into the translation system.
+     * @param string $wordId To store the parameter translation.
+     * @param string $default To store the default value if the translation is empty.
+     * @param array $params To store parameter into the translation system.
      *
      * @return string
      */
@@ -216,9 +231,9 @@ class Trans
     /**
      * Function to get the translation of the page as title.
      *
-     * @param string $wordId   To store the parameter translation.
-     * @param string $default  To store the default value if the translation is empty.
-     * @param array  $params   To store parameter into the translation system.
+     * @param string $wordId To store the parameter translation.
+     * @param string $default To store the default value if the translation is empty.
+     * @param array $params To store parameter into the translation system.
      *
      * @return string
      */

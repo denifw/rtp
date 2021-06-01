@@ -12,6 +12,8 @@
 namespace App\Frame\System;
 
 use App\Frame\Formatter\DataParser;
+use App\Frame\Formatter\SqlHelper;
+use App\Frame\System\Session\UserSession;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -29,9 +31,9 @@ class SystemSettings
     /**
      * Property to store the user data.
      *
-     * @var array
+     * @var UserSession
      */
-    private $User = [];
+    private $User;
 
     /**
      * Property to store the settings system
@@ -49,7 +51,7 @@ class SystemSettings
      */
     public function registerSystemSetting(array $user): void
     {
-        $this->User = $user;
+        $this->User = new UserSession($user);
         if (session()->exists('user') === false) {
             session()->put('user', $user);
         }
@@ -90,22 +92,16 @@ class SystemSettings
     private function loadMenu(): array
     {
         $wheres = [];
-        $wheres[] = '(mn_deleted_on IS NULL)';
-        $wheres[] = "(mn_active = 'Y')";
+        $wheres[] = SqlHelper::generateNullCondition('mn_deleted_on');
+        $wheres[] = SqlHelper::generateStringCondition('mn_active', 'Y');
         $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         $query = 'SELECT mn_id, mn_name, mn_parent, mn_icon, mn_order
 				FROM menu ' . $strWhere;
-        $query .= ' ORDER BY mn_parent, mn_order';
+        $query .= ' ORDER BY mn_parent, mn_order, mn_id';
         $sqlResult = DB::select($query);
         $result = [];
         if (empty($sqlResult) === false) {
-            $result = DataParser::arrayObjectToArray($sqlResult, [
-                'mn_id',
-                'mn_name',
-                'mn_parent',
-                'mn_icon',
-                'mn_order'
-            ]);
+            $result = DataParser::arrayObjectToArray($sqlResult);
         }
 
         return $result;
@@ -119,46 +115,33 @@ class SystemSettings
     private function loadPage(): array
     {
         $wheres = [];
-        if ($this->User['ss_system'] !== 'Y' || $this->User['us_system'] !== 'Y') {
-            $wheres[] = "(pg.pg_system = 'N')";
+        if ($this->User->Settings->isSystem() === false || $this->User->isUserSystem() === false) {
+            $wheres[] = SqlHelper::generateStringCondition('pg.pg_system', 'N');
         }
-        if ($this->User['us_system'] !== 'Y') {
-            $subWhere = '(pg.pg_id IN (SELECT ugp.ugp_pg_id
+        if ($this->User->isUserSystem() === false) {
+            $subWhere = "(pg.pg_id IN (SELECT ugp.ugp_pg_id
                                 FROM user_group_page AS ugp INNER JOIN
                                      (SELECT ug.usg_id
                                       FROM user_group_detail as ugd INNER JOIN
                                         user_group as ug ON ug.usg_id = ugd.ugd_usg_id
-                                      WHERE (ugd.ugd_deleted_on IS NULL) AND ((ug.usg_ss_id = ' . $this->User['ss_id'] . ') OR (ug.usg_ss_id IS NULL))
-                                        AND (ugd.ugd_ump_id = ' . $this->User['ump_id'] . ") AND (ug.usg_deleted_on IS NULL) AND (ug.usg_active = 'Y') 
+                                      WHERE (ugd.ugd_deleted_on IS NULL) AND ((ug.usg_ss_id = '" . $this->User->getSsId() . "') OR (ug.usg_ss_id IS NULL))
+                                        AND (ugd.ugd_ump_id = '" . $this->User->getMappingId() . "') AND (ug.usg_deleted_on IS NULL) AND (ug.usg_active = 'Y')
                                         GROUP BY ug.usg_id) AS usg ON usg.usg_id = ugp.ugp_usg_id
                                 WHERE (ugp.ugp_deleted_on IS NULL)))";
-            $wheres[] = "((pg.pg_default = 'Y') OR " . $subWhere . ')';
+            $wheres[] = '(' . SqlHelper::generateStringCondition('pg.pg_default', 'Y') . ' OR ' . $subWhere . ')';
         }
-        $wheres[] = '(pg.pg_deleted_on IS NULL)';
-        $wheres[] = "(pg.pg_active = 'Y')";
+        $wheres[] = SqlHelper::generateNullCondition('pg.pg_deleted_on');
+        $wheres[] = SqlHelper::generateStringCondition('pg.pg_active', 'Y');
         $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        $query = 'SELECT pg.pg_id, pg.pg_title, pg.pg_route, pg.pg_icon, pg.pg_description, pg.pg_mn_id, pg.pg_order, 
+        $query = 'SELECT pg.pg_id, pg.pg_title, pg.pg_route, pg.pg_icon, pg.pg_description, pg.pg_mn_id, pg.pg_order,
                       pc.pc_name, pg.pg_default, pg.pg_system, pg.pg_pc_id, pc.pc_route
-				FROM page AS pg INNER JOIN 
+				FROM page AS pg INNER JOIN
 				page_category AS pc on pg.pg_pc_id = pc.pc_id ' . $strWhere;
-        $query .= ' ORDER BY pg.pg_mn_id, pg.pg_order';
+        $query .= ' ORDER BY pg.pg_mn_id, pg.pg_order, pg.pg_id';
         $sqlResult = DB::select($query);
         $results = [];
         if (empty($sqlResult) === false) {
-            $results = DataParser::arrayObjectToArray($sqlResult, [
-                'pg_id',
-                'pg_mn_id',
-                'pg_title',
-                'pg_description',
-                'pg_route',
-                'pg_icon',
-                'pg_order',
-                'pg_default',
-                'pg_system',
-                'pg_pc_id',
-                'pc_name',
-                'pc_route',
-            ]);
+            $results = DataParser::arrayObjectToArray($sqlResult);
         }
 
         return $results;
@@ -169,37 +152,34 @@ class SystemSettings
      *
      * @return array
      */
-    private function loadPageRight(): array
+    private
+    function loadPageRight(): array
     {
         $wheres = [];
         $pageIds = $this->loadPageIds();
-        $wheres[] = '(pr_pg_id IN (' . implode(',', $pageIds) . '))';
-        $wheres[] = "(pr_active = 'Y')";
-        $wheres[] = '(pr_deleted_on IS NULL)';
-        if ($this->User['us_system'] !== 'Y') {
-            $subWhere = '(pr_id IN (SELECT ugr.ugr_pr_id
+        $wheres[] = "(pr_pg_id IN ('" . implode("', '", $pageIds) . "'))";
+        $wheres[] = SqlHelper::generateStringCondition('pr_active', 'Y');
+        $wheres[] = SqlHelper::generateNullCondition('pr_deleted_on');
+        if ($this->User->isUserSystem() === false) {
+            $subWhere = "(pr_id IN (SELECT ugr.ugr_pr_id
                                     FROM user_group_right AS ugr INNER JOIN
                                      (SELECT ug.usg_id
                                       FROM user_group_detail as ugd INNER JOIN
                                         user_group as ug ON ug.usg_id = ugd.ugd_usg_id
-                                      WHERE (ugd.ugd_deleted_on IS NULL) AND ((ug.usg_ss_id = ' . $this->User['ss_id'] . ') OR (ug.usg_ss_id IS NULL))
-                                        AND (ugd.ugd_ump_id = ' . $this->User['ump_id'] . ") AND (ug.usg_deleted_on IS NULL) AND (ug.usg_active = 'Y') 
+                                      WHERE (ugd.ugd_deleted_on IS NULL) AND ((ug.usg_ss_id = '" . $this->User->getSsId() . "') OR (ug.usg_ss_id IS NULL))
+                                        AND (ugd.ugd_ump_id = '" . $this->User->getMappingId() . "') AND (ug.usg_deleted_on IS NULL) AND (ug.usg_active = 'Y')
                                         GROUP BY ug.usg_id) AS usg ON usg.usg_id = ugr.ugr_usg_id
                                     WHERE (ugr.ugr_deleted_on IS NULL)))";
-            $wheres[] = "((pr_default = 'Y') OR " . $subWhere . ')';
+            $wheres[] = '(' . SqlHelper::generateStringCondition('pr_default', 'Y') . ' OR ' . $subWhere . ')';
         }
         $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         $query = 'SELECT pr_id, pr_pg_id, pr_name
                         FROM page_right' . $strWhere;
-        $query .= ' GROUP BY pr_id, pr_pg_id, pr_name';
+        $query .= ' GROUP BY pr_pg_id, pr_name, pr_id';
         $sqlResult = DB::select($query);
         $results = [];
         if (empty($sqlResult) === false) {
-            $temp = DataParser::arrayObjectToArray($sqlResult, [
-                'pr_id',
-                'pr_pg_id',
-                'pr_name'
-            ]);
+            $temp = DataParser::arrayObjectToArray($sqlResult);
             foreach ($temp as $row) {
                 if (array_key_exists($row['pr_pg_id'], $results) === false) {
                     $results[$row['pr_pg_id']] = [];
@@ -217,7 +197,8 @@ class SystemSettings
      *
      * @return array
      */
-    private function loadPageIds(): array
+    private
+    function loadPageIds(): array
     {
         $results = [];
         $pages = $this->Settings['pages'];

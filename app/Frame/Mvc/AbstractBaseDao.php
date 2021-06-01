@@ -39,10 +39,9 @@ abstract class AbstractBaseDao extends Model
     /**
      * Property to store the last insert id.
      *
-     * @var int
+     * @var string
      */
-    protected $LastInsertId = 0;
-
+    protected $LastInsertId = '';
 
     /**
      * Property to store the incremental number.
@@ -50,6 +49,13 @@ abstract class AbstractBaseDao extends Model
      * @var int
      */
     protected $Incremental = 0;
+
+    /**
+     * Property to store the numeric fields.
+     *
+     * @var array
+     */
+    protected $NumericFields = [];
 
     /**
      * Base dao constructor.
@@ -66,25 +72,17 @@ abstract class AbstractBaseDao extends Model
         $this->table = $tableName;
         $this->primaryKey = $prefixTable . '_id';
         $this->initializeRandomIncremental();
-        if (empty($fields) === false) {
-            $fillAble = [];
-            foreach ($fields as $field) {
-                if ($field !== $this->primaryKey) {
-                    $fillAble[] = $field;
-                }
-            }
-            $fillAble = array_merge($fillAble, [
-                $this->TablePrefix . '_created_on',
-                $this->TablePrefix . '_created_by',
-                $this->TablePrefix . '_updated_on',
-                $this->TablePrefix . '_updated_by',
-                $this->TablePrefix . '_deleted_on',
-                $this->TablePrefix . '_deleted_by',
-                $this->TablePrefix . '_deleted_reason',
-                $this->TablePrefix . '_uid',
-            ]);
-            $this->fillable = array_values(array_unique($fillAble));
-        }
+
+        $fields = array_merge($fields, [
+            $this->TablePrefix . '_created_on',
+            $this->TablePrefix . '_created_by',
+            $this->TablePrefix . '_updated_on',
+            $this->TablePrefix . '_updated_by',
+            $this->TablePrefix . '_deleted_on',
+            $this->TablePrefix . '_deleted_by',
+            $this->TablePrefix . '_deleted_reason',
+        ]);
+        $this->fillable = array_values(array_unique($fields));
     }
 
     /**
@@ -95,34 +93,12 @@ abstract class AbstractBaseDao extends Model
     private function initializeRandomIncremental(): void
     {
         try {
-            $this->Incremental = random_int(0, 100);
+            $this->Incremental = random_int(0, 1000);
         } catch (Exception $e) {
             $this->Incremental = 0;
         }
 
     }
-
-
-    /**
-     * Abstract function to do insert transaction.
-     *
-     * @param array $fieldData To store the field value per column.
-     * @param int $userId To store the user data.
-     *
-     * @return void
-     */
-    public function doApiInsertTransaction(array $fieldData, $userId): void
-    {
-        $this->Incremental++;
-        $uidKey = microtime() . $this->TablePrefix . $userId . $this->Incremental;
-        $colValue = array_merge($fieldData, [
-            $this->TablePrefix . '_created_on' => date('Y-m-d H:i:s'),
-            $this->TablePrefix . '_created_by' => $userId,
-            $this->TablePrefix . '_uid' => Uuid::uuid3(Uuid::NAMESPACE_URL, $uidKey),
-        ]);
-        $this->LastInsertId = DB::table($this->table)->insertGetId($colValue, $this->primaryKey);
-    }
-
 
     /**
      * Abstract function to do insert transaction.
@@ -136,47 +112,24 @@ abstract class AbstractBaseDao extends Model
         $user = new UserSession();
         $this->Incremental++;
         $uidKey = microtime() . $this->TablePrefix . $user->getId() . $this->Incremental;
+        $this->LastInsertId = Uuid::uuid3(Uuid::NAMESPACE_URL, $uidKey);
         $colValue = array_merge($fieldData, [
             $this->TablePrefix . '_created_on' => date('Y-m-d H:i:s'),
             $this->TablePrefix . '_created_by' => $user->getId(),
-            $this->TablePrefix . '_uid' => Uuid::uuid3(Uuid::NAMESPACE_URL, $uidKey),
+            $this->TablePrefix . '_uid' => $this->LastInsertId,
         ]);
-        $this->LastInsertId = DB::table($this->table)->insertGetId($colValue, $this->primaryKey);
+        DB::table($this->table)->insert($colValue);
     }
-
-    /**
-     * Abstract function to do insert batch transaction.
-     *
-     * @param array $data To store the field value per column.
-     *
-     * @return void
-     */
-    public function doInsertBatchTransaction(array $data): void
-    {
-        $dataInsert = [];
-        $user = new UserSession();
-        foreach ($data as $fieldData) {
-            $uidKey = microtime() . $this->TablePrefix . $user->getId() . ++$this->Incremental;
-            $colValue = array_merge($fieldData, [
-                $this->TablePrefix . '_created_on' => date('Y-m-d H:i:s'),
-                $this->TablePrefix . '_created_by' => $user->getId(),
-                $this->TablePrefix . '_uid' => Uuid::uuid3(Uuid::NAMESPACE_URL, $uidKey),
-            ]);
-            $dataInsert[] = $colValue;
-        }
-        DB::table($this->table)->insert($dataInsert);
-    }
-
 
     /**
      * Abstract function to load the data.
      *
-     * @param int $primaryKeyValue To store the primary key value.
+     * @param string $primaryKeyValue To store the primary key value.
      * @param array $fieldData To store the field value per column.
      *
      * @return void
      */
-    public function doUpdateTransaction($primaryKeyValue, array $fieldData): void
+    public function doUpdateTransaction(string $primaryKeyValue, array $fieldData): void
     {
         $user = new UserSession();
         $colValue = array_merge($fieldData, [
@@ -191,12 +144,12 @@ abstract class AbstractBaseDao extends Model
     /**
      * Abstract function to load the data.
      *
-     * @param int $primaryKeyValue To store the primary key value.
+     * @param string $primaryKeyValue To store the primary key value.
      * @param string $deleteReason To store the message for deleted data.
      *
      * @return void
      */
-    public function doDeleteTransaction($primaryKeyValue, string $deleteReason = ''): void
+    public function doDeleteTransaction(string $primaryKeyValue, string $deleteReason = ''): void
     {
         $user = new UserSession();
         $data = [
@@ -214,54 +167,11 @@ abstract class AbstractBaseDao extends Model
     /**
      * Abstract function to load the data.
      *
-     * @param int $primaryKeyValue To store the primary key value.
-     * @param array $fieldData To store the field value per column.
-     * @param int $userId To store the user data.
+     * @param string $primaryKeyValue To store the primary key value.
      *
      * @return void
      */
-    public function doApiUpdateTransaction($primaryKeyValue, array $fieldData, $userId): void
-    {
-        $colValue = array_merge($fieldData, [
-            $this->TablePrefix . '_updated_on' => date('Y-m-d H:i:s'),
-            $this->TablePrefix . '_updated_by' => $userId,
-        ]);
-        DB::table($this->table)
-            ->where($this->primaryKey, $primaryKeyValue)
-            ->update($colValue);
-    }
-
-    /**
-     * Abstract function to load the data.
-     *
-     * @param int $primaryKeyValue To store the primary key value.
-     * @param int $userId To store the user data.
-     * @param string $deleteReason To store the message for deleted data.
-     *
-     * @return void
-     */
-    public function doApiDeleteTransaction($primaryKeyValue, $userId, string $deleteReason = ''): void
-    {
-        $data = [
-            $this->TablePrefix . '_deleted_on' => date('Y-m-d H:i:s'),
-            $this->TablePrefix . '_deleted_by' => $userId,
-        ];
-        if (empty($deleteReason) === false) {
-            $data[$this->TablePrefix . '_deleted_reason'] = $deleteReason;
-        }
-        DB::table($this->table)
-            ->where($this->primaryKey, $primaryKeyValue)
-            ->update($data);
-    }
-
-    /**
-     * Abstract function to load the data.
-     *
-     * @param int $primaryKeyValue To store the primary key value.
-     *
-     * @return void
-     */
-    public function doHardDeleteTransaction($primaryKeyValue): void
+    public function doHardDeleteTransaction(string $primaryKeyValue): void
     {
         DB::table($this->table)
             ->where($this->primaryKey, $primaryKeyValue)
@@ -271,11 +181,11 @@ abstract class AbstractBaseDao extends Model
     /**
      * Abstract function to undo delete data.
      *
-     * @param int $primaryKeyValue To store the primary key value.
+     * @param string $primaryKeyValue To store the primary key value.
      *
      * @return void
      */
-    public function doUndoDeleteTransaction($primaryKeyValue): void
+    public function doUndoDeleteTransaction(string $primaryKeyValue): void
     {
         DB::table($this->table)
             ->where($this->primaryKey, $primaryKeyValue)
@@ -286,62 +196,68 @@ abstract class AbstractBaseDao extends Model
             ]);
     }
 
-    /**
-     * Abstract function to load the seeder query.
-     *
-     * @return array
-     */
-    abstract public function loadSeeder(): array;
 
     /**
      * Function to set the user detail that do the un-delete.
      *
-     * @return int
+     * @return string
      */
-    public function getLastInsertId(): int
+    public function getLastInsertId(): string
     {
         return $this->LastInsertId;
     }
 
+
     /**
-     * Function to set the user detail that do the un-delete.
-     *
-     * @param array $textFields To store the required fields.
+     * Abstract function to load the seeder query for table user_mapping.
      *
      * @return array
      */
-    protected function generateSeeder(array $textFields = []): array
+    public function loadSeeder(): array
     {
         $result = [];
         $outFields = $this->getFillAbleFields();
         $data = $this->loadSeedData($outFields);
         if (empty($data) === false) {
             # add default string fields
-            $textFields[] = $this->TablePrefix . '_uid';
-            $textFields[] = $this->TablePrefix . '_deleted_reason';
-            $textFields = array_values(array_unique($textFields));
+            $numberFields = array_values(array_unique($this->NumericFields));
 
             # Generate Seeder
+            $createdBy = Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1');
             foreach ($data as $row) {
                 $query = "DB::table('" . $this->getTable() . "')->insert([";
                 foreach ($outFields as $field) {
-                    if (in_array($field, $textFields, true) === true) {
-                        $val = "'" . $row[$field] . "'";
-                    } else {
+                    if (in_array($field, $numberFields, true) === true) {
                         $val = $row[$field];
+                    } else {
+                        $val = "'" . $row[$field] . "'";
                     }
                     if (empty($val) === false && $val !== "''") {
                         $query .= "'" . $field . "' => " . $val . ', ';
                     }
                 }
-                $query .= "'" . $this->TablePrefix . "_created_on' => date('Y-m-d H:i:s'), ";
-                $query .= "'" . $this->TablePrefix . "_created_by' => 1";
+                $query .= "'" . $this->TablePrefix . "_created_by' => '" . $createdBy . "', ";
+                $query .= "'" . $this->TablePrefix . "_created_on' => date('Y-m-d H:i:s')";
                 $query .= ']);';
                 $result[] = $query;
             }
         }
 
         return $result;
+    }
+
+
+    /**
+     * Function to set the user detail that do the un-delete.
+     *
+     * @param array $numberFields To store the required fields.
+     *
+     * @return array
+     * @deprecated Change to parent function.
+     */
+    protected function generateSeeder(array $numberFields = []): array
+    {
+        return $numberFields;
     }
 
     /**
@@ -383,56 +299,11 @@ abstract class AbstractBaseDao extends Model
         $query = ' SELECT ' . implode(', ', $outFields);
         $query .= ' FROM ' . $this->getTable();
         $query .= ' WHERE (' . $this->TablePrefix . '_deleted_on IS NULL)';
-//        $query .= ' AND (' . $this->TablePrefix . '_usg_id = 65)';
-        $query .= ' ORDER BY ' . $this->primaryKey;
+        $query .= ' ORDER BY ' . $this->TablePrefix . '_created_on, ' . $this->primaryKey;
         $sqlResult = DB::select($query);
         $result = [];
         if (empty($sqlResult) === false) {
             $result = DataParser::arrayObjectToArray($sqlResult, $outFields);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Function to generate order by field.
-     *
-     * @param array $orders To store list order by field.
-     *
-     * @return string
-     */
-    protected static function generateOrderBySyntax(array $orders = []): string
-    {
-        $result = '';
-        $temps = [];
-        if (empty($orders) === false) {
-            $result = ' ORDER BY ';
-            foreach ($orders as $order) {
-                if (is_array($order) === false) {
-                    $result .= $order . ' ';
-                } else {
-                    $temps[] = trim($order[0] . ' ' . $order[1]);
-                }
-            }
-            $result .= implode(', ', $temps);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Function to generate limit query
-     *
-     * @param int $limit To store the maximum row to load.
-     * @param int $offset To store the starting index of the data.
-     *
-     * @return string
-     */
-    protected static function generateLimitSyntax(int $limit = 0, int $offset = 0): string
-    {
-        $result = '';
-        if ($limit !== null && $limit > 0) {
-            $result = ' LIMIT ' . $limit . ' OFFSET ' . $offset;
         }
 
         return $result;

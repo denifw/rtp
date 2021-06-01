@@ -22,5 +22,15 @@ class ContactPersonSeeder extends Seeder
             'cp_created_on' => date('Y-m-d H:i:s'),
             'cp_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1')
         ]);
+        DB::table('contact_person')->insert([
+            'cp_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'cp2'),
+            'cp_number' => 'CP-210100001',
+            'cp_name' => 'Deni Firdaus Waruwu',
+            'cp_email' => 'deni.firdaus.w@gmail.com',
+            'cp_of_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'of2'),
+            'cp_active' => 'Y',
+            'cp_created_on' => date('Y-m-d H:i:s'),
+            'cp_created_by' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'us1')
+        ]);
     }
 }

@@ -266,8 +266,6 @@ abstract class AbstractBaseLayout extends AbstractBaseModel
      */
     public function createView(): array
     {
-        $this->doUpdateNotification();
-
         return $this->View->createView();
     }
 

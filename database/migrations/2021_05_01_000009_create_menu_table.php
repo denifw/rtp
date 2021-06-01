@@ -16,6 +16,7 @@ class CreateMenuTable extends Migration
         Schema::create('menu', function (Blueprint $table) {
             $table->uuid('mn_id')->primary();
             $table->string('mn_name', 128);
+            $table->string('mn_code', 128);
             $table->uuid('mn_parent')->nullable();
             $table->integer('mn_order');
             $table->string('mn_icon', '125');
@@ -27,7 +28,7 @@ class CreateMenuTable extends Migration
             $table->uuid('mn_deleted_by')->nullable();
             $table->dateTime('mn_deleted_on')->nullable();
             $table->string('mn_deleted_reason', 256)->nullable();
-            $table->unique(['mn_name', 'mn_parent'], 'tbl_mn_name_parent_unique');
+            $table->unique(['mn_code', 'mn_parent'], 'tbl_mn_code_parent_unique');
         });
 
     }

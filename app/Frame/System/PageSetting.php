@@ -47,12 +47,12 @@ class PageSetting
     /**
      * Base model constructor.
      *
-     * @param string      $pageCategory To store the page category of the model.
-     * @param string      $pageRoute    To store the name space model to load the page setting.
-     * @param UserSession $user         To store the user object.
+     * @param string $pageCategory To store the page category of the model.
+     * @param string $pageRoute To store the name space model to load the page setting.
+     * @param UserSession $user To store the user object.
      *
      */
-    public function __construct($pageCategory, $pageRoute, UserSession $user)
+    public function __construct(string $pageCategory, string $pageRoute, UserSession $user)
     {
         $this->pageCategory = $pageCategory;
         $this->pageRoute = $pageRoute;
@@ -74,11 +74,11 @@ class PageSetting
      * Function load the page.
      *
      * @param string $pageCategory To store the page category of the model.
-     * @param string $pageRoute    To store the name space model to load the page setting.
+     * @param string $pageRoute To store the name space model to load the page setting.
      *
      * @return void
      */
-    public function loadPage($pageCategory, $pageRoute): void
+    public function loadPage(string $pageCategory, string $pageRoute): void
     {
         $page = null;
         $pages = SystemSettings::loadSettings('pages');
@@ -134,16 +134,6 @@ class PageSetting
     /**
      * Function to get the page title.
      *
-     * @return string
-     */
-    public function getPageTitle(): string
-    {
-        return Trans::getWord($this->Page['pg_id'] . '.title', 'page', $this->Page['pg_title']);
-    }
-
-    /**
-     * Function to get the page title.
-     *
      * @param string $right To store the right name.
      *
      * @return boolean
@@ -184,13 +174,23 @@ class PageSetting
     }
 
     /**
+     * Function to get the page title.
+     *
+     * @return string
+     */
+    public function getPageTitle(): string
+    {
+        return Trans::getPageWord($this->getPageRoute() . '.title', $this->Page['pg_title']);
+    }
+
+    /**
      * Function to get the page description.
      *
      * @return string
      */
     public function getPageDescription(): string
     {
-        return $this->Page['pg_description'];
+        return Trans::getPageWord($this->getPageRoute() . '.description', $this->Page['pg_description']);
     }
 
     /**
