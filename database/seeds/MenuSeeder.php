@@ -26,7 +26,6 @@ class MenuSeeder extends Seeder
             'mn_id' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'mn2'),
             'mn_name' => 'System',
             'mn_code' => 'system',
-            'mn_parent' => Uuid::uuid3(Uuid::NAMESPACE_URL, 'mn1'),
             'mn_order' => 100,
             'mn_icon' => 'fa fa-sitemap',
             'mn_active' => 'Y',

@@ -98,7 +98,7 @@ abstract class AbstractBaseAuthController extends Controller
             $settings = new SystemSettings();
             $settings->registerSystemSetting($user);
         } else {
-            Message::throwMessage(Trans::getWord('failed', 'message'));
+            Message::throwMessage(Trans::getMessageWord('invalidUsernamePassword'));
         }
     }
 

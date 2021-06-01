@@ -14,7 +14,6 @@ use App\Frame\Exceptions\Message;
 use App\Frame\Formatter\Trans;
 use App\Frame\Gui\Icon;
 use App\Frame\System\Session\UserSession;
-use App\Model\Dao\Setting\DashboardDao;
 
 /**
  * Class to control the generation of menu system.
@@ -137,8 +136,8 @@ class Menu
         $result .= '<ul class="nav side-menu">';
         foreach ($this->Menus as $menu) {
             if (empty($menu['mn_parent']) === true) {
-                if (strtolower($menu['mn_name']) === 'root') {
-                    $result .= $this->getItemLinkMenu($menu['mn_id']);
+                if (strtolower($menu['mn_code']) === 'root') {
+                    $result .= $this->getItemLinkMenu($menu);
                 } else {
                     $result .= $this->getItemMenu($menu);
                 }
@@ -154,29 +153,29 @@ class Menu
     /**
      * Function to get the link item for the menu.
      *
-     * @param string $menuId To store the menu id.
+     * @param array $menu To store the menu id.
      *
      * @return string
      */
-    private function getItemLinkMenu(string $menuId): string
+    private function getItemLinkMenu(array $menu): string
     {
         $result = '';
-        if (array_key_exists($menuId, $this->Pages) === true) {
-            $pages = $this->Pages[$menuId];
+        if (array_key_exists($menu['mn_id'], $this->Pages) === true) {
+            $pages = $this->Pages[$menu['mn_id']];
             foreach ($pages as $page) {
                 $selected = $this->isSelectedMenu($page['pg_route'], $page['pc_route']);
                 # Check Active menu.
                 $active = '';
                 if ($selected === true && $this->User->isSet() && $this->User->getMenuStyle() !== 'nav-sm') {
-                    $this->ActiveMenus[$menuId] = true;
+                    $this->ActiveMenus[$menu['mn_id']] = true;
                     $active = ' class="current-page"';
                 }
                 $result .= '<li' . $active . '>';
                 $result .= '<a href="' . url('/' . $this->getPageUrl($page['pg_route'], $page['pc_route'])) . '">';
-                if ($menuId === 1) {
+                if ($menu['mn_code'] === 'root') {
                     $result .= '<i class="' . $page['pg_icon'] . '"></i> ';
                 }
-                $result .= Trans::getWord($page['pg_id'] . '.title', 'page', $page['pg_title']);
+                $result .= Trans::getPageWord($page['pg_route'] . '.title', $page['pg_title']);
                 $result .= '</a>';
                 $result .= '</li>';
             }
@@ -228,13 +227,9 @@ class Menu
      *
      * @return string
      */
-    private function getItemMenu($menu): string
+    private function getItemMenu(array $menu): string
     {
-        if ($menu['mn_name'] === 'Dashboard') {
-            $childMenu = $this->getItemChildMenuDashboard($menu['mn_id']);
-        } else {
-            $childMenu = $this->getItemChildMenu($menu['mn_id']);
-        }
+        $childMenu = $this->getItemChildMenu($menu);
         $result = '';
         # get the item child menu.
         if (empty($childMenu) === false) {
@@ -254,7 +249,7 @@ class Menu
             $result .= '<li' . $active . '>';
             $result .= '<a href="javascript:;">';
             $result .= '<i class="' . $menu['mn_icon'] . '"></i> ';
-            $result .= Trans::getWord($menu['mn_id'], 'menu', $menu['mn_name']);
+            $result .= Trans::getMenuWord($menu['mn_code'], $menu['mn_name']);
             $result .= ' <span class="' . Icon::ChevronDown . '"></span>';
             $result .= '</a>';
             $result .= $childMenu;
@@ -267,95 +262,32 @@ class Menu
     /**
      * Function to get the parent menu.
      *
-     * @param string $menuId To store the menu id.
+     * @param array $menu To store the menu id.
      *
      * @return string
      */
-    private function getItemChildMenu($menuId): string
+    private function getItemChildMenu(array $menu): string
     {
         $result = '';
         # get link item for the link child.
-        $strLink = $this->getItemLinkMenu($menuId);
+        $strLink = $this->getItemLinkMenu($menu);
         $strSubMenu = '';
-        foreach ($this->Menus as $menu) {
-            if ($menu['mn_parent'] === $menuId) {
+        foreach ($this->Menus as $row) {
+            if ($row['mn_parent'] === $menu['mn_id']) {
                 # Call recursive function if there is another menu child.
-                $strSubMenu .= $this->getItemMenu($menu);
+                $strSubMenu .= $this->getItemMenu($row);
             }
         }
         # create sub menu if the link child or menu child is not empty.
         if (empty($strLink) === false || empty($strSubMenu) === false) {
             $styleActive = '';
-            if (array_key_exists($menuId, $this->ActiveMenus) === true) {
+            if (array_key_exists($menu['mn_id'], $this->ActiveMenus) === true) {
                 $styleActive = ' style = "display: block;"';
             }
             $result .= '<ul class="nav child_menu" ' . $styleActive . '>';
             $result .= $strLink;
             $result .= $strSubMenu;
             $result .= '</ul>';
-        }
-
-        return $result;
-    }
-
-    /**
-     * Function to get the parent menu.
-     *
-     * @param string $menuId To store the menu id.
-     *
-     * @return string
-     */
-    private function getItemChildMenuDashboard($menuId): string
-    {
-        $result = '';
-        # Load Dashboard User
-        $wheres[] = '(dsh.dsh_ss_id = ' . $this->User->getSsId() . ')';
-        $wheres[] = '(dsh.dsh_us_id = ' . $this->User->getId() . ')';
-        $wheres[] = '(dsh.dsh_deleted_on IS NULL)';
-        $orderList[] = 'dsh.dsh_order ASC';
-        $dashboard = DashboardDao::loadData($wheres, $orderList);
-        # get link item for the link child.
-        $strLink = '';
-        $strSubMenu = '';
-        if (empty($dashboard) === false) {
-            $selected = $this->isSelectedMenu('home', '');
-            # Check Active menu.
-            $active = '';
-            if ($selected === true && $this->User->isSet() && $this->User->getMenuStyle() !== 'nav-sm') {
-                $this->ActiveMenus[$menuId] = true;
-                $active = ' class="current-page"';
-            }
-            foreach ($dashboard as $row) {
-                if ((int)request('dsh_id') === $row['dsh_id']) {
-                    $strLink .= '<li ' . $active . '>';
-                } else {
-                    $strLink .= '<li>';
-                }
-                $strLink .= '<a href="' . url('/home?dsh_id=' . $row['dsh_id']) . '">';
-                $strLink .= $row['dsh_name'];
-                $strLink .= '</a>';
-                $strLink .= '</li>';
-            }
-        } else {
-            $strLink = $this->getItemLinkMenu($menuId);
-        }
-        foreach ($this->Menus as $menu) {
-            if ($menu['mn_parent'] === $menuId) {
-                # Call recursive function if there is another menu child.
-                $strSubMenu .= $this->getItemMenu($menu);
-            }
-        }
-        # create sub menu if the link child or menu child is not empty.
-        if (empty($strLink) === false || empty($strSubMenu) === false) {
-            $styleActive = '';
-            if (array_key_exists($menuId, $this->ActiveMenus) === true) {
-                $styleActive = ' style = "display: block;"';
-            }
-            $result .= '<ul class="nav child_menu" ' . $styleActive . '>';
-            $result .= $strLink;
-            $result .= $strSubMenu;
-            $result .= '</ul>';
-
         }
 
         return $result;

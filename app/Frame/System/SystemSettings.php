@@ -95,7 +95,7 @@ class SystemSettings
         $wheres[] = SqlHelper::generateNullCondition('mn_deleted_on');
         $wheres[] = SqlHelper::generateStringCondition('mn_active', 'Y');
         $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        $query = 'SELECT mn_id, mn_name, mn_parent, mn_icon, mn_order
+        $query = 'SELECT mn_id, mn_code, mn_name, mn_parent, mn_icon, mn_order
 				FROM menu ' . $strWhere;
         $query .= ' ORDER BY mn_parent, mn_order, mn_id';
         $sqlResult = DB::select($query);

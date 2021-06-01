@@ -72,7 +72,7 @@ class LoginController extends AbstractBaseAuthController
             $userDao = new UsersDao();
             $user = $userDao->getLoginData(request('us_username'), request('us_password'));
             if (empty($user) === true) {
-                Message::throwMessage(Trans::getWord('failed', 'message'));
+                Message::throwMessage(Trans::getMessageWord('invalidUsernamePassword'));
             }
             if ($user['us_system'] === 'N') {
                 $userSetting = UserMappingDao::loadUserMappingData($user['us_id']);
@@ -80,7 +80,7 @@ class LoginController extends AbstractBaseAuthController
                 $userSetting = UserMappingDao::loadSystemMappingData();
             }
             if (empty($userSetting) === true) {
-                Message::throwMessage(Trans::getWord('failed', 'message'));
+                Message::throwMessage(Trans::getMessageWord('invalidUsernamePassword'));
             }
             $user = array_merge($user, $userSetting);
             $this->setSession($user);
@@ -115,7 +115,7 @@ class LoginController extends AbstractBaseAuthController
             $userSession = new UserSession();
             $user = UsersDao::getByReference($userSession->getId());
             if (empty($user) === true) {
-                Message::throwMessage(Trans::getWord('failed', 'message'));
+                Message::throwMessage(Trans::getMessageWord('invalidUsernamePassword'));
             }
             if ($user['us_system'] === 'N') {
                 $userSetting = UserMappingDao::loadUserMappingData($user['us_id'], request('ss_id'));
