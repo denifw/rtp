@@ -34,19 +34,19 @@ class DocumentTemplate extends AbstractFormModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'documentTemplate', 'dt_id');
+        parent::__construct(get_class($this), 'dt', 'dt_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
-            'dt_dtt_id' => $this->getIntParameter('dt_dtt_id'),
+            'dt_dtt_id' => $this->getStringParameter('dt_dtt_id'),
             'dt_description' => $this->getStringParameter('dt_description'),
             'dt_path' => $this->getStringParameter('dt_path'),
             'dt_active' => $this->getStringParameter('dt_active','Y')
@@ -65,7 +65,7 @@ class DocumentTemplate extends AbstractFormModel
     protected function doUpdate(): void
     {
         $colVal = [
-            'dt_dtt_id' => $this->getIntParameter('dt_dtt_id'),
+            'dt_dtt_id' => $this->getStringParameter('dt_dtt_id'),
             'dt_description' => $this->getStringParameter('dt_description'),
             'dt_path' => $this->getStringParameter('dt_path'),
             'dt_active' => $this->getStringParameter('dt_active')
@@ -109,7 +109,7 @@ class DocumentTemplate extends AbstractFormModel
             $this->Validation->checkUnique('dt_path','document_template',[
                 'dt_id' => $this->getDetailReferenceValue()
             ],[
-                'dt_dtt_id' => $this->getIntParameter('dt_dtt_id')
+                'dt_dtt_id' => $this->getStringParameter('dt_dtt_id')
             ]);
         } else {
             parent::loadValidationRole();
@@ -132,8 +132,8 @@ class DocumentTemplate extends AbstractFormModel
         $fieldSet = new FieldSet($this->Validation);
         $fieldSet->setGridDimension(12,12);
 
-        $dtField = $this->Field->getSingleSelect('documentTemplateType','dt_dtt_description',$this->getStringParameter('dt_dtt_description'));
-        $dtField->setHiddenField('dt_dtt_id',$this->getIntParameter('dt_dtt_id'));
+        $dtField = $this->Field->getSingleSelect('dtt','dt_dtt_description',$this->getStringParameter('dt_dtt_description'));
+        $dtField->setHiddenField('dt_dtt_id',$this->getStringParameter('dt_dtt_id'));
         $dtField->setEnableNewButton(false);
 
         # Add field to field set

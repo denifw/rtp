@@ -34,7 +34,7 @@ class DocumentTemplate extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'documentTemplate');
+        parent::__construct(get_class($this), 'dt');
         $this->setParameters($parameters);
     }
 
@@ -48,7 +48,7 @@ class DocumentTemplate extends AbstractListingModel
         #create type field
 
         $dtField = $this->Field->getSingleSelect('documentTemplateType','dt_dtt_description',$this->getStringParameter('dt_dtt_description'));
-        $dtField->setHiddenField('dt_dtt_id',$this->getIntParameter('dt_dtt_id'));
+        $dtField->setHiddenField('dt_dtt_id',$this->getStringParameter('dt_dtt_id'));
         $dtField->setEnableNewButton(false);
 
         $this->ListingForm->addField(Trans::getWord('templateType'), $dtField);

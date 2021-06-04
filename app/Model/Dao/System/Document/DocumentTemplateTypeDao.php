@@ -10,6 +10,7 @@
 
 namespace App\Model\Dao\System\Document;
 
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
 use Illuminate\Support\Facades\DB;
@@ -46,43 +47,21 @@ class DocumentTemplateTypeDao extends AbstractBaseDao
     }
 
     /**
-     * Abstract function to load the seeder query for table document_template_type.
-     *
-     * @return array
-     */
-    public function loadSeeder(): array
-    {
-        return $this->generateSeeder([
-            'dtt_code',
-            'dtt_description',
-            'dtt_active',
-        ]);
-    }
-
-
-    /**
-     * function to get all available fields
-     *
-     * @return array
-     */
-    public static function getFields(): array
-    {
-        return self::$Fields;
-    }
-
-    /**
      * Function to get data by reference value
      *
-     * @param int $referenceValue To store the reference value of the table.
+     * @param string $referenceValue To store the reference value of the table.
      *
      * @return array
      */
-    public static function getByReference($referenceValue): array
+    public static function getByReference(string $referenceValue): array
     {
         $where = [];
-        $where[] = '(dtt_id = ' . $referenceValue . ')';
-
-        return self::loadData($where)[0];
+        $where[] = SqlHelper::generateStringCondition('dtt_id', $referenceValue);
+        $data = self::loadData($where);
+        if (count($data) === 1) {
+            return $data[0];
+        }
+        return [];
     }
 
     /**
@@ -95,24 +74,12 @@ class DocumentTemplateTypeDao extends AbstractBaseDao
     public static function getByCode(string $code): array
     {
         $where = [];
-        $where[] = "(dtt_code = '" . mb_strtolower($code) . "')";
-
-        return self::loadData($where)[0];
-    }
-
-    /**
-     * Function to get all active record.
-     *
-     * @return array
-     */
-    public static function loadActiveData(): array
-    {
-        $where = [];
-        $where[] = "(dtt_active = 'Y')";
-        $where[] = '(dtt_deleted_on IS NULL)';
-
-        return self::loadData($where);
-
+        $where[] = SqlHelper::generateStringCondition('dtt_code', mb_strtolower($code));
+        $data = self::loadData($where);
+        if (count($data) === 1) {
+            return $data[0];
+        }
+        return [];
     }
 
     /**
@@ -172,17 +139,17 @@ class DocumentTemplateTypeDao extends AbstractBaseDao
     /**
      * Function to get record for single select field.
      *
+     * @param string|array $textColumn To store the column name that will be show as a text.
      * @param array $wheres To store the list condition query.
      * @param array $orders To store the list sorting query.
-     * @param int $limit To store the limit of the data.
      *
      * @return array
      */
-    public static function loadSingleSelectData(array $wheres = [], array $orders = [], int $limit = 0): array
+    public static function loadSingleSelectData($textColumn, array $wheres = [], array $orders = []): array
     {
-        $data = self::loadData($wheres, $orders, $limit);
+        $data = self::loadData($wheres, $orders, 20);
 
-        return parent::doPrepareSingleSelectData($data, 'dtt_description', 'dtt_id');
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'dtt_id');
     }
 
 }

@@ -34,7 +34,7 @@ class DocumentTemplateType extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'documentTemplateType');
+        parent::__construct(get_class($this), 'dtt');
         $this->setParameters($parameters);
     }
 

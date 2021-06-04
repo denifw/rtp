@@ -10,9 +10,10 @@
 
 namespace App\Model\Listing\System\Document;
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
+use App\Model\Dao\System\Document\DocumentGroupDao;
 
 /**
  * Class to control the system of DocumentGroup.
@@ -33,7 +34,7 @@ class DocumentGroup extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'documentGroup');
+        parent::__construct(get_class($this), 'dcg');
         $this->setParameters($parameters);
     }
 
@@ -65,9 +66,7 @@ class DocumentGroup extends AbstractListingModel
             'dcg_active' => Trans::getWord('active'),
         ]);
         # Load the data for DocumentGroup.
-        $columns = array_merge(array_keys($this->ListingTable->getHeaderRow()), ['dcg_id']);
-        $listingData = $this->loadData($columns);
-        $this->ListingTable->addRows($listingData);
+        $this->ListingTable->addRows($this->loadData());
         $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['dcg_id']);
         $this->ListingTable->setColumnType('dcg_active', 'yesno');
     }
@@ -79,66 +78,42 @@ class DocumentGroup extends AbstractListingModel
      */
     protected function getTotalRows(): int
     {
-        # Set Select query;
-        $query = 'SELECT count(DISTINCT (dcg_id)) AS total_rows
-                   FROM document_group';
-        # Set where condition.
-        $query .= $this->getWhereCondition();
-
-        return $this->loadTotalListingRows($query);
+        return DocumentGroupDao::loadTotalData($this->getWhereCondition());
     }
 
 
     /**
      * Get query to get the listing data.
      *
-     * @param array $outFields To store the out field from selection data.
-     *
      * @return array
      */
-    private function loadData(array $outFields): array
+    private function loadData(): array
     {
-        # Set Select query;
-        $query = 'SELECT dcg_id, dcg_code, dcg_description, dcg_table, dcg_value_field, dcg_text_field, dcg_active
-                        FROM document_group ';
-        # Set Where condition.
-        $query .= $this->getWhereCondition();
-        # Set group by query.
-        $query .= ' GROUP BY dcg_id, dcg_code, dcg_description, dcg_table, dcg_value_field, dcg_text_field, dcg_active';
-        # Set order by query.
-        if (empty($this->ListingSort->getSelectedField()) === false) {
-            $query .= $this->ListingSort->getOrderByQuery();
-        } else {
-            $query .= ' ORDER BY dcg_code';
-        }
-
-        return $this->loadDatabaseRow($query, $outFields);
+        return DocumentGroupDao::loadData(
+            $this->getWhereCondition(),
+            $this->ListingSort->getOrderByFields(),
+            $this->getLimitTable(),
+            $this->getLimitOffsetTable());
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return string
+     * @return array
      */
-    private function getWhereCondition(): string
+    private function getWhereCondition(): array
     {
         # Set where conditions
         $wheres = [];
 
         if ($this->isValidParameter('dcg_code') === true) {
-            $wheres[] = StringFormatter::generateLikeQuery('dcg_code', $this->getStringParameter('dcg_code'));
+            $wheres[] = SqlHelper::generateLikeCondition('dcg_code', $this->getStringParameter('dcg_code'));
         }
 
         if ($this->isValidParameter('dcg_active') === true) {
-            $wheres[] = "(dcg_active = '" . $this->getStringParameter('dcg_active') . "')";
+            $wheres[] = SqlHelper::generateStringCondition('dcg_active', $this->getStringParameter('dcg_active'));
         }
-
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
-
         # return the where query.
-        return $strWhere;
+        return $wheres;
     }
 }

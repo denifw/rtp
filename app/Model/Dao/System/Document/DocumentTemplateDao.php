@@ -10,6 +10,7 @@
 
 namespace App\Model\Dao\System\Document;
 
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
 use Illuminate\Support\Facades\DB;
@@ -48,59 +49,23 @@ class DocumentTemplateDao extends AbstractBaseDao
     }
 
     /**
-     * Abstract function to load the seeder query for table document_template.
-     *
-     * @return array
-     */
-    public function loadSeeder(): array
-    {
-        return $this->generateSeeder([
-            'dt_description',
-            'dt_path',
-            'dt_preview_path',
-            'dt_active',
-        ]);
-    }
-
-
-    /**
-     * function to get all available fields
-     *
-     * @return array
-     */
-    public static function getFields(): array
-    {
-        return self::$Fields;
-    }
-
-    /**
      * Function to get data by reference value
      *
-     * @param int $referenceValue To store the reference value of the table.
+     * @param string $referenceValue To store the reference value of the table.
      *
      * @return array
      */
-    public static function getByReference($referenceValue): array
+    public static function getByReference(string $referenceValue): array
     {
         $where = [];
-        $where[] = '(dt.dt_id = ' . $referenceValue . ')';
+        $where[] = SqlHelper::generateStringCondition('dt.dt_id', $referenceValue);
 
-        return self::loadData($where)[0];
-    }
+        $data = self::loadData($where);
+        if (count($data) === 1) {
+            return $data[0];
+        }
 
-    /**
-     * Function to get all active record.
-     *
-     * @return array
-     */
-    public static function loadActiveData(): array
-    {
-        $where = [];
-        $where[] = "(dt.dt_active = 'Y')";
-        $where[] = '(dt.dt_deleted_on IS NULL)';
-
-        return self::loadData($where);
-
+        return [];
     }
 
     /**
@@ -122,9 +87,11 @@ class DocumentTemplateDao extends AbstractBaseDao
         $query = 'SELECT dt.dt_id, dt.dt_description, dt.dt_dtt_id, dt.dt_path, dt.dt_preview_path, dt.dt_active,
                             dtt.dtt_code as dt_dtt_code, dtt.dtt_description as dt_dtt_description
                         FROM document_template as dt
-                        INNER JOIN document_template_type as dtt ON dt.dt_dtt_id = dtt.dtt_id' . $strWhere;
+                        INNER JOIN document_template_type as dtt ON dt.dt_dtt_id = dtt.dtt_id ' . $strWhere;
         if (empty($orders) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orders);
+        } else {
+            $query .= ' ORDER BY dt.dt_description, dt.dt_id';
         }
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
@@ -163,17 +130,17 @@ class DocumentTemplateDao extends AbstractBaseDao
     /**
      * Function to get record for single select field.
      *
+     * @param string|array $textColumn To store the column name that will be show as a text.
      * @param array $wheres To store the list condition query.
      * @param array $orders To store the list sorting query.
-     * @param int $limit To store the limit of the data.
      *
      * @return array
      */
-    public static function loadSingleSelectData(array $wheres = [], array $orders = [], int $limit = 0): array
+    public static function loadSingleSelectData($textColumn, array $wheres = [], array $orders = []): array
     {
-        $data = self::loadData($wheres, $orders, $limit);
+        $data = self::loadData($wheres, $orders, 20);
 
-        return parent::doPrepareSingleSelectData($data, 'dt_description', 'dt_id');
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'dt_id');
     }
 
 }

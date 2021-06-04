@@ -40,4 +40,12 @@ return [
     'path' => 'Jalur',
     'seeder' => 'Seeder',
     'tableName' => 'Nama Tabel',
+    'table' => 'Tabel',
+    'valueField' => 'Field Nilai',
+    'textField' => 'Field Teks',
+    'tableReference' => 'Tabel Reference',
+    'documentGroup' => 'Grup Dokumen',
+    'group' => 'Grup',
+    'master' => 'Master',
+    'templateType' => 'Tipe Kerangka',
 ];

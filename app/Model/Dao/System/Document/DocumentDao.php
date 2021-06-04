@@ -58,19 +58,18 @@ class DocumentDao extends AbstractBaseDao
     /**
      * Function to get all the data by id.
      *
-     * @param int $ssId To store the id of system setting.
+     * @param string $ssId To store the id of system setting.
      * @param string $code To store the id of system setting.
      *
      * @return array
      */
-    public static function loadSystemSettingLogo($ssId, string $code): array
+    public static function loadSystemSettingLogo(string $ssId, string $code): array
     {
         $wheres = [];
-//        $wheres[] = '(dct.dct_code = ' . $code . ')';
         $wheres[] = SqlHelper::generateLikeCondition('dct.dct_code', $code);
-        $wheres[] = '(doc_ss_id = ' . $ssId . ')';
-        $wheres[] = '(doc_group_reference = ' . $ssId . ')';
-        $wheres[] = '(doc_deleted_on IS NULL)';
+        $wheres[] = SqlHelper::generateStringCondition('doc.doc_ss_id', $ssId);
+        $wheres[] = SqlHelper::generateStringCondition('doc.doc_group_reference', $ssId);
+        $wheres[] = SqlHelper::generateNullCondition('doc.doc_deleted_on');
         $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         $query = 'SELECT doc_id, doc_file_name, doc_created_on, dct_code, dcg_code, ss.ss_name_space
                     FROM document as doc INNER JOIN
@@ -158,21 +157,6 @@ class DocumentDao extends AbstractBaseDao
     }
 
     /**
-     * Abstract function to load the seeder query for table document.
-     *
-     * @return array
-     */
-    public function loadSeeder(): array
-    {
-        return $this->generateSeeder([
-            'doc_file_name',
-            'doc_file_type',
-            'doc_public',
-        ]);
-    }
-
-
-    /**
      * Abstract function to do insert transaction.
      *
      * @param array $fieldData To store the field value per column.
@@ -186,17 +170,6 @@ class DocumentDao extends AbstractBaseDao
         $this->doInsertTransaction($fieldData);
         $upload = new FileUpload($this->getLastInsertId());
         $upload->upload($file);
-    }
-
-
-    /**
-     * function to get all available fields
-     *
-     * @return array
-     */
-    public static function getFields(): array
-    {
-        return self::$Fields;
     }
 
     /**
@@ -222,21 +195,6 @@ class DocumentDao extends AbstractBaseDao
         }
 
         return $result;
-    }
-
-    /**
-     * Function to get all active record.
-     *
-     * @return array
-     */
-    public static function loadActiveData(): array
-    {
-        $where = [];
-        $where[] = "(doc.doc_active = 'Y')";
-        $where[] = '(doc.doc_deleted_on IS NULL)';
-
-        return self::loadData($where);
-
     }
 
     /**

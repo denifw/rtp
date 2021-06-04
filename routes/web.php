@@ -58,4 +58,30 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'System/Page/PageRight');
     });
+    # Api Access
+    Route::match(['get', 'post'], '/aa/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Page/ApiAccess');
+    });
+    # System Document
+    # Document Group
+    Route::match(['get', 'post'], '/dcg/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Document/DocumentGroup');
+    });
+    # Document Type
+    Route::match(['get', 'post'], '/dct/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Document/DocumentType');
+    });
+    # Document Template
+    Route::match(['get', 'post'], '/dt/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Document/DocumentTemplate');
+    });
+    # Document Template Type
+    Route::match(['get', 'post'], '/dtt/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Document/DocumentTemplateType');
+    });
 });

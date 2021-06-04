@@ -33,7 +33,9 @@ class DocumentTemplateType extends AbstractBaseAjaxModel
     public function loadSingleSelectData(): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateLikeCondition('dtt_description', $this->getStringParameter('search_key'));
-        return DocumentTemplateTypeDao::loadSingleSelectData($wheres);
+        if ($this->isValidParameter('search_key') === true) {
+            $wheres[] = SqlHelper::generateLikeCondition('dtt_description', $this->getStringParameter('search_key'));
+        }
+        return DocumentTemplateTypeDao::loadSingleSelectData('dtt_description', $wheres);
     }
 }

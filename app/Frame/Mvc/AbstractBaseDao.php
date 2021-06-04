@@ -299,7 +299,7 @@ abstract class AbstractBaseDao extends Model
         $query = ' SELECT ' . implode(', ', $outFields);
         $query .= ' FROM ' . $this->getTable();
         $query .= ' WHERE (' . $this->TablePrefix . '_deleted_on IS NULL)';
-        $query .= ' ORDER BY ' . $this->TablePrefix . '_created_on, ' . $this->primaryKey;
+        $query .= ' ORDER BY ' . $this->TablePrefix . '_created_on DESC, ' . $this->primaryKey;
         $sqlResult = DB::select($query);
         $result = [];
         if (empty($sqlResult) === false) {

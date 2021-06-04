@@ -11,7 +11,6 @@
 namespace App\Model\Ajax\System\Document;
 
 use App\Frame\Formatter\SqlHelper;
-use App\Frame\Formatter\StringFormatter;
 use App\Frame\Mvc\AbstractBaseAjaxModel;
 use App\Model\Dao\System\Document\DocumentTemplateDao;
 
@@ -34,10 +33,12 @@ class DocumentTemplate extends AbstractBaseAjaxModel
     public function loadSingleSelectData(): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateLikeCondition('dt_description', $this->getStringParameter('search_key'));
-        if($this->isValidParameter('dt_dtt_id')) {
-            $wheres[] = '(dt_dtt_id = '.$this->getIntParameter('dt_dtt_id').')';
+        if ($this->isValidParameter('search_key') === true) {
+            $wheres[] = SqlHelper::generateLikeCondition('dt.dt_description', $this->getStringParameter('search_key'));
         }
-        return DocumentTemplateDao::loadSingleSelectData($wheres);
+        if ($this->isValidParameter('dt_dtt_id')) {
+            $wheres[] = SqlHelper::generateStringCondition('dt.dt_dtt_id', $this->getStringParameter('dt_dtt_id'));
+        }
+        return DocumentTemplateDao::loadSingleSelectData('dt_description', $wheres);
     }
 }

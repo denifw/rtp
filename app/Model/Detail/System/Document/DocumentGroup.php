@@ -36,16 +36,16 @@ class DocumentGroup extends AbstractFormModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'documentGroup', 'dcg_id');
+        parent::__construct(get_class($this), 'dcg', 'dcg_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $code = $this->getStringParameter('dcg_code');
         $code = mb_strtolower(StringFormatter::replaceSpecialCharacter($code));
@@ -123,7 +123,7 @@ class DocumentGroup extends AbstractFormModel
     /**
      * Function to get the general Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getGeneralFieldSet(): Portlet
     {
@@ -137,7 +137,7 @@ class DocumentGroup extends AbstractFormModel
             $this->setParameter('dcg_text_text', $this->getStringParameter('dcg_text_field'));
         }
         # Create Fields.
-        $tblFields = $this->Field->getSingleSelect('systemTable', 'dcg_table_text', $this->getStringParameter('dcg_table_text'));
+        $tblFields = $this->Field->getSingleSelect('st', 'dcg_table_text', $this->getStringParameter('dcg_table_text'));
         $tblFields->setHiddenField('dcg_table', $this->getStringParameter('dcg_table'));
         $tblFields->setEnableNewButton(false);
         $tblFields->setEnableNewButton(false);
@@ -146,13 +146,13 @@ class DocumentGroup extends AbstractFormModel
         $tblFields->addClearField('dcg_text_text');
         $tblFields->addClearField('dcg_text_field');
         # Value Field
-        $valFields = $this->Field->getSingleSelect('systemTable', 'dcg_value_text', $this->getStringParameter('dcg_value_text'), 'loadFieldsTable');
+        $valFields = $this->Field->getSingleSelect('st', 'dcg_value_text', $this->getStringParameter('dcg_value_text'), 'loadFieldsTable');
         $valFields->setHiddenField('dcg_value_field', $this->getStringParameter('dcg_value_field'));
         $valFields->addParameterById('table_name', 'dcg_table', Trans::getWord('tableReference'));
         $valFields->setEnableNewButton(false);
         $valFields->setEnableDetailButton(false);
 
-        $textFields = $this->Field->getSingleSelect('systemTable', 'dcg_text_text', $this->getStringParameter('dcg_text_text'), 'loadFieldsTable');
+        $textFields = $this->Field->getSingleSelect('st', 'dcg_text_text', $this->getStringParameter('dcg_text_text'), 'loadFieldsTable');
         $textFields->setHiddenField('dcg_text_field', $this->getStringParameter('dcg_text_field'));
         $textFields->addParameterById('table_name', 'dcg_table', Trans::getWord('tableReference'));
         $textFields->setEnableNewButton(false);

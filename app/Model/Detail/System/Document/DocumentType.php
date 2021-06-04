@@ -36,16 +36,16 @@ class DocumentType extends AbstractFormModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'documentType', 'dct_id');
+        parent::__construct(get_class($this), 'dct', 'dct_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $code = $this->getStringParameter('dct_code');
         $code = mb_strtolower(StringFormatter::replaceSpecialCharacter($code));
@@ -56,7 +56,6 @@ class DocumentType extends AbstractFormModel
             'dct_table' => $this->getStringParameter('dct_table'),
             'dct_value_field' => $this->getStringParameter('dct_value_field'),
             'dct_text_field' => $this->getStringParameter('dct_text_field'),
-            'dct_master' => $this->getStringParameter('dct_master', 'Y'),
             'dct_active' => $this->getStringParameter('dct_active', 'Y'),
         ];
         $dctDao = new DocumentTypeDao();
@@ -79,7 +78,6 @@ class DocumentType extends AbstractFormModel
             'dct_table' => $this->getStringParameter('dct_table'),
             'dct_value_field' => $this->getStringParameter('dct_value_field'),
             'dct_text_field' => $this->getStringParameter('dct_text_field'),
-            'dct_master' => $this->getStringParameter('dct_master', 'Y'),
             'dct_active' => $this->getStringParameter('dct_active', 'Y'),
         ];
         $dctDao = new DocumentTypeDao();
@@ -119,7 +117,7 @@ class DocumentType extends AbstractFormModel
         $this->Validation->checkUnique('dct_code', 'document_type', [
             'dct_id' => $this->getDetailReferenceValue()
         ], [
-            'dct_dcg_id' => $this->getIntParameter('dct_dcg_id')
+            'dct_dcg_id' => $this->getStringParameter('dct_dcg_id')
         ]);
     }
 
@@ -127,7 +125,7 @@ class DocumentType extends AbstractFormModel
     /**
      * Function to get the general Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getGeneralFieldSet(): Portlet
     {
@@ -141,11 +139,11 @@ class DocumentType extends AbstractFormModel
             $this->setParameter('dct_text_text', $this->getStringParameter('dct_text_field'));
         }
         # Create Fields.
-        $dcgFields = $this->Field->getSingleSelect('documentGroup', 'dct_group', $this->getStringParameter('dct_group'));
+        $dcgFields = $this->Field->getSingleSelect('dcg', 'dct_group', $this->getStringParameter('dct_group'));
         $dcgFields->setHiddenField('dct_dcg_id', $this->getStringParameter('dct_dcg_id'));
         $dcgFields->setDetailReferenceCode('dcg_id');
         # Table Field
-        $tblFields = $this->Field->getSingleSelect('systemTable', 'dct_table_text', $this->getStringParameter('dct_table_text'));
+        $tblFields = $this->Field->getSingleSelect('st', 'dct_table_text', $this->getStringParameter('dct_table_text'));
         $tblFields->setHiddenField('dct_table', $this->getStringParameter('dct_table'));
         $tblFields->setEnableNewButton(false);
         $tblFields->setEnableNewButton(false);
@@ -154,13 +152,13 @@ class DocumentType extends AbstractFormModel
         $tblFields->addClearField('dct_text_text');
         $tblFields->addClearField('dct_text_field');
         # Value Field
-        $valFields = $this->Field->getSingleSelect('systemTable', 'dct_value_text', $this->getStringParameter('dct_value_text'), 'loadFieldsTable');
+        $valFields = $this->Field->getSingleSelect('st', 'dct_value_text', $this->getStringParameter('dct_value_text'), 'loadFieldsTable');
         $valFields->setHiddenField('dct_value_field', $this->getStringParameter('dct_value_field'));
         $valFields->addParameterById('table_name', 'dct_table', Trans::getWord('tableReference'));
         $valFields->setEnableNewButton(false);
         $valFields->setEnableDetailButton(false);
 
-        $textFields = $this->Field->getSingleSelect('systemTable', 'dct_text_text', $this->getStringParameter('dct_text_text'), 'loadFieldsTable');
+        $textFields = $this->Field->getSingleSelect('st', 'dct_text_text', $this->getStringParameter('dct_text_text'), 'loadFieldsTable');
         $textFields->setHiddenField('dct_text_field', $this->getStringParameter('dct_text_field'));
         $textFields->addParameterById('table_name', 'dct_table', Trans::getWord('tableReference'));
         $textFields->setEnableNewButton(false);
@@ -174,13 +172,12 @@ class DocumentType extends AbstractFormModel
         # Add field to field set
         $fieldSet = new FieldSet($this->Validation);
         $fieldSet->setGridDimension(6, 6);
-        $fieldSet->addField(Trans::getWord('group'), $dcgFields, true);
         $fieldSet->addField(Trans::getWord('code'), $codeField, true);
         $fieldSet->addField(Trans::getWord('description'), $this->Field->getText('dct_description', $this->getStringParameter('dct_description')), true);
+        $fieldSet->addField(Trans::getWord('group'), $dcgFields, true);
         $fieldSet->addField(Trans::getWord('tableReference'), $tblFields);
         $fieldSet->addField(Trans::getWord('valueField'), $valFields);
         $fieldSet->addField(Trans::getWord('textField'), $textFields);
-        $fieldSet->addField(Trans::getWord('master'), $this->Field->getYesNo('dct_master', $this->getStringParameter('dct_master')));
         if ($this->isUpdate() === true) {
             $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('dct_active', $this->getStringParameter('dct_active')));
         }

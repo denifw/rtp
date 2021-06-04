@@ -13,6 +13,7 @@ namespace App\Model\Ajax\System\Document;
 
 use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseAjaxModel;
+use App\Model\Dao\System\Document\DocumentTypeDao;
 
 /**
  * Class to handle the ajax request fo DocumentType.
@@ -33,25 +34,17 @@ class DocumentType extends AbstractBaseAjaxModel
     public function loadSingleSelectData(): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateLikeCondition('dct.dct_code', $this->getStringParameter('search_key'));
-        $wheres[] = '(dct.dct_deleted_on IS NULL)';
-        $wheres[] = "(dct.dct_active = 'Y')";
+        if ($this->isValidParameter('search_key') === true) {
+            $wheres[] = SqlHelper::generateLikeCondition('dct.dct_code', $this->getStringParameter('search_key'));
+        }
+        $wheres[] = SqlHelper::generateStringCondition('dct.dct_active', 'Y');
+        $wheres[] = SqlHelper::generateNullCondition('dct.dct_deleted_on');
         if ($this->isValidParameter('dct_dcg_id') === true) {
-            $wheres[] = '(dct.dct_dcg_id = ' . $this->getIntParameter('dct_dcg_id') . ')';
+            $wheres[] = SqlHelper::generateStringCondition('dct.dct_dcg_id', $this->getStringParameter('dct_dcg_id'));
         }
         if ($this->isValidParameter('dcg_code') === true) {
-            $wheres[] = "(dcg.dcg_code = '" . $this->getStringParameter('dcg_code') . "')";
+            $wheres[] = SqlHelper::generateStringCondition('dcg.dcg_code', $this->getStringParameter('dcg_code'));
         }
-        if ($this->isValidParameter('dct_master') === true) {
-            $wheres[] = "(dct.dct_master = '" . $this->getStringParameter('dct_master') . "')";
-        }
-        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        $query = 'SELECT dct.dct_id, dct.dct_description
-                    FROM document_type as dct INNER JOIN
-                    document_group as dcg ON dct.dct_dcg_id = dcg.dcg_id' . $strWhere;
-        $query .= ' ORDER BY dct.dct_description, dct.dct_id';
-        $query .= ' LIMIT 30 OFFSET 0';
-
-        return $this->loadDataForSingleSelect($query, 'dct_description', 'dct_id', true);
+        return DocumentTypeDao::loadSingleSelectData('dct_description', $wheres);
     }
 }

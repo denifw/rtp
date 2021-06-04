@@ -34,16 +34,16 @@ class DocumentTemplateType extends AbstractFormModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'documentTemplateType', 'dtt_id');
+        parent::__construct(get_class($this), 'dtt', 'dtt_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
             'dtt_code' => mb_strtolower($this->getStringParameter('dtt_code')),
