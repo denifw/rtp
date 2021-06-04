@@ -23,7 +23,7 @@ return [
     'close' => 'Tutup',
     'code' => 'Kode',
     'save' => 'Simpan',
-    'route' => 'Route',
+    'route' => 'Rute',
     'title' => 'Judul',
     'category' => 'Kategory',
     'menu' => 'Menu',

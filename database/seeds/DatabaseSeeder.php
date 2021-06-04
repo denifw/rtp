@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             MenuSeeder::class,
             PageCategorySeeder::class,
             PageSeeder::class,
+            PageRightSeeder::class,
             CountrySeeder::class,
             StateSeeder::class,
             CitySeeder::class,

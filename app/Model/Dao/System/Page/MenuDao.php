@@ -33,6 +33,7 @@ class MenuDao extends AbstractBaseDao
     private static $Fields = [
         'mn_id',
         'mn_name',
+        'mn_code',
         'mn_parent',
         'mn_order',
         'mn_icon',

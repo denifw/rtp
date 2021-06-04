@@ -188,11 +188,11 @@ class Menu
      * Function to get the parent menu.
      *
      * @param string $pageRoute To store the page route.
-     * @param string $pageCategoryRoute To store the page category route.
+     * @param null|string $pageCategoryRoute To store the page category route.
      *
      * @return boolean
      */
-    private function isSelectedMenu(string $pageRoute, string $pageCategoryRoute): bool
+    private function isSelectedMenu(string $pageRoute, ?string $pageCategoryRoute): bool
     {
         $selected = $this->ActiveUrl === $this->getPageUrl($pageRoute, $pageCategoryRoute);
         if ($selected === false && empty($pageRoute) === false) {
@@ -206,11 +206,11 @@ class Menu
      * Function to get the page url.
      *
      * @param string $pageRoute To store the page route.
-     * @param string $pageCategoryRoute To store the page category route.
+     * @param null|string $pageCategoryRoute To store the page category route.
      *
      * @return string
      */
-    private function getPageUrl(string $pageRoute, string $pageCategoryRoute): string
+    private function getPageUrl(string $pageRoute, ?string $pageCategoryRoute): string
     {
         $url = $pageRoute;
         if (empty($pageCategoryRoute) === false) {
