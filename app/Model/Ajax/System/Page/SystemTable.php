@@ -8,11 +8,12 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Ajax\System;
+namespace App\Model\Ajax\System\Page;
 
 use App\Frame\Formatter\DataParser;
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseAjaxModel;
+use App\Model\Dao\System\Page\SystemTableDao;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -34,20 +35,16 @@ class SystemTable extends AbstractBaseAjaxModel
     public function loadSingleSelectData(): array
     {
         $wheres = [];
-        $wheres[] = StringFormatter::generateLikeQuery('st_name', $this->getStringParameter('search_key'));
-        $wheres[] = "(st_active = 'Y')";
-        $wheres[] = '(st_deleted_on IS NULL)';
-        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        $query = 'SELECT st_id, st_name 
-                        FROM system_table ' . $strWhere;
-        $query .= ' ORDER BY st_name';
-        $query .= ' LIMIT 30 OFFSET 0';
+        if ($this->isValidParameter('search_key') === true) {
+            $wheres[] = SqlHelper::generateLikeCondition('st_name', $this->getStringParameter('search_key'));
+        }
+        $wheres[] = SqlHelper::generateStringCondition('st_active', 'Y');
+        $wheres[] = SqlHelper::generateNullCondition('st_deleted_on');
 
         $results = [];
-        $data = DB::select($query);
+        $data = SystemTableDao::loadData($wheres);
         if (empty($data) === false) {
-            $tempResult = DataParser::arrayObjectToArray($data, ['st_name']);
-            foreach ($tempResult AS $row) {
+            foreach ($data as $row) {
                 $results[] = [
                     'text' => $row['st_name'],
                     'value' => str_replace(' ', '_', mb_strtolower($row['st_name']))
@@ -68,9 +65,11 @@ class SystemTable extends AbstractBaseAjaxModel
     public function loadFieldsTable(): array
     {
         $wheres = [];
-        $wheres[] = StringFormatter::generateLikeQuery('column_name', $this->getStringParameter('search_key'));
-        $wheres[] = "(table_schema = 'public')";
-        $wheres[] = "(table_name = '" . $this->getStringParameter('table_name') . "')";
+        if ($this->isValidParameter('search_key') === true) {
+            $wheres[] = SqlHelper::generateLikeCondition('column_name', $this->getStringParameter('search_key'));
+        }
+        $wheres[] = SqlHelper::generateStringCondition('table_schema', 'public');
+        $wheres[] = SqlHelper::generateStringCondition('table_name', $this->getStringParameter('table_name'));
         $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         $query = 'SELECT column_name, data_type, is_nullable
               FROM information_schema.columns ' . $strWhere;
@@ -79,7 +78,7 @@ class SystemTable extends AbstractBaseAjaxModel
         $data = DB::select($query);
         if (empty($data) === false) {
             $tempResult = DataParser::arrayObjectToArray($data, ['column_name']);
-            foreach ($tempResult AS $row) {
+            foreach ($tempResult as $row) {
                 $results[] = [
                     'text' => $row['column_name'],
                     'value' => $row['column_name']

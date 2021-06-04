@@ -9,7 +9,7 @@
 namespace App\Model\Ajax\System\Page;
 
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseAjaxModel;
 use App\Model\Dao\System\Page\PageDao;
 
@@ -24,22 +24,22 @@ class Page extends AbstractBaseAjaxModel
     {
         $wheres = [];
         if ($this->isValidParameter('pg_title') === true) {
-            $wheres[] = StringFormatter::generateLikeQuery('pg.pg_title', $this->getStringParameter('pg_title'));
+            $wheres[] = SqlHelper::generateLikeCondition('pg.pg_title', $this->getStringParameter('pg_title'));
         }
         if ($this->isValidParameter('pc_name') === true) {
-            $wheres[] = StringFormatter::generateLikeQuery('pc.pc_name', $this->getStringParameter('pc_name'));
+            $wheres[] = SqlHelper::generateLikeCondition('pc.pc_name', $this->getStringParameter('pc_name'));
         }
         if ($this->isValidParameter('mn_name') === true) {
-            $wheres[] = StringFormatter::generateLikeQuery('mn.mn_name', $this->getStringParameter('mn_name'));
+            $wheres[] = SqlHelper::generateLikeCondition('mn.mn_name', $this->getStringParameter('mn_name'));
         }
         if ($this->isValidParameter('pg_system') === true) {
-            $wheres[] = "(pg.pg_system = '" . $this->getStringParameter('pg_system') . "')";
+            $wheres[] = SqlHelper::generateStringCondition('pg.pg_system', $this->getStringParameter('pg_system'));
         }
         if ($this->isValidParameter('pg_active') === true) {
-            $wheres[] = "(pg.pg_active = '" . $this->getStringParameter('pg_active') . "')";
+            $wheres[] = SqlHelper::generateStringCondition('pg.pg_active', $this->getStringParameter('pg_active'));
         }
-        $wheres[] = '(pg.pg_deleted_on IS NULL)';
-        $data = PageDao::loadAllData($wheres);
+        $wheres[] = SqlHelper::generateNullCondition('pg.pg_deleted_on');
+        $data = PageDao::loadData($wheres);
         $results = [];
         foreach ($data as $row) {
             if (empty($row['parent_menu']) === false) {

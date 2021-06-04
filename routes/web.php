@@ -29,9 +29,15 @@ Route::get('/test', 'TestController@test');
 Route::group(['middleware' => ['app_auth']], static function () {
 
     Route::get('/', 'DashboardController@index');
+    Route::get('/home', 'DashboardController@home');
     Route::get('/logout', 'Auth\LoginController@doLogout');
     Route::get('/doSwitch', 'Auth\LoginController@doSwitch');
     Route::get('/seed', 'SeederController@index');
+    # system table
+    Route::match(['get', 'post'], '/st/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Page/SystemTable');
+    });
     # menu
     Route::match(['get', 'post'], '/mn/{pc?}', static function ($pc = 'listing') {
         $control = new PageController();

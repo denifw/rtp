@@ -14,7 +14,7 @@ class CreateSystemTableTable extends Migration
     public function up()
     {
         Schema::create('system_table', function (Blueprint $table) {
-            $table->uuid('prd_id')->primary();
+            $table->uuid('st_id')->primary();
             $table->string('st_name', 256);
             $table->string('st_prefix', 256);
             $table->string('st_path', 256);

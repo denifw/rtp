@@ -10,9 +10,10 @@
 
 namespace App\Model\Listing\System\Page;
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
+use App\Model\Dao\System\Page\PageCategoryDao;
 
 /**
  * Class to control the system of PageCategory.
@@ -33,7 +34,7 @@ class PageCategory extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'pageCategory');
+        parent::__construct(get_class($this), 'pc');
         $this->setParameters($parameters);
     }
 
@@ -58,12 +59,12 @@ class PageCategory extends AbstractListingModel
         # set header column table
         $this->ListingTable->setHeaderRow([
             'pc_name' => Trans::getWord('name'),
+            'pc_code' => Trans::getWord('code'),
             'pc_route' => Trans::getWord('route'),
             'pc_active' => Trans::getWord('active'),
         ]);
         # Load the data for PageCategory.
-        $columns = array_merge(array_keys($this->ListingTable->getHeaderRow()), ['pc_id']);
-        $listingData = $this->loadData($columns);
+        $listingData = $this->loadData();
         $this->ListingTable->addRows($listingData);
         $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['pc_id']);
         $this->ListingTable->setColumnType('pc_active', 'yesno');
@@ -76,62 +77,41 @@ class PageCategory extends AbstractListingModel
      */
     protected function getTotalRows(): int
     {
-        # Set Select query;
-        $query = 'SELECT count(DISTINCT (pc_id)) AS total_rows
-                   FROM page_category';
-        # Set where condition.
-        $query .= $this->getWhereCondition();
-
-        return $this->loadTotalListingRows($query);
+        return PageCategoryDao::loadTotalData($this->getWhereCondition());
     }
 
 
     /**
      * Get query to get the listing data.
      *
-     * @param array $outFields To store the out field from selection data.
-     *
      * @return array
      */
-    private function loadData(array $outFields): array
+    private function loadData(): array
     {
-        # Set Select query;
-        $query = 'SELECT pc_id, pc_name, pc_route, pc_active
-                FROM page_category ';
-        # Set Where condition.
-        $query .= $this->getWhereCondition();
-        # Set group by query.
-        $query .= ' GROUP BY pc_id, pc_name, pc_route, pc_active';
-        # Set order by query.
-        if (empty($this->ListingSort->getSelectedField()) === false) {
-            $query .= $this->ListingSort->getOrderByQuery();
-        }
+        return PageCategoryDao::loadData(
+            $this->getWhereCondition(),
+            $this->ListingSort->getOrderByFields(),
+            $this->getLimitTable(),
+            $this->getLimitOffsetTable());
 
-        return $this->loadDatabaseRow($query, $outFields);
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return string
+     * @return array
      */
-    private function getWhereCondition(): string
+    private function getWhereCondition(): array
     {
         # Set where conditions
         $wheres = [];
 
         if ($this->isValidParameter('pc_name') === true) {
-            $wheres[] = StringFormatter::generateLikeQuery('pc_name', $this->getStringParameter('pc_name'));
+            $wheres[] = SqlHelper::generateLikeCondition('pc_name', $this->getStringParameter('pc_name'));
         }
         if ($this->isValidParameter('pc_active') === true) {
-            $wheres[] = "(pc_active = '" . $this->getStringParameter('pc_active') . "')";
+            $wheres[] = SqlHelper::generateStringCondition('pc_active', $this->getStringParameter('pc_active'));
         }
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
-
-        # return the where query.
-        return $strWhere;
+        return $wheres;
     }
 }

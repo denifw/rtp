@@ -10,6 +10,7 @@
 
 namespace App\Model\Dao\System\Page;
 
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
 use Illuminate\Support\Facades\DB;
@@ -48,42 +49,16 @@ class PageRightDao extends AbstractBaseDao
     }
 
     /**
-     * Abstract function to load the seeder query for table page_right.
-     *
-     * @return array
-     */
-    public function loadSeeder(): array
-    {
-        return $this->generateSeeder([
-            'pr_name',
-            'pr_description',
-            'pr_default',
-            'pr_active',
-        ]);
-    }
-
-
-    /**
-     * function to get all available fields
-     *
-     * @return array
-     */
-    public static function getFields(): array
-    {
-        return self::$Fields;
-    }
-
-    /**
      * Function to get data by reference value
      *
-     * @param int $referenceValue To store the reference value of the table.
+     * @param string $referenceValue To store the reference value of the table.
      *
      * @return array
      */
-    public static function getByReference($referenceValue): array
+    public static function getByReference(string $referenceValue): array
     {
         $wheres = [];
-        $wheres[] = '(pr_id = ' . $referenceValue . ')';
+        $wheres[] = SqlHelper::generateStringCondition('pr_id', $referenceValue);
         $data = self::loadAllData($wheres);
         if (count($data) === 1) {
             return $data[0];
@@ -92,12 +67,28 @@ class PageRightDao extends AbstractBaseDao
         return [];
     }
 
+
+    /**
+     * Function to get data by reference value
+     *
+     * @param string $pgId To store the reference value of the table.
+     *
+     * @return array
+     */
+    public static function getByPageId(string $pgId): array
+    {
+        $wheres = [];
+        $wheres[] = SqlHelper::generateStringCondition('pr_pg_id', $pgId);
+        return self::loadAllData($wheres);
+
+    }
+
     /**
      * Function to get all record.
      *
      * @param array $wheres To store the list condition query.
-     * @param int   $limit  To store the limit of the data.
-     * @param int   $offset To store the offset of the data to apply limit.
+     * @param int $limit To store the limit of the data.
+     * @param int $offset To store the offset of the data to apply limit.
      *
      * @return array
      */
@@ -107,7 +98,7 @@ class PageRightDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT pr_id, pr_pg_id, pr_name, pr_description, pr_default, pr_active, 
+        $query = 'SELECT pr_id, pr_pg_id, pr_name, pr_description, pr_default, pr_active,
                             pg.pg_title as pr_pg_title
                         FROM page_right as pr INNER JOIN
                         page as pg ON pg.pg_id = pr.pr_pg_id ' . $strWhere;

@@ -8,13 +8,14 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Listing\System;
+namespace App\Model\Listing\System\Page;
 
 use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Gui\Html\Buttons\Button;
 use App\Frame\Gui\Icon;
 use App\Frame\Mvc\AbstractListingModel;
+use App\Model\Dao\System\Page\SystemTableDao;
 
 /**
  * Class to control the system of SystemTable.
@@ -35,7 +36,7 @@ class SystemTable extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'systemTable');
+        parent::__construct(get_class($this), 'st');
         $this->setParameters($parameters);
     }
 
@@ -82,59 +83,42 @@ class SystemTable extends AbstractListingModel
      */
     protected function getTotalRows(): int
     {
-        # Set Select query;
-        $query = 'SELECT count(DISTINCT (st_id)) AS total_rows
-                   FROM system_table';
-        # Set where condition.
-        $query .= $this->getWhereCondition();
-
-        return $this->loadTotalListingRows($query);
+        return SystemTableDao::loadTotalData($this->getWhereCondition());
     }
 
 
     /**
      * Get query to get the listing data.
      *
-     * @param array $outFields To store the out field from selection data.
-     *
      * @return array
      */
-    private function loadData(array $outFields): array
+    private function loadData(): array
     {
-        # Set Select query;
-        $query = 'SELECT st_id, st_name, st_prefix, st_path, st_active
-                    FROM system_table ';
-        # Set Where condition.
-        $query .= $this->getWhereCondition();
-        # Set group by query.
-        $query .= ' GROUP BY st_id, st_name, st_prefix, st_path, st_active';
-        # Set order by query.
-        if (empty($this->ListingSort->getSelectedField()) === false) {
-            $query .= $this->ListingSort->getOrderByQuery();
-        } else {
-            $query .= ' ORDER BY st_name';
-        }
+        $data = SystemTableDao::loadData(
+            $this->getWhereCondition(),
+            $this->ListingSort->getOrderByFields(),
+            $this->getLimitTable(),
+            $this->getLimitOffsetTable());
 
-        $data = $this->loadDatabaseRow($query, $outFields);
-        $lengthData = count($data);
-        for ($i = 0; $i < $lengthData; $i++) {
-            $btn = new Button('btnSeed' . $data[$i]['st_id'], '');
+        $results = [];
+        foreach ($data as $row) {
+            $btn = new Button('btnSeed' . $row['st_id'], '');
             $btn->setIcon(Icon::Eye)->btnDanger()->viewIconOnly();
-            $fileName = str_replace(' ', '', $data[$i]['st_name']) . 'Dao';
-            $path = str_replace(['\\', ' '], ['/', ''], $data[$i]['st_path']) . '/' . $fileName;
+            $fileName = str_replace(' ', '', $row['st_name']) . 'Dao';
+            $path = str_replace(['\\', ' '], ['/', ''], $row['st_path']) . '/' . $fileName;
             $btn->setPopup('seed', ['page' => $path]);
-            $data[$i]['seeder'] = $btn;
+            $row['seeder'] = $btn;
+            $results[] = $row;
         }
-
-        return $data;
+        return $results;
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return string
+     * @return array
      */
-    private function getWhereCondition(): string
+    private function getWhereCondition(): array
     {
         # Set where conditions
         $wheres = [];
@@ -146,14 +130,9 @@ class SystemTable extends AbstractListingModel
             $wheres[] = SqlHelper::generateStringCondition('st_prefix', $this->getStringParameter('st_prefix'));
         }
         if ($this->isValidParameter('st_active') === true) {
-            $wheres[] = "(st_active = '" . $this->getStringParameter('st_active') . "')";
-        }
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
+            $wheres[] = SqlHelper::generateStringCondition('st_active', $this->getStringParameter('st_active'));
         }
 
-        # return the where query.
-        return $strWhere;
+        return $wheres;
     }
 }

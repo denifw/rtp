@@ -65,6 +65,7 @@ class Menu extends AbstractListingModel
             [
                 'mn_name' => Trans::getWord('name'),
                 'parent_menu' => Trans::getWord('subMenuOf'),
+                'mn_icon' => Trans::getWord('icon'),
                 'mn_order' => Trans::getWord('sortNumber'),
                 'mn_active' => Trans::getWord('active')
             ]

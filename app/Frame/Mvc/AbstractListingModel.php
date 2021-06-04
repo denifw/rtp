@@ -128,7 +128,7 @@ abstract class AbstractListingModel extends AbstractBaseLayout
             $this->EnableSearchButton = true;
         }
         # Create portlet
-        $portlet = new Portlet('ListingTablePortlet', 'Listing');
+        $portlet = new Portlet('ListingTablePortlet', Trans::getWord('listing'));
         $portlet->setIcon(Icon::List);
         # Add pagination to portlet.
         $portlet->setPagination($this->Pagination);

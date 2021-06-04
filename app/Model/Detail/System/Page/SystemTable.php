@@ -8,13 +8,13 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Detail\System;
+namespace App\Model\Detail\System\Page;
 
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractFormModel;
-use App\Model\Dao\System\SystemTableDao;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
+use App\Model\Dao\System\Page\SystemTableDao;
 
 /**
  * Class to handle the creation of detail SystemTable page
@@ -34,16 +34,16 @@ class SystemTable extends AbstractFormModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'systemTable', 'st_id');
+        parent::__construct(get_class($this), 'st', 'st_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
             'st_name' => $this->getStringParameter('st_name'),

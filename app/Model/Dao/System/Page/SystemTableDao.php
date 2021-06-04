@@ -16,14 +16,14 @@ use App\Frame\Formatter\DataParser;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Class to handle data access object for table menu.
+ * Class to handle data access object for table system_table.
  *
  * @package    app
- * @subpackage Model\Dao\Pages
+ * @subpackage Model\Dao\System
  * @author     Deni Firdaus Waruwu <deni.fw@gmail.com>
  * @copyright  2019 MataLOG
  */
-class MenuDao extends AbstractBaseDao
+class SystemTableDao extends AbstractBaseDao
 {
     /**
      * The field for the table.
@@ -31,32 +31,21 @@ class MenuDao extends AbstractBaseDao
      * @var array
      */
     private static $Fields = [
-        'mn_id',
-        'mn_name',
-        'mn_parent',
-        'mn_order',
-        'mn_icon',
-        'mn_active',
+        'st_id',
+        'st_name',
+        'st_prefix',
+        'st_path',
+        'st_active',
     ];
 
     /**
-     * Property to store the numeric fields.
-     *
-     * @var array
-     */
-    protected $NumericFields = [
-        'mn_order',
-    ];
-
-    /**
-     * Base dao constructor for menu.
+     * Base dao constructor for system_table.
      *
      */
     public function __construct()
     {
-        parent::__construct('menu', 'mn', self::$Fields);
+        parent::__construct('system_table', 'st', self::$Fields);
     }
-
 
     /**
      * Function to get data by reference value
@@ -68,11 +57,12 @@ class MenuDao extends AbstractBaseDao
     public static function getByReference(string $referenceValue): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('m1.mn_id', $referenceValue);
+        $wheres[] = SqlHelper::generateStringCondition('st_id', $referenceValue);
         $data = self::loadData($wheres);
         if (count($data) === 1) {
             return $data[0];
         }
+
         return [];
     }
 
@@ -92,21 +82,19 @@ class MenuDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT m1.mn_id, m1.mn_code, m1.mn_icon, m1.mn_name, m1.mn_active, m2.mn_name AS parent_menu, m1.mn_parent,
-                        m1.mn_order, m2.mn_order as parent_order
-                FROM menu AS m1
-                    LEFT OUTER JOIN menu AS m2 ON m1.mn_parent = m2.mn_id' . $strWhere;
+        $query = 'SELECT st_id, st_name, st_prefix, st_path, st_active
+                        FROM system_table ' . $strWhere;
         if (empty($orderBy) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orderBy);
         } else {
-            $query .= ' ORDER BY m1.mn_parent DESC, m1.mn_order, m1.mn_id';
+            $query .= ' ORDER BY st_path, st_name, st_id';
         }
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
         }
         $result = DB::select($query);
 
-        return DataParser::arrayObjectToArray($result);
+        return DataParser::arrayObjectToArray($result, self::$Fields);
 
     }
 
@@ -124,9 +112,8 @@ class MenuDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT count(DISTINCT (m1.mn_id)) AS total_rows
-                       FROM menu AS m1
-                    LEFT OUTER JOIN menu AS m2 ON m1.mn_parent = m2.mn_id' . $strWhere;
+        $query = 'SELECT count(DISTINCT (st_id)) AS total_rows
+                       FROM system_table ' . $strWhere;
         $sqlResults = DB::select($query);
         if (count($sqlResults) === 1) {
             $result = (int)DataParser::objectToArray($sqlResults[0])['total_rows'];
@@ -147,7 +134,7 @@ class MenuDao extends AbstractBaseDao
     {
         $data = self::loadData($wheres, $orders, 20);
 
-        return parent::doPrepareSingleSelectData($data, $textColumn, 'mn_id');
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'st_id');
     }
 
 

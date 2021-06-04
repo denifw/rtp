@@ -325,7 +325,9 @@ abstract class AbstractBaseDao extends Model
             if (is_array($textColumn) === true) {
                 $text = [];
                 foreach ($textColumn as $column) {
-                    $text[] = $row[$column];
+                    if (empty($row[$column]) === false) {
+                        $text[] = $row[$column];
+                    }
                 }
                 $row['text'] = implode(' - ', $text);
             } else {

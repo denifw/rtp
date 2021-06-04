@@ -34,16 +34,16 @@ class PageCategory extends AbstractFormModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'pageCategory', 'pc_id');
+        parent::__construct(get_class($this), 'pc', 'pc_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
             'pc_name' => $this->getStringParameter('pc_name'),
@@ -99,15 +99,18 @@ class PageCategory extends AbstractFormModel
      */
     public function loadValidationRole(): void
     {
-        $this->Validation->checkRequire('pc_name', 2, 55);
-        $this->Validation->checkMaxLength('pc_name', 55);
+        $this->Validation->checkRequire('pc_name', 2, 64);
+        $this->Validation->checkRequire('pc_code', 2, 55);
+        $this->Validation->checkUnique('pc_code', 'page_category', [
+            'pc_id' => $this->getDetailReferenceValue()
+        ]);
     }
 
 
     /**
      * Function to get the general Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getGeneralFieldSet(): Portlet
     {
@@ -115,6 +118,7 @@ class PageCategory extends AbstractFormModel
         $fieldSet = new FieldSet($this->Validation);
         $fieldSet->setGridDimension(12, 12, 12);
         $fieldSet->addField(Trans::getWord('name'), $this->Field->getText('pc_name', $this->getStringParameter('pc_name')), true);
+        $fieldSet->addField(Trans::getWord('code'), $this->Field->getText('pc_code', $this->getStringParameter('pc_code')), true);
         $fieldSet->addField(Trans::getWord('route'), $this->Field->getText('pc_route', $this->getStringParameter('pc_route')));
         $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('pc_active', $this->getStringParameter('pc_active')));
 

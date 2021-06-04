@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
 
         # Already run at trial system.
         $this->call([
+            SystemTableSeeder::class,
             MenuSeeder::class,
             PageCategorySeeder::class,
             PageSeeder::class,

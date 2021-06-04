@@ -295,7 +295,7 @@ class Pagination
     {
         if ($this->ActivePage === 1) {
             $result = '<li class="disabled">';
-            $result .= '<span>First</span>';
+            $result .= '<span>' . Trans::getWord('first') . '</span>';
             $result .= '</li>';
 
         } else {

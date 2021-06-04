@@ -16,7 +16,6 @@ use App\Frame\Gui\Icon;
 use App\Frame\Gui\Modal;
 use App\Frame\Gui\Table;
 use App\Frame\Mvc\AbstractFormModel;
-use App\Model\Dao\System\Page\PageCategoryDao;
 use App\Model\Dao\System\Page\PageDao;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
@@ -40,25 +39,25 @@ class Page extends AbstractFormModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'page', 'pg_id');
+        parent::__construct(get_class($this), 'pg', 'pg_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
             'pg_title' => $this->getStringParameter('pg_title'),
             'pg_description' => $this->getStringParameter('pg_description'),
             'pg_route' => $this->getStringParameter('pg_route'),
-            'pg_mn_id' => $this->getIntParameter('pg_mn_id'),
-            'pg_pc_id' => $this->getIntParameter('pg_pc_id'),
+            'pg_mn_id' => $this->getStringParameter('pg_mn_id'),
+            'pg_pc_id' => $this->getStringParameter('pg_pc_id'),
             'pg_icon' => $this->getStringParameter('pg_icon'),
-            'pg_order' => $this->getIntParameter('pg_order'),
+            'pg_order' => $this->getStringParameter('pg_order'),
             'pg_default' => $this->getStringParameter('pg_default', 'N'),
             'pg_system' => $this->getStringParameter('pg_system', 'N'),
             'pg_active' => $this->getStringParameter('pg_active', 'Y')
@@ -66,15 +65,16 @@ class Page extends AbstractFormModel
         ];
         $pgDao = new PageDao();
         $pgDao->doInsertTransaction($colVal);
-        if ($pgDao->getLastInsertId() > 0 && $this->getStringParameter('pg_system', 'N') !== 'Y') {
-            $rights = $this->loadDefaultRightsForNewPage($pgDao->getLastInsertId());
+        $lastInsertId = $pgDao->getLastInsertId();
+        if (empty($lastInsertId) === false && $this->getStringParameter('pg_system', 'N') !== 'Y') {
+            $rights = $this->loadDefaultRightsForNewPage($lastInsertId);
             $prDao = new PageRightDao();
             foreach ($rights as $right) {
                 $prDao->doInsertTransaction($right);
             }
         }
 
-        return $pgDao->getLastInsertId();
+        return $lastInsertId;
     }
 
     /**
@@ -104,8 +104,8 @@ class Page extends AbstractFormModel
                 'pg_title' => $this->getStringParameter('pg_title'),
                 'pg_description' => $this->getStringParameter('pg_description'),
                 'pg_route' => $this->getStringParameter('pg_route'),
-                'pg_mn_id' => $this->getIntParameter('pg_mn_id'),
-                'pg_pc_id' => $this->getIntParameter('pg_pc_id'),
+                'pg_mn_id' => $this->getStringParameter('pg_mn_id'),
+                'pg_pc_id' => $this->getStringParameter('pg_pc_id'),
                 'pg_icon' => $this->getStringParameter('pg_icon'),
                 'pg_order' => $this->getIntParameter('pg_order'),
                 'pg_default' => $this->getStringParameter('pg_default', 'N'),
@@ -152,7 +152,7 @@ class Page extends AbstractFormModel
             $this->Validation->checkRequire('pr_name', 3, 125);
             $this->Validation->checkRequire('pr_description', 3, 255);
             $this->Validation->checkUnique('pr_name', 'page_right', [
-                'pr_id' => $this->getIntParameter('pr_id', 0)
+                'pr_id' => $this->getStringParameter('pr_id', 0)
             ], [
                 'pr_pg_id' => $this->getDetailReferenceValue()
             ]);
@@ -161,6 +161,7 @@ class Page extends AbstractFormModel
             $this->Validation->checkRequire('pg_description', 2, 255);
             $this->Validation->checkRequire('pg_route', 2, 125);
             $this->Validation->checkRequire('pg_pc_id');
+            $this->Validation->checkRequire('pc_code');
             if ($this->isValidParameter('pg_mn_id') === true) {
                 $this->Validation->checkRequire('pg_order');
                 $this->Validation->checkInt('pg_order', 1);
@@ -168,7 +169,7 @@ class Page extends AbstractFormModel
             $this->Validation->checkUnique('pg_route', 'page', [
                 'pg_id' => $this->getDetailReferenceValue()
             ], [
-                'pg_pc_id' => $this->getIntParameter('pg_pc_id')
+                'pg_pc_id' => $this->getStringParameter('pg_pc_id')
             ]);
         }
     }
@@ -185,12 +186,17 @@ class Page extends AbstractFormModel
         $fieldSet = new FieldSet($this->Validation);
         $fieldSet->setGridDimension(6, 6);
         # Create custom field.
-        $menuField = $this->Field->getSingleSelect('menu', 'mn_name', $this->getStringParameter('mn_name'));
-        $menuField->setHiddenField('pg_mn_id', $this->getIntParameter('pg_mn_id'));
+        $menuField = $this->Field->getSingleSelect('mn', 'mn_name', $this->getStringParameter('mn_name'));
+        $menuField->setHiddenField('pg_mn_id', $this->getStringParameter('pg_mn_id'));
         $menuField->setDetailReferenceCode('mn_id');
         # Page Category Field.
-        $categoryField = $this->Field->getSelect('pg_pc_id', $this->getIntParameter('pg_pc_id'));
-        $categoryField->addOptions(PageCategoryDao::loadActiveData(), 'pc_name', 'pc_id');
+        # Create custom field.
+        $categoryField = $this->Field->getSingleSelect('pc', 'pc_name', $this->getStringParameter('pc_name'));
+        $categoryField->setHiddenField('pg_pc_id', $this->getStringParameter('pg_pc_id'));
+        $categoryField->setDetailReferenceCode('pc_id');
+        $categoryField->setAutoCompleteFields([
+            'pc_code' => 'pc_code'
+        ]);
         # add field.
         $fieldSet->addField(Trans::getWord('title'), $this->Field->getText('pg_title', $this->getStringParameter('pg_title')), true);
         $fieldSet->addField(Trans::getWord('description'), $this->Field->getText('pg_description', $this->getStringParameter('pg_description')), true);
@@ -201,7 +207,10 @@ class Page extends AbstractFormModel
         $fieldSet->addField(Trans::getWord('icon'), $this->Field->getText('pg_icon', $this->getStringParameter('pg_icon')));
         $fieldSet->addField(Trans::getWord('default'), $this->Field->getYesNo('pg_default', $this->getStringParameter('pg_default')));
         $fieldSet->addField(Trans::getWord('system'), $this->Field->getYesNo('pg_system', $this->getStringParameter('pg_system')));
-        $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('pg_active', $this->getStringParameter('pg_active')));
+        if ($this->isUpdate() === true) {
+            $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('pg_active', $this->getStringParameter('pg_active')));
+        }
+        $fieldSet->addHiddenField($this->Field->getHidden('pc_code', $this->getStringParameter('pc_code')));
 
         # Create a portlet box.
         $portlet = new Portlet('pgGeneralPortlet', $this->getDefaultPortletTitle());
@@ -225,24 +234,22 @@ class Page extends AbstractFormModel
         # Create Table
         $rightTable = new Table('pgRightTable');
         $rightTable->setHeaderRow([
-            'pr_name' => Trans::getWord('right'),
+            'pr_name' => Trans::getWord('rights'),
             'pr_description' => Trans::getWord('description'),
             'pr_default' => Trans::getWord('default'),
             'pr_active' => Trans::getWord('active'),
         ]);
-        $wheres = [];
-        $wheres[] = '(pr_pg_id = ' . $this->getDetailReferenceValue() . ')';
-        $rightData = PageRightDao::loadAllData($wheres);
+        $rightData = PageRightDao::getByPageId($this->getDetailReferenceValue());
         $rightTable->addRows($rightData);
         # Add special settings to the table
         $rightTable->setUpdateActionByModal($prModal, 'pageRight', 'getByIdForModal', ['pr_id']);
         $rightTable->setColumnType('pr_default', 'yesno');
         $rightTable->setColumnType('pr_active', 'yesno');
         # Create a portlet box.
-        $portlet = new Portlet('pgRightPortlet', Trans::getWord('pageRight'));
+        $portlet = new Portlet('pgRightPortlet', Trans::getWord('rights'));
         $portlet->addTable($rightTable);
         # Add button new right into the portlet
-        $btnRightMdl = new ModalButton('btnPrMdl', Trans::getWord('addRight'), $prModal->getModalId());
+        $btnRightMdl = new ModalButton('btnPrMdl', Trans::getWord('addRights'), $prModal->getModalId());
         $btnRightMdl->setIcon(Icon::Plus)->btnPrimary()->pullRight();
         $portlet->addButton($btnRightMdl);
 
@@ -257,7 +264,7 @@ class Page extends AbstractFormModel
      */
     private function loadRightModal(): Modal
     {
-        $modal = new Modal('PgPrMdl', Trans::getWord('right'));
+        $modal = new Modal('PgPrMdl', Trans::getWord('rights'));
         $modal->setFormSubmit($this->getMainFormId(), 'doUpdateRight');
         $showModal = false;
         if ($this->getFormAction() === 'doUpdateRight' && $this->isValidPostValues() === false) {
@@ -280,15 +287,14 @@ class Page extends AbstractFormModel
     /**
      * Function to load the default right for new page.
      *
-     * @param int $pgId To store the page id.
+     * @param string $pgId To store the page id.
      *
      * @return array
      */
-    private function loadDefaultRightsForNewPage($pgId): array
+    private function loadDefaultRightsForNewPage(string $pgId): array
     {
-        if ($this->getIntParameter('pg_pc_id') === 1) {
-            $result = [];
-        } elseif ($this->getIntParameter('pg_pc_id') === 2) {
+        $pageCategory = $this->getStringParameter('pc_code');
+        if ($pageCategory === 'listing') {
             $result = [
                 [
                     'pr_pg_id' => $pgId,
@@ -312,7 +318,7 @@ class Page extends AbstractFormModel
                     'pr_active' => 'Y',
                 ]
             ];
-        } elseif ($this->getIntParameter('pg_pc_id') === 3) {
+        } elseif ($pageCategory === 'detail') {
             $result = [
                 [
                     'pr_pg_id' => $pgId,
@@ -336,7 +342,7 @@ class Page extends AbstractFormModel
                     'pr_active' => 'Y',
                 ],
             ];
-        } elseif ($this->getIntParameter('pg_pc_id') === 4) {
+        } elseif ($pageCategory === 'view') {
             $result = [
                 [
                     'pr_pg_id' => $pgId,
@@ -346,7 +352,7 @@ class Page extends AbstractFormModel
                     'pr_active' => 'Y',
                 ]
             ];
-        } elseif ($this->getIntParameter('pg_pc_id') === 5) {
+        } elseif ($pageCategory === 'statistic') {
             $result = [
                 [
                     'pr_pg_id' => $pgId,

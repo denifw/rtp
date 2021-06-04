@@ -66,45 +66,45 @@ class Home extends AbstractDashboardModel
      */
     public function loadDashboardItem(): void
     {
-        if ($this->isValidParameter('dsh_order') === false) {
-            $this->setParameter('dsh_order', $this->getLastOrderNumber());
-            $this->setParameter('dsh_order_number', $this->getLastOrderNumber());
-        }
-        if ($this->isValidParameter('dsh_order_new') === false) {
-            $this->setParameter('dsh_order_new', $this->getLastOrderNumber());
-            $this->setParameter('dsh_order_new_number', $this->getLastOrderNumber());
-        }
-        $dshId = $this->getReferenceValue();
-        $wheres[] = '(dsd.dsd_dsh_id = ' . $dshId . ')';
-        $wheres[] = '(dsd.dsd_deleted_on IS NULL)';
-        $wheres[] = '(dsi.dsi_deleted_on IS NULL)';
-        $orderList[] = 'dsd.dsd_order ASC';
-        $dashboardItem = DashboardDetailDao::loadData($wheres, $orderList);
-        $pageRight = $this->PageSetting->loadPageRightsByIdPage($this->PageSetting->getPageId());
-        $modalDeleteWidget = $this->getDeleteWidgetModal();
-        $this->View->addModal($modalDeleteWidget);
-        foreach ($dashboardItem AS $row) {
-            $pagePath = str_replace('/', '\\', $row['dsi_path']);
-            $model = 'App\\Model\\DashboardItem\\' . $pagePath;
-            if (class_exists($model)) {
-                $id = str_replace(' ', '', $row['dsi_code']) . $row['dsd_id'];
-                $route = $row['dsi_route'];
-                $this->Model = new $model($id);
-                $this->Model->setParameters($row);
-                $this->Model->setRoute($route);
-                $this->Model->setPageRight($pageRight);
-                $this->Model->ModalDelete = $modalDeleteWidget;
-                if ($this->EnableAutoReload) {
-                    $this->Model->setAutoReloadTime($this->AutoReloadTime);
-                }
-                if (empty($row['dsd_parameter']) === false) {
-                    $this->Model->addCallBackParameters(json_decode($row['dsd_parameter'], true));
-                }
-                $this->addContent($this->Model->doCreate());
-            } else {
-                $this->addContent('Class : ' . $model . ' Not exist');
-            }
-        }
+//        if ($this->isValidParameter('dsh_order') === false) {
+//            $this->setParameter('dsh_order', $this->getLastOrderNumber());
+//            $this->setParameter('dsh_order_number', $this->getLastOrderNumber());
+//        }
+//        if ($this->isValidParameter('dsh_order_new') === false) {
+//            $this->setParameter('dsh_order_new', $this->getLastOrderNumber());
+//            $this->setParameter('dsh_order_new_number', $this->getLastOrderNumber());
+//        }
+//        $dshId = $this->getReferenceValue();
+//        $wheres[] = '(dsd.dsd_dsh_id = ' . $dshId . ')';
+//        $wheres[] = '(dsd.dsd_deleted_on IS NULL)';
+//        $wheres[] = '(dsi.dsi_deleted_on IS NULL)';
+//        $orderList[] = 'dsd.dsd_order ASC';
+//        $dashboardItem = DashboardDetailDao::loadData($wheres, $orderList);
+//        $pageRight = $this->PageSetting->loadPageRightsByIdPage($this->PageSetting->getPageId());
+//        $modalDeleteWidget = $this->getDeleteWidgetModal();
+//        $this->View->addModal($modalDeleteWidget);
+//        foreach ($dashboardItem AS $row) {
+//            $pagePath = str_replace('/', '\\', $row['dsi_path']);
+//            $model = 'App\\Model\\DashboardItem\\' . $pagePath;
+//            if (class_exists($model)) {
+//                $id = str_replace(' ', '', $row['dsi_code']) . $row['dsd_id'];
+//                $route = $row['dsi_route'];
+//                $this->Model = new $model($id);
+//                $this->Model->setParameters($row);
+//                $this->Model->setRoute($route);
+//                $this->Model->setPageRight($pageRight);
+//                $this->Model->ModalDelete = $modalDeleteWidget;
+//                if ($this->EnableAutoReload) {
+//                    $this->Model->setAutoReloadTime($this->AutoReloadTime);
+//                }
+//                if (empty($row['dsd_parameter']) === false) {
+//                    $this->Model->addCallBackParameters(json_decode($row['dsd_parameter'], true));
+//                }
+//                $this->addContent($this->Model->doCreate());
+//            } else {
+//                $this->addContent('Class : ' . $model . ' Not exist');
+//            }
+//        }
     }
 
 //    /**

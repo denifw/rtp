@@ -16,6 +16,7 @@ class CreatePageCategoryTable extends Migration
         Schema::create('page_category', function (Blueprint $table) {
             $table->uuid('pc_id')->primary();
             $table->string('pc_name', 64);
+            $table->string('pc_code', 64);
             $table->string('pc_route', 64)->nullable();
             $table->char('pc_active', 1)->default('Y');
             $table->uuid('pc_created_by');
@@ -24,7 +25,7 @@ class CreatePageCategoryTable extends Migration
             $table->dateTime('pc_updated_on')->nullable();
             $table->uuid('pc_deleted_by')->nullable();
             $table->dateTime('pc_deleted_on')->nullable();
-            $table->unique('pc_name', 'tbl_pc_name_unique');
+            $table->unique('pc_code', 'tbl_pc_code_unique');
             $table->string('pc_deleted_reason', 256)->nullable();
         });
     }
