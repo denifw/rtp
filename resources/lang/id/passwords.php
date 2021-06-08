@@ -13,10 +13,10 @@ return [
     |
     */
 
-    'password' => 'Passwords must be at least eight characters and match the confirmation.',
-    'reset' => 'Your password has been reset!',
-    'sent' => 'We have e-mailed your password reset link!',
-    'token' => 'This password reset token is invalid.',
-    'user' => "We can't find a user with that e-mail address.",
+    'password' => 'Kata sandi setidaknya harus 8 karakter dan harus dikonfirmasi.',
+    'reset' => 'Kata sandi anda sudah di reset.',
+    'sent' => 'Sistem telah mengirimkan URL ke email anda untuk mereset kata sandi anda.',
+    'token' => 'Token yang anda gunakan tidak valid.',
+    'user' => "Sistem tidak dapat menemukan data pengguna dengan email yang anda masukkan.",
 
 ];
