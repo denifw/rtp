@@ -36,13 +36,22 @@ class SqlHelper
      * @param string $columnName to store the query selection.
      * @param ?string $value to store the query selection.
      * @param string $operator to store the query selection.
+     * @param string $convert to store the trigger to convert to lover or upper.
      *
      * @return string
      */
-    public static function generateStringCondition(string $columnName, ?string $value, string $operator = '='): string
+    public static function generateStringCondition(string $columnName, ?string $value, string $operator = '=', string $convert = ''): string
     {
         if (in_array($operator, self::$OperatorList, true) === false) {
             Message::throwMessage('Invalid operator (' . $operator . ') for generating sql string conditions.');
+        }
+        if (empty($convert) === false) {
+            if (mb_strtolower($convert) === 'low') {
+                return '(LOWER(' . $columnName . ') ' . $operator . ' \'' . mb_strtolower($value) . '\')';
+            }
+            if (mb_strtolower($convert) === 'up') {
+                return '(UPPER(' . $columnName . ') ' . $operator . ' \'' . mb_strtoupper($value) . '\')';
+            }
         }
         return '(' . $columnName . ' ' . $operator . ' \'' . $value . '\')';
     }

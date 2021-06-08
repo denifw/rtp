@@ -1,0 +1,23 @@
+<?php
+/**
+ * Contains code written by the Deni Firdaus Waruwu.
+ * Any other use of this code is in violation of copy rights.
+ *
+ * @package    Project
+ * @author     Deni Firdaus Waruwu <deni.firdaus.w@gmail.com>
+ * @copyright  ${YEAR} Deni Firdaus Waruwu.
+ */
+namespace App\\${Name_Space};
+
+/**
+ *
+ *
+ * @package    app
+ * @subpackage ${Name_Space}
+ * @author     Deni Firdaus Waruwu <deni.firdaus.w@gmail.com>
+ * @copyright  ${YEAR} Deni Firdaus Waruwu.
+ */
+class ${Class_Name}
+{
+
+}

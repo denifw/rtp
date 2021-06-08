@@ -104,4 +104,34 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'System/Master/District');
     });
+    # System - Master - Bank
+    Route::match(['get', 'post'], '/bn/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Master/Bank');
+    });
+    # System - Master - Currency
+    Route::match(['get', 'post'], '/cur/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Master/Currency');
+    });
+    # System - Master - Languages
+    Route::match(['get', 'post'], '/lg/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Master/languages');
+    });
+    # System - Master - Serial Code
+    Route::match(['get', 'post'], '/sc/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Master/SerialCode');
+    });
+    # System - Master - Service
+    Route::match(['get', 'post'], '/srv/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Master/Service');
+    });
+    # System - Master - Unit
+    Route::match(['get', 'post'], '/uom/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Master/Unit');
+    });
 });

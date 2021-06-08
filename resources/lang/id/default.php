@@ -54,4 +54,6 @@ return [
     'country' => 'Negara',
     'state' => 'Provinsi',
     'city' => 'Kab/Kota',
+    'currency' => 'Mata Uang',
+    'shortName' => 'Nama Pendek',
 ];

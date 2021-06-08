@@ -116,7 +116,7 @@ class SystemSettingDao extends AbstractBaseDao
      *
      * @return array
      */
-    public static function loadAllData(array $wheres = [], int $limit = 0, int $offset = 0): array
+    public static function loadData(array $wheres = [], int $limit = 0, int $offset = 0): array
     {
         $strWhere = '';
         if (empty($wheres) === false) {
