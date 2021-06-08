@@ -8,7 +8,7 @@
  * @copyright 2019 MataLOG
  */
 
-namespace App\Model\Dao\User;
+namespace App\Model\Dao\System\Access;
 
 use App\Frame\Formatter\DateTimeParser;
 use App\Frame\Formatter\SqlHelper;

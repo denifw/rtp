@@ -8,8 +8,9 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Dao\Setting;
+namespace App\Model\Dao\System\Access;
 
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
 use Illuminate\Support\Facades\DB;
@@ -47,6 +48,15 @@ class SerialNumberDao extends AbstractBaseDao
         'sn_postfix',
         'sn_active',
     ];
+    /**
+     * Property to store the numeric fields.
+     *
+     * @var array
+     */
+    protected $NumericFields = [
+        'sn_length',
+        'sn_increment',
+    ];
 
     /**
      * Base dao constructor for serial_number.
@@ -58,67 +68,44 @@ class SerialNumberDao extends AbstractBaseDao
     }
 
     /**
-     * Abstract function to load the seeder query for table serial_number.
+     * Function to get data by reference value
+     *
+     * @param string $referenceValue To store the reference value of the table.
      *
      * @return array
      */
-    public function loadSeeder(): array
+    public static function getByReference(string $referenceValue): array
     {
-        return $this->generateSeeder([
-            'sn_relation',
-            'sn_format',
-            'sn_separator',
-            'sn_prefix',
-            'sn_yearly',
-            'sn_monthly',
-            'sn_postfix',
-            'sn_active',
-        ]);
-    }
+        $wheres = [];
+        $wheres[] = SqlHelper::generateStringCondition('sn.sn_id', $referenceValue);
 
-
-    /**
-     * function to get all available fields
-     *
-     * @return array
-     */
-    public static function getFields(): array
-    {
-        return self::$Fields;
+        $data = self::loadData($wheres);
+        if (count($data) === 1) {
+            return $data[0];
+        }
+        return [];
     }
 
     /**
      * Function to get data by reference value
      *
-     * @param int $referenceValue To store the reference value of the table.
-     * @param int $ssId To store the reference of system setting.
+     * @param string $referenceValue To store the reference value of the table.
+     * @param string $ssId To store the reference of system setting.
      *
      * @return array
      */
-    public static function getByReferenceAndSystemSetting($referenceValue, $ssId): array
+    public static function getByReferenceAndSystemSetting(string $referenceValue, string $ssId): array
     {
         $wheres = [];
-        $wheres[] = '(sn.sn_id = ' . $referenceValue . ')';
-        $wheres[] = '(sn.sn_ss_id = ' . $ssId . ')';
+        $wheres[] = SqlHelper::generateStringCondition('sn.sn_id', $referenceValue);
+        $wheres[] = SqlHelper::generateStringCondition('sn.sn_ss_id', $ssId);
 
-        return self::loadData($wheres)[0];
+        $data = self::loadData($wheres);
+        if (count($data) === 1) {
+            return $data[0];
+        }
+        return [];
     }
-
-    /**
-     * Function to get all active record.
-     *
-     * @return array
-     */
-    public static function loadActiveData(): array
-    {
-        $where = [];
-        $where[] = "(sn.sn_active = 'Y')";
-        $where[] = '(sn.sn_deleted_on IS NULL)';
-
-        return self::loadData($where);
-
-    }
-
     /**
      * Function to get all record.
      *
@@ -156,5 +143,29 @@ class SerialNumberDao extends AbstractBaseDao
 
     }
 
+
+    /**
+     * Function to get total record.
+     *
+     * @param array $wheres To store the list condition query.
+     *
+     * @return int
+     */
+    public static function loadTotalData(array $wheres = []): int
+    {
+        $result = 0;
+        $strWhere = '';
+        if (empty($wheres) === false) {
+            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
+        }
+        $query = 'SELECT count(DISTINCT (usg.usg_id)) AS total_rows
+                   FROM user_group as usg
+                            LEFT OUTER JOIN system_setting as ss ON usg.usg_ss_id = ss.ss_id ' . $strWhere;
+        $sqlResults = DB::select($query);
+        if (count($sqlResults) === 1) {
+            $result = (int)DataParser::objectToArray($sqlResults[0])['total_rows'];
+        }
+        return $result;
+    }
 
 }

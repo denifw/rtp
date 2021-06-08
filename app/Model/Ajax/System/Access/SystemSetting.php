@@ -8,10 +8,11 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Ajax\System;
+namespace App\Model\Ajax\System\Access;
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseAjaxModel;
+use App\Model\Dao\System\Access\SystemSettingDao;
 
 /**
  * Class to handle the ajax request fo SystemSetting.
@@ -31,16 +32,12 @@ class SystemSetting extends AbstractBaseAjaxModel
     public function loadSingleSelectData(): array
     {
         $wheres = [];
-        $wheres[] = StringFormatter::generateLikeQuery('ss_relation', $this->getStringParameter('search_key'));
-        $wheres[] = '(ss_deleted_on IS NULL)';
-        $wheres[] = "(ss_active = 'Y')";
-        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        $query = 'SELECT ss_id, ss_relation
-                        FROM system_setting ' . $strWhere;
-        $query .= ' ORDER BY ss_relation';
-        $query .= ' LIMIT 30 OFFSET 0';
-
-        return $this->loadDataForSingleSelect($query, 'ss_relation', 'ss_id');
+        if ($this->isValidParameter('search_key') === true) {
+            $wheres[] = SqlHelper::generateLikeCondition('ss_relation', $this->getStringParameter('search_key'));
+        }
+        $wheres[] = SqlHelper::generateStringCondition('ss_active', 'Y');
+        $wheres[] = SqlHelper::generateNullCondition('ss_deleted_on');
+        return SystemSettingDao::loadSingleSelectData('ss_relation', $wheres);
     }
 
 }

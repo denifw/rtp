@@ -8,7 +8,7 @@
  * @copyright 2019 MataLOG
  */
 
-namespace App\Model\Dao\User;
+namespace App\Model\Dao\System\Access;
 
 use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseDao;
@@ -40,6 +40,7 @@ class UsersDao extends AbstractBaseDao
         'us_picture',
         'us_lg_id',
         'us_menu_style',
+        'us_confirm',
         'us_active',
     ];
 
@@ -143,6 +144,47 @@ class UsersDao extends AbstractBaseDao
 
         return DataParser::arrayObjectToArray($result);
 
+    }
+
+    /**
+     * Function to get total record.
+     *
+     * @param array $wheres To store the list condition query.
+     *
+     * @return int
+     */
+    public static function loadTotalData(array $wheres = []): int
+    {
+        $result = 0;
+        $strWhere = '';
+        if (empty($wheres) === false) {
+            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
+        }
+        $query = 'SELECT count(DISTINCT (us.us_id)) AS total_rows
+                   FROM users as us
+					    INNER JOIN languages as lg ON us.us_lg_id = lg.lg_id ' . $strWhere;
+        $sqlResults = DB::select($query);
+        if (count($sqlResults) === 1) {
+            $result = (int)DataParser::objectToArray($sqlResults[0])['total_rows'];
+        }
+        return $result;
+    }
+
+
+    /**
+     * Function to get record for single select field.
+     *
+     * @param string|array $textColumn To store the column name that will be show as a text.
+     * @param array $wheres To store the list condition query.
+     * @param array $orders To store the list sorting query.
+     *
+     * @return array
+     */
+    public static function loadSingleSelectData($textColumn, array $wheres = [], array $orders = []): array
+    {
+        $data = self::loadData($wheres, $orders, 20);
+
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'us_id');
     }
 
 

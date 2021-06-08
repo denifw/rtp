@@ -8,7 +8,7 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Dao\User;
+namespace App\Model\Dao\System\Access;
 
 use App\Frame\Exceptions\Message;
 use App\Frame\Mvc\AbstractBaseDao;
@@ -46,29 +46,6 @@ class UserMobileTokenDao extends AbstractBaseDao
     }
 
     /**
-     * Abstract function to load the seeder query for table user_mobile_token.
-     *
-     * @return array
-     */
-    public function loadSeeder(): array
-    {
-        return $this->generateSeeder([
-            'umt_api_token',
-        ]);
-    }
-
-
-    /**
-     * function to get all available fields
-     *
-     * @return array
-     */
-    public static function getFields(): array
-    {
-        return self::$Fields;
-    }
-
-    /**
      * Abstract function to load the data.
      *
      * @param int $usId To store the primary key value.
@@ -95,7 +72,7 @@ class UserMobileTokenDao extends AbstractBaseDao
     {
         $this->Incremental++;
         $uidKey = time() . $this->TablePrefix . $fieldData['umt_us_id'] . $this->Incremental;
-        $fieldData[$this->TablePrefix.'_uid'] = Uuid::uuid3(Uuid::NAMESPACE_URL, $uidKey);
+        $fieldData[$this->TablePrefix . '_uid'] = Uuid::uuid3(Uuid::NAMESPACE_URL, $uidKey);
         $this->LastInsertId = DB::table($this->table)->insertGetId($fieldData, $this->primaryKey);
     }
 
