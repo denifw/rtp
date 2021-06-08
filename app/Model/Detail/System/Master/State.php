@@ -8,14 +8,14 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Detail\System\Location;
+namespace App\Model\Detail\System\Master;
 
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractFormModel;
-use App\Model\Dao\System\Location\CountryDao;
-use App\Model\Dao\System\Location\StateDao;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
+use App\Model\Dao\System\Master\CountryDao;
+use App\Model\Dao\System\Master\StateDao;
 
 /**
  * Class to handle the creation of detail State page
@@ -35,19 +35,19 @@ class State extends AbstractFormModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'state', 'stt_id');
+        parent::__construct(get_class($this), 'stt', 'stt_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
-            'stt_cnt_id' => $this->getIntParameter('stt_cnt_id'),
+            'stt_cnt_id' => $this->getStringParameter('stt_cnt_id'),
             'stt_name' => $this->getStringParameter('stt_name'),
             'stt_iso' => $this->getStringParameter('stt_iso'),
             'stt_active' => $this->getStringParameter('stt_active', 'Y')
@@ -66,7 +66,7 @@ class State extends AbstractFormModel
     protected function doUpdate(): void
     {
         $colVal = [
-            'stt_cnt_id' => $this->getIntParameter('stt_cnt_id'),
+            'stt_cnt_id' => $this->getStringParameter('stt_cnt_id'),
             'stt_name' => $this->getStringParameter('stt_name'),
             'stt_iso' => $this->getStringParameter('stt_iso'),
             'stt_active' => $this->getStringParameter('stt_active', 'Y')
@@ -93,7 +93,7 @@ class State extends AbstractFormModel
     public function loadForm(): void
     {
         if ($this->isInsert() === true && $this->isValidParameter('stt_cnt_id') === true) {
-            $cnt = CountryDao::getByReference($this->getIntParameter('stt_cnt_id'));
+            $cnt = CountryDao::getByReference($this->getStringParameter('stt_cnt_id'));
             if (empty($cnt) === false) {
                 $this->setParameter('stt_country', $cnt['cnt_name']);
             } else {
@@ -118,13 +118,13 @@ class State extends AbstractFormModel
     /**
      * Function to get the general Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getGeneralFieldSet(): Portlet
     {
         # Create Fields.
-        $countryField = $this->Field->getSingleSelect('country', 'stt_country', $this->getStringParameter('stt_country'));
-        $countryField->setHiddenField('stt_cnt_id', $this->getIntParameter('stt_cnt_id'));
+        $countryField = $this->Field->getSingleSelect('cnt', 'stt_country', $this->getStringParameter('stt_country'));
+        $countryField->setHiddenField('stt_cnt_id', $this->getStringParameter('stt_cnt_id'));
         $countryField->setDetailReferenceCode('cnt_id');
 
         # Add field to field set

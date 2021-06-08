@@ -8,10 +8,11 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Ajax\System\Location;
+namespace App\Model\Ajax\System\Master;
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseAjaxModel;
+use App\Model\Dao\System\Master\StateDao;
 
 /**
  * Class to handle the ajax request fo State.
@@ -32,18 +33,14 @@ class State extends AbstractBaseAjaxModel
     public function loadSingleSelectData(): array
     {
         $wheres = [];
-        $wheres[] = StringFormatter::generateLikeQuery('stt_name', $this->getStringParameter('search_key'));
-        $wheres[] = '(stt_deleted_on IS NULL)';
-        $wheres[] = "(stt_active = 'Y')";
-        if ($this->isValidParameter('stt_cnt_id') === true) {
-            $wheres[] = '(stt_cnt_id = ' . $this->getIntParameter('stt_cnt_id') . ')';
+        if ($this->isValidParameter('search_key') === true) {
+            $wheres[] = SqlHelper::generateLikeCondition('stt.stt_name', $this->getStringParameter('search_key'));
         }
-        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        $query = 'SELECT stt_id, stt_name
-                    FROM state' . $strWhere;
-        $query .= ' ORDER BY stt_name';
-        $query .= ' LIMIT 30 OFFSET 0';
-
-        return $this->loadDataForSingleSelect($query, 'stt_name', 'stt_id');
+        $wheres[] = SqlHelper::generateNullCondition('stt.stt_deleted_on');
+        $wheres[] = SqlHelper::generateStringCondition('stt.stt_active', 'Y');
+        if ($this->isValidParameter('stt_cnt_id') === true) {
+            $wheres[] = SqlHelper::generateStringCondition('stt.stt_cnt_id', $this->getStringParameter('stt_cnt_id'));
+        }
+        return StateDao::loadSingleSelectData('stt_name', $wheres);
     }
 }

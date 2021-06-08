@@ -8,13 +8,13 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Detail\System\Location;
+namespace App\Model\Detail\System\Master;
 
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractFormModel;
-use App\Model\Dao\System\Location\CountryDao;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
+use App\Model\Dao\System\Master\CountryDao;
 
 /**
  * Class to handle the creation of detail Country page
@@ -34,16 +34,16 @@ class Country extends AbstractFormModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'country', 'cnt_id');
+        parent::__construct(get_class($this), 'cnt', 'cnt_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
             'cnt_name' => $this->getStringParameter('cnt_name'),
@@ -111,7 +111,7 @@ class Country extends AbstractFormModel
     /**
      * Function to get the general Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getGeneralFieldSet(): Portlet
     {

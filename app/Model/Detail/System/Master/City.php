@@ -8,15 +8,15 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Detail\System\Location;
+namespace App\Model\Detail\System\Master;
 
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractFormModel;
-use App\Model\Dao\System\Location\CityDao;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
-use App\Model\Dao\System\Location\CountryDao;
-use App\Model\Dao\System\Location\StateDao;
+use App\Model\Dao\System\Master\CityDao;
+use App\Model\Dao\System\Master\CountryDao;
+use App\Model\Dao\System\Master\StateDao;
 
 /**
  * Class to handle the creation of detail City page
@@ -36,20 +36,20 @@ class City extends AbstractFormModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'city', 'cty_id');
+        parent::__construct(get_class($this), 'cty', 'cty_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
-            'cty_cnt_id' => $this->getIntParameter('cty_cnt_id'),
-            'cty_stt_id' => $this->getIntParameter('cty_stt_id'),
+            'cty_cnt_id' => $this->getStringParameter('cty_cnt_id'),
+            'cty_stt_id' => $this->getStringParameter('cty_stt_id'),
             'cty_name' => $this->getStringParameter('cty_name'),
             'cty_iso' => $this->getStringParameter('cty_iso'),
             'cty_active' => $this->getStringParameter('cty_active', 'Y')
@@ -68,8 +68,8 @@ class City extends AbstractFormModel
     protected function doUpdate(): void
     {
         $colVal = [
-            'cty_cnt_id' => $this->getIntParameter('cty_cnt_id'),
-            'cty_stt_id' => $this->getIntParameter('cty_stt_id'),
+            'cty_cnt_id' => $this->getStringParameter('cty_cnt_id'),
+            'cty_stt_id' => $this->getStringParameter('cty_stt_id'),
             'cty_name' => $this->getStringParameter('cty_name'),
             'cty_iso' => $this->getStringParameter('cty_iso'),
             'cty_active' => $this->getStringParameter('cty_active', 'Y')
@@ -97,7 +97,7 @@ class City extends AbstractFormModel
     {
         if ($this->isInsert() === true) {
             if ($this->isValidParameter('cty_cnt_id') === true) {
-                $cnt = CountryDao::getByReference($this->getIntParameter('cty_cnt_id'));
+                $cnt = CountryDao::getByReference($this->getStringParameter('cty_cnt_id'));
                 if (empty($cnt) === false) {
                     $this->setParameter('cty_country', $cnt['cnt_name']);
                 } else {
@@ -105,7 +105,7 @@ class City extends AbstractFormModel
                 }
             }
             if ($this->isValidParameter('cty_stt_id') === true) {
-                $state = StateDao::getByReference($this->getIntParameter('cty_stt_id'));
+                $state = StateDao::getByReference($this->getStringParameter('cty_stt_id'));
                 if (empty($state) === false) {
                     $this->setParameter('cty_state', $state['stt_name']);
                 } else {
@@ -132,19 +132,19 @@ class City extends AbstractFormModel
     /**
      * Function to get the general Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getGeneralFieldSet(): Portlet
     {
         # Create Fields.
-        $countryField = $this->Field->getSingleSelect('country', 'cty_country', $this->getStringParameter('cty_country'));
-        $countryField->setHiddenField('cty_cnt_id', $this->getIntParameter('cty_cnt_id'));
+        $countryField = $this->Field->getSingleSelect('cnt', 'cty_country', $this->getStringParameter('cty_country'));
+        $countryField->setHiddenField('cty_cnt_id', $this->getStringParameter('cty_cnt_id'));
         $countryField->setDetailReferenceCode('cnt_id');
         $countryField->addClearField('cty_stt_id');
         $countryField->addClearField('cty_state');
 
-        $stateField = $this->Field->getSingleSelect('state', 'cty_state', $this->getStringParameter('cty_state'));
-        $stateField->setHiddenField('cty_stt_id', $this->getIntParameter('cty_stt_id'));
+        $stateField = $this->Field->getSingleSelect('stt', 'cty_state', $this->getStringParameter('cty_state'));
+        $stateField->setHiddenField('cty_stt_id', $this->getStringParameter('cty_stt_id'));
         $stateField->setDetailReferenceCode('stt_id');
         $stateField->addParameterById('stt_cnt_id', 'cty_cnt_id', Trans::getWord('country'));
 

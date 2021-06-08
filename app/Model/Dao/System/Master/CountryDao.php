@@ -8,8 +8,9 @@
  * @copyright 2019 MataLOG
  */
 
-namespace App\Model\Dao\System\Location;
+namespace App\Model\Dao\System\Master;
 
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
 use Illuminate\Support\Facades\DB;
@@ -46,85 +47,31 @@ class CountryDao extends AbstractBaseDao
     }
 
     /**
-     * Abstract function to load the seeder query for table country.
-     *
-     * @return array
-     */
-    public function loadSeeder(): array
-    {
-        return $this->generateSeeder([
-            'cnt_name',
-            'cnt_iso',
-            'cnt_active',
-        ]);
-    }
-
-
-    /**
-     * function to get all available fields
-     *
-     * @return array
-     */
-    public static function getFields(): array
-    {
-        return self::$Fields;
-    }
-
-    /**
      * Function to get data by reference value
      *
-     * @param int $referenceValue To store the reference value of the table.
+     * @param string $referenceValue To store the reference value of the table.
      *
      * @return array
      */
-    public static function getByReference($referenceValue): array
+    public static function getByReference(string $referenceValue): array
     {
-        $query = 'SELECT cnt_id, cnt_name, cnt_iso, cnt_active
-                        FROM country
-                        WHERE (cnt_id = ' . $referenceValue . ')';
-        $sqlResults = DB::select($query);
-        $result = [];
-        if (\count($sqlResults) === 1) {
-            $result = DataParser::objectToArray($sqlResults[0], self::$Fields);
+        $wheres = [];
+        $wheres[] = SqlHelper::generateStringCondition('cnt_id', $referenceValue);
+        $data = self::loadData($wheres);
+        if (count($data) === 1) {
+            return $data[0];
         }
 
-        return $result;
+        return [];
     }
 
     /**
      * Function to get all record.
      *
      * @param array $wheres To store the list condition query.
-     * @param int   $limit  To store the limit of the data.
-     * @param int   $offset To store the offset of the data to apply limit.
-     *
-     * @return array
-     */
-    public static function loadAllData(array $wheres = [], int $limit = 0, int $offset = 0): array
-    {
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
-        $query = 'SELECT cnt_id, cnt_name, cnt_iso, cnt_active
-                        FROM country' . $strWhere;
-        if ($limit > 0) {
-            $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-        }
-        $result = DB::select($query);
-
-        return DataParser::arrayObjectToArray($result, self::$Fields);
-
-    }
-
-
-    /**
-     * Function to get all record.
-     *
-     * @param array $wheres  To store the list condition query.
-     * @param array $orderBy To store the list order by query.
-     * @param int   $limit   To store the limit of the data.
-     * @param int   $offset  To store the offset of the data to apply limit.
+     * @param array $orderBy To store the list condition query.
+     * @param int $limit To store the limit of the data.
+     * @param int $offset To store the offset of the data to apply limit.
      *
      * @return array
      */
@@ -135,9 +82,11 @@ class CountryDao extends AbstractBaseDao
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
         $query = 'SELECT cnt_id, cnt_name, cnt_iso, cnt_active
-                        FROM country ' . $strWhere;
+                        FROM country' . $strWhere;
         if (empty($orderBy) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orderBy);
+        } else {
+            $query .= ' ORDER BY cnt_name, cnt_id';
         }
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
@@ -171,5 +120,19 @@ class CountryDao extends AbstractBaseDao
         return $result;
     }
 
+    /**
+     * Function to get record for single select field.
+     *
+     * @param string|array $textColumn To store the column name that will be show as a text.
+     * @param array $wheres To store the list condition query.
+     * @param array $orders To store the list sorting query.
+     *
+     * @return array
+     */
+    public static function loadSingleSelectData($textColumn, array $wheres = [], array $orders = []): array
+    {
+        $data = self::loadData($wheres, $orders, 20);
 
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'cnt_id');
+    }
 }

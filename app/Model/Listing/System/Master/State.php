@@ -8,12 +8,12 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Listing\System\Location;
+namespace App\Model\Listing\System\Master;
 
 use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
-use App\Model\Dao\System\Location\StateDao;
+use App\Model\Dao\System\Master\StateDao;
 
 /**
  * Class to control the system of State.
@@ -34,7 +34,7 @@ class State extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'state');
+        parent::__construct(get_class($this), 'stt');
         $this->setParameters($parameters);
     }
 
@@ -45,8 +45,8 @@ class State extends AbstractListingModel
      */
     public function loadSearchForm(): void
     {
-        $countryField = $this->Field->getSingleSelect('country', 'stt_country', $this->getStringParameter('stt_country'));
-        $countryField->setHiddenField('stt_cnt_id', $this->getIntParameter('stt_cnt_id'));
+        $countryField = $this->Field->getSingleSelect('cnt', 'stt_country', $this->getStringParameter('stt_country'));
+        $countryField->setHiddenField('stt_cnt_id', $this->getStringParameter('stt_cnt_id'));
         $countryField->setEnableDetailButton(false);
         $countryField->setEnableNewButton(false);
         $this->ListingForm->addField(Trans::getWord('country'), $countryField);
@@ -69,9 +69,7 @@ class State extends AbstractListingModel
         ]);
         # Load the data for State.
         $this->ListingTable->addRows($this->loadData());
-        if ($this->isAllowUpdate() === true) {
-            $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['stt_id']);
-        }
+        $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['stt_id']);
         $this->ListingTable->setColumnType('stt_active', 'yesno');
     }
 
@@ -111,13 +109,13 @@ class State extends AbstractListingModel
         $wheres = [];
 
         if ($this->isValidParameter('stt_cnt_id') === true) {
-            $wheres[] = '(stt.stt_cnt_id = ' . $this->getIntParameter('stt_cnt_id') . ')';
+            $wheres[] = SqlHelper::generateStringCondition('stt.stt_cnt_id', $this->getStringParameter('stt_cnt_id'));
         }
         if ($this->isValidParameter('stt_name') === true) {
             $wheres[] = SqlHelper::generateLikeCondition('stt.stt_name', $this->getStringParameter('stt_name'));
         }
         if ($this->isValidParameter('stt_active') === true) {
-            $wheres[] = "(stt.stt_active = '" . $this->getStringParameter('stt_active') . "')";
+            $wheres[] = SqlHelper::generateStringCondition('stt.stt_active', $this->getStringParameter('stt_active'));
         }
 
 

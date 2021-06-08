@@ -14,14 +14,14 @@
                         <span class=" fa fa-angle-down"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-usermenu pull-right">
-                        {{--<li><a href="{{url('/view?page=Crm/Profile')}}"> Profile</a></li>--}}
-                        {{--<li><a href="{{url('/view?page=Auth/ChangePassword')}}"> Change Password</a></li>--}}
                         {!! $switcher !!}
                         <li><a href="{{url('/changePassword')}}"><i
-                                        class="fa fa-edit pull-right"></i> Change Password</a>
+                                    class="fa fa-edit pull-right"></i> {{\App\Frame\Formatter\Trans::getWord('changePassword')}}
+                            </a>
                         </li>
                         <li><a href="javascript:;" onclick="App.logoutSystem()"><i
-                                        class="fa fa-sign-out pull-right"></i> Log Out</a>
+                                    class="fa fa-sign-out pull-right"></i> {{\App\Frame\Formatter\Trans::getWord('logout')}}
+                            </a>
                             <form id="logout_form" method="GET" action="{{url('/logout')}}"></form>
                         </li>
                     </ul>

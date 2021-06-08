@@ -84,4 +84,24 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'System/Document/DocumentTemplateType');
     });
+    # System - Master Country
+    Route::match(['get', 'post'], '/cnt/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Master/Country');
+    });
+    # System - Master State
+    Route::match(['get', 'post'], '/stt/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Master/State');
+    });
+    # System - Master City
+    Route::match(['get', 'post'], '/cty/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Master/City');
+    });
+    # System - Master District
+    Route::match(['get', 'post'], '/dtc/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Master/District');
+    });
 });

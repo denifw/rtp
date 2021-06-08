@@ -8,10 +8,11 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Ajax\System\Location;
+namespace App\Model\Ajax\System\Master;
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseAjaxModel;
+use App\Model\Dao\System\Master\CountryDao;
 
 /**
  * Class to handle the ajax request fo Country.
@@ -32,18 +33,11 @@ class Country extends AbstractBaseAjaxModel
     public function loadSingleSelectData(): array
     {
         $wheres = [];
-        $searchKey1 = StringFormatter::generateLikeQuery('cnt_name', $this->getStringParameter('search_key'));
-        $searchKey2 = StringFormatter::generateLikeQuery('cnt_iso', $this->getStringParameter('search_key'));
-        $wheres[] = '(' . $searchKey1 . ' OR ' . $searchKey2 . ')';
-        $wheres[] = '(cnt_deleted_on IS NULL)';
-        $wheres[] = "(cnt_active = 'Y')";
-
-        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        $query = 'SELECT cnt_id, cnt_name
-                    FROM country ' . $strWhere;
-        $query .= ' ORDER BY cnt_name';
-        $query .= ' LIMIT 30 OFFSET 0';
-
-        return $this->loadDataForSingleSelect($query, 'cnt_name', 'cnt_id');
+        if ($this->isValidParameter('search_key') === true) {
+            $wheres[] = SqlHelper::generateOrLikeCondition(['cnt_name', 'cnt_iso'], $this->getStringParameter('search_key'));
+        }
+        $wheres[] = SqlHelper::generateNullCondition('cnt_deleted_on');
+        $wheres[] = SqlHelper::generateStringCondition('cnt_active', 'Y');
+        return CountryDao::loadSingleSelectData(['cnt_name', 'cnt_iso'], $wheres);
     }
 }

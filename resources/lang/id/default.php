@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'switchSystem' => 'Ganti System',
+    'switchSystem' => 'Ganti Sistem',
     'name' => 'Nama',
     'subMenuOf' => 'Sub Menu Dari',
     'sortNumber' => 'Nomor Urut',
@@ -48,4 +48,10 @@ return [
     'group' => 'Grup',
     'master' => 'Master',
     'templateType' => 'Tipe Kerangka',
+    'changePassword' => 'Ubah Kata Sandi',
+    'logout' => 'Keluar',
+    'isoCode' => 'Kode ISO',
+    'country' => 'Negara',
+    'state' => 'Provinsi',
+    'city' => 'Kab/Kota',
 ];

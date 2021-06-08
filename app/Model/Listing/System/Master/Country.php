@@ -8,12 +8,12 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Listing\System\Location;
+namespace App\Model\Listing\System\Master;
 
 use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
-use App\Model\Dao\System\Location\CountryDao;
+use App\Model\Dao\System\Master\CountryDao;
 
 /**
  * Class to control the system of Country.
@@ -34,7 +34,7 @@ class Country extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'country');
+        parent::__construct(get_class($this), 'cnt');
         $this->setParameters($parameters);
     }
 
@@ -65,9 +65,7 @@ class Country extends AbstractListingModel
         ]);
         # Load the data for Country.
         $this->ListingTable->addRows($this->loadData());
-        if ($this->isAllowUpdate() === true) {
-            $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['cnt_id']);
-        }
+        $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['cnt_id']);
         $this->ListingTable->setColumnType('cnt_active', 'yesno');
         $this->ListingTable->addColumnAttribute('cnt_iso', 'style', 'text-align: center;');
     }
@@ -114,7 +112,7 @@ class Country extends AbstractListingModel
             $wheres[] = SqlHelper::generateLikeCondition('cnt_iso', $this->getStringParameter('cnt_iso'));
         }
         if ($this->isValidParameter('cnt_active') === true) {
-            $wheres[] = "(cnt_active = '" . $this->getStringParameter('cnt_active') . "')";
+            $wheres[] = SqlHelper::generateStringCondition('cnt_active', $this->getStringParameter('cnt_active'));
         }
         return $wheres;
     }

@@ -8,8 +8,9 @@
  * @copyright 2019 MataLOG
  */
 
-namespace App\Model\Dao\System\Location;
+namespace App\Model\Dao\System\Master;
 
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
 use Illuminate\Support\Facades\DB;
@@ -47,59 +48,31 @@ class StateDao extends AbstractBaseDao
     }
 
     /**
-     * Abstract function to load the seeder query for table state.
-     *
-     * @return array
-     */
-    public function loadSeeder(): array
-    {
-        return $this->generateSeeder([
-            'stt_name',
-            'stt_iso',
-            'stt_active',
-        ]);
-    }
-
-
-    /**
-     * function to get all available fields
-     *
-     * @return array
-     */
-    public static function getFields(): array
-    {
-        return self::$Fields;
-    }
-
-    /**
      * Function to get data by reference value
      *
-     * @param int $referenceValue To store the reference value of the table.
+     * @param string $referenceValue To store the reference value of the table.
      *
      * @return array
      */
-    public static function getByReference($referenceValue): array
+    public static function getByReference(string $referenceValue): array
     {
-        $query = 'SELECT stt.stt_id, stt.stt_name, stt.stt_iso, stt.stt_cnt_id, cnt.cnt_name as stt_country, stt.stt_active
-                        FROM state as stt INNER JOIN
-                        country as cnt ON stt.stt_cnt_id = cnt.cnt_id
-                        WHERE (stt.stt_id = ' . $referenceValue . ')';
-        $sqlResults = DB::select($query);
-        $result = [];
-        if (count($sqlResults) === 1) {
-            $result = DataParser::objectToArray($sqlResults[0], array_merge(self::$Fields, ['stt_country']));
+        $wheres = [];
+        $wheres[] = SqlHelper::generateStringCondition('stt.stt_id', $referenceValue);
+        $data = self::loadData($wheres);
+        if (count($data) === 1) {
+            return $data[0];
         }
 
-        return $result;
+        return [];
     }
 
     /**
      * Function to get all record.
      *
-     * @param array $wheres  To store the list condition query.
+     * @param array $wheres To store the list condition query.
      * @param array $orderBy To store the list order by query.
-     * @param int   $limit   To store the limit of the data.
-     * @param int   $offset  To store the offset of the data to apply limit.
+     * @param int $limit To store the limit of the data.
+     * @param int $offset To store the offset of the data to apply limit.
      *
      * @return array
      */
@@ -151,5 +124,20 @@ class StateDao extends AbstractBaseDao
         return $result;
     }
 
+    /**
+     * Function to get record for single select field.
+     *
+     * @param string|array $textColumn To store the column name that will be show as a text.
+     * @param array $wheres To store the list condition query.
+     * @param array $orders To store the list sorting query.
+     *
+     * @return array
+     */
+    public static function loadSingleSelectData($textColumn, array $wheres = [], array $orders = []): array
+    {
+        $data = self::loadData($wheres, $orders, 20);
+
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'stt_id');
+    }
 
 }

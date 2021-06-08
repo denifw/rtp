@@ -8,12 +8,12 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Listing\System\Location;
+namespace App\Model\Listing\System\Master;
 
 use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
-use App\Model\Dao\System\Location\CityDao;
+use App\Model\Dao\System\Master\CityDao;
 
 /**
  * Class to control the system of City.
@@ -34,7 +34,7 @@ class City extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'city');
+        parent::__construct(get_class($this), 'cty');
         $this->setParameters($parameters);
     }
 
@@ -45,15 +45,15 @@ class City extends AbstractListingModel
      */
     public function loadSearchForm(): void
     {
-        $countryField = $this->Field->getSingleSelect('country', 'cty_country', $this->getStringParameter('cty_country'));
-        $countryField->setHiddenField('cty_cnt_id', $this->getIntParameter('cty_cnt_id'));
+        $countryField = $this->Field->getSingleSelect('cnt', 'cty_country', $this->getStringParameter('cty_country'));
+        $countryField->setHiddenField('cty_cnt_id', $this->getStringParameter('cty_cnt_id'));
         $countryField->setEnableNewButton(false);
         $countryField->setEnableDetailButton(false);
         $countryField->addClearField('cty_stt_id');
         $countryField->addClearField('cty_state');
 
-        $stateField = $this->Field->getSingleSelect('state', 'cty_state', $this->getStringParameter('cty_state'));
-        $stateField->setHiddenField('cty_stt_id', $this->getIntParameter('cty_stt_id'));
+        $stateField = $this->Field->getSingleSelect('stt', 'cty_state', $this->getStringParameter('cty_state'));
+        $stateField->setHiddenField('cty_stt_id', $this->getStringParameter('cty_stt_id'));
         $stateField->setEnableDetailButton(false);
         $stateField->setEnableNewButton(false);
         $stateField->addOptionalParameterById('stt_cnt_id', 'cty_cnt_id');
@@ -81,9 +81,7 @@ class City extends AbstractListingModel
         ]);
         # Load the data for City.
         $this->ListingTable->addRows($this->loadData());
-        if ($this->isAllowUpdate() === true) {
-            $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['cty_id']);
-        }
+        $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['cty_id']);
         $this->ListingTable->setColumnType('cty_active', 'yesno');
     }
 
@@ -123,16 +121,16 @@ class City extends AbstractListingModel
         $wheres = [];
 
         if ($this->isValidParameter('cty_cnt_id') === true) {
-            $wheres[] = '(cty.cty_cnt_id = ' . $this->getIntParameter('cty_cnt_id') . ')';
+            $wheres[] = SqlHelper::generateStringCondition('cty.cty_cnt_id', $this->getStringParameter('cty_cnt_id'));
         }
         if ($this->isValidParameter('cty_stt_id') === true) {
-            $wheres[] = '(cty.cty_stt_id = ' . $this->getIntParameter('cty_stt_id') . ')';
+            $wheres[] = SqlHelper::generateStringCondition('cty.cty_stt_id', $this->getStringParameter('cty_stt_id'));
         }
         if ($this->isValidParameter('cty_name') === true) {
             $wheres[] = SqlHelper::generateLikeCondition('cty.cty_name', $this->getStringParameter('cty_name'));
         }
         if ($this->isValidParameter('cty_active') === true) {
-            $wheres[] = "(cty.cty_active = '" . $this->getStringParameter('cty_active') . "')";
+            $wheres[] = SqlHelper::generateStringCondition('cty.cty_active', $this->getStringParameter('cty_active'));
         }
 
         # return the where query.
