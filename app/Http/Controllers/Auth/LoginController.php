@@ -8,9 +8,10 @@ use App\Frame\Formatter\Trans;
 use App\Frame\System\Session\UserSession;
 use App\Frame\System\Validation;
 use App\Http\Controllers\AbstractBaseAuthController;
-use App\Model\Dao\User\UserMappingDao;
-use App\Model\Dao\User\UsersDao;
-use App\Model\Dao\User\UserTokenDao;
+use App\Model\Dao\System\Access\UserMappingDao;
+use App\Model\Dao\System\Access\UsersDao;
+use App\Model\Dao\System\Access\UserTokenDao;
+use Exception;
 
 class LoginController extends AbstractBaseAuthController
 {
@@ -86,7 +87,7 @@ class LoginController extends AbstractBaseAuthController
             $this->setSession($user);
 
             return redirect('/');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return view('auth.login')
                 ->withErrors([$e->getMessage()])
                 ->with('us_username', request('us_username'))
@@ -131,7 +132,7 @@ class LoginController extends AbstractBaseAuthController
 
             return redirect('/');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return view('errors.general', ['error_message' => Trans::getWord('pageNotFound', 'message'), 'back_url' => url('/')]);
         }
 

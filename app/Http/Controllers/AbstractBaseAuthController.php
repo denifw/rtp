@@ -13,8 +13,8 @@ namespace App\Http\Controllers;
 use App\Frame\Exceptions\Message;
 use App\Frame\Formatter\Trans;
 use App\Frame\System\SystemSettings;
-use App\Model\Dao\User\UserMappingDao;
-use App\Model\Dao\User\UserTokenDao;
+use App\Model\Dao\System\Access\UserMappingDao;
+use App\Model\Dao\System\Access\UserTokenDao;
 
 /**
  * Class to control the login of AbstractBaseAuth.

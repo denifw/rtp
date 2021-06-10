@@ -19,6 +19,7 @@ use App\Frame\Mvc\AbstractFormModel;
 use App\Frame\Mvc\AbstractListingModel;
 use App\Frame\Mvc\AbstractViewerModel;
 use App\Frame\System\View;
+use Exception;
 
 class AbstractBaseController extends Controller
 {
@@ -55,7 +56,7 @@ class AbstractBaseController extends Controller
 //                $model->removeActiveModal();
 //            }
             $contents = $model->createView();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $view = new View('error_form', 'Error Page', 'Error Message');
             $view->addErrorMessage($e->getMessage());
             $view->setErrorMessages($model->getView()->getErrorMessages());
@@ -69,7 +70,7 @@ class AbstractBaseController extends Controller
     /**
      * Function to control listing screen
      *
-     * @param \App\Frame\Mvc\AbstractBaseDashboardItem $model
+     * @param AbstractBaseDashboardItem $model
      *
      * @return mixed
      */
@@ -86,7 +87,7 @@ class AbstractBaseController extends Controller
     /**
      * Function to control listing screen
      *
-     * @param \App\Frame\Mvc\AbstractListingModel $model
+     * @param AbstractListingModel $model
      *
      * @return mixed
      *
@@ -111,7 +112,7 @@ class AbstractBaseController extends Controller
                     if ($actionFunction !== null && method_exists($model, $actionFunction) === true) {
                         try {
                             $model->$actionFunction();
-                        } catch (\Exception $e) {
+                        } catch (Exception $e) {
                             throw new ErrorException($e->getMessage());
                         }
                     }
@@ -125,7 +126,7 @@ class AbstractBaseController extends Controller
             }
 
             return view('listing', $content);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $url = '';
             if ($model->isPopupLayout() === false) {
                 $url = url('/' . $model->getDefaultRoute());
@@ -138,13 +139,13 @@ class AbstractBaseController extends Controller
     /**
      * Function to control detail screen
      *
-     * @param \App\Frame\Mvc\AbstractFormModel $model
+     * @param AbstractFormModel $model
      *
      * @return mixed
      *
      * @deprecated Use Page Controller instead.
      */
-    protected function doControlDetail($model)
+    protected function doControlDetail(AbstractFormModel $model)
     {
         if (($model instanceof AbstractFormModel) === false) {
             return view('errors.general', ['error_message' => 'Invalid page model for detail page.', 'back_url' => '']);
@@ -180,7 +181,7 @@ class AbstractBaseController extends Controller
             }
 
             return view('detail', $content);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $url = '';
             if ($model->isPopupLayout() === false) {
                 $url = url('/' . $model->getDefaultRoute());
@@ -194,7 +195,7 @@ class AbstractBaseController extends Controller
     /**
      * Function to control view screen
      *
-     * @param \App\Frame\Mvc\AbstractViewerModel $model
+     * @param AbstractViewerModel $model
      *
      * @return mixed
      *
@@ -234,7 +235,7 @@ class AbstractBaseController extends Controller
             }
 
             return view('detail', $content);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $url = '';
             if ($model->isPopupLayout() === false) {
                 $url = url('/' . $model->getDefaultRoute());
@@ -247,7 +248,7 @@ class AbstractBaseController extends Controller
     /**
      * Function to control view screen
      *
-     * @param \App\Frame\Mvc\AbstractBaseAjaxModel $model
+     * @param AbstractBaseAjaxModel $model
      *
      * @return mixed
      *

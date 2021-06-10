@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Frame\Formatter\Trans;
 use App\Frame\System\Validation;
 use App\Http\Controllers\AbstractBaseAuthController;
-use App\Model\Dao\User\UsersDao;
-use App\Model\Dao\User\UserTokenDao;
+use App\Model\Dao\System\Access\UsersDao;
+use App\Model\Dao\System\Access\UserTokenDao;
 use App\Model\Mail\PasswordReset;
 use Illuminate\Support\Facades\Mail;
 
@@ -41,8 +41,7 @@ class ForgotPasswordController extends AbstractBaseAuthController
         if ($validator->isValidInputs() === false) {
             return view('auth.forget')->withErrors([$validator->getErrorMessage('us_username', Trans::getWord('username'))])->with('us_username', request('us_username'));
         }
-        $userDao = new UsersDao();
-        $user = $userDao->getByUsername(request('us_username'));
+        $user = UsersDao::getByUsername(request('us_username'));
         if (empty($user) === false) {
             # Generate the token.
             $userTokenDao = new UserTokenDao();

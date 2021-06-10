@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Frame\Formatter\Trans;
 use App\Frame\System\Session\UserSession;
-use App\Model\Dao\User\UserTokenDao;
+use App\Model\Dao\System\Access\UserTokenDao;
 use Closure;
 use Illuminate\Support\Facades\App;
 

@@ -13,9 +13,9 @@ namespace App\Http\Controllers\Auth;
 use App\Frame\Formatter\Trans;
 use App\Frame\System\Validation;
 use App\Http\Controllers\AbstractBaseAuthController;
-use App\Model\Dao\User\UserMappingDao;
-use App\Model\Dao\User\UsersDao;
-use App\Model\Dao\User\UserTokenDao;
+use App\Model\Dao\System\Access\UserMappingDao;
+use App\Model\Dao\System\Access\UsersDao;
+use App\Model\Dao\System\Access\UserTokenDao;
 
 /**
  *
@@ -82,7 +82,7 @@ class EmailConfirmationController extends AbstractBaseAuthController
         $usDao = new UsersDao();
         $usDao->doUpdateTransaction($userToken['ut_us_id'], $colVal);
 
-        $ump = UserMappingDao::loadDataByUserIdAndSystemId($userToken['ut_us_id'], $userToken['ut_ss_id']);
+        $ump = UserMappingDao::getByUserIdAndSystemId($userToken['ut_us_id'], $userToken['ut_ss_id']);
         $umpDao = new UserMappingDao();
         $umpColVal = [
             'ump_confirm' => 'Y'
