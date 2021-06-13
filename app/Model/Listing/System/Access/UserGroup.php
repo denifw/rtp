@@ -48,7 +48,7 @@ class UserGroup extends AbstractListingModel
         $ssField = $this->Field->getSingleSelect('ss', 'usg_system', $this->getStringParameter('usg_system'));
         $ssField->setHiddenField('usg_ss_id', $this->getStringParameter('usg_ss_id'));
         $ssField->setEnableNewButton(false);
-        $this->ListingForm->addField(Trans::getWord('systemSetting'), $ssField);
+        $this->ListingForm->addField(Trans::getWord('systemName'), $ssField);
         $this->ListingForm->addField(Trans::getWord('name'), $this->Field->getText('usg_name', $this->getStringParameter('usg_name')));
         $this->ListingForm->addField(Trans::getWord('active'), $this->Field->getYesNo('usg_active', $this->getStringParameter('usg_active')));
         $this->ListingForm->setGridDimension(4);
@@ -65,7 +65,7 @@ class UserGroup extends AbstractListingModel
         # set header column table
         $this->ListingTable->setHeaderRow([
             'usg_name' => Trans::getWord('name'),
-            'ss_relation' => Trans::getWord('systemSetting'),
+            'ss_relation' => Trans::getWord('systemName'),
             'usg_active' => Trans::getWord('active')
         ]);
         # Load the data for UserGroup.

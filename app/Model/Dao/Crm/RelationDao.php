@@ -10,6 +10,7 @@
 
 namespace App\Model\Dao\Crm;
 
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
 use Illuminate\Support\Facades\DB;
@@ -57,116 +58,20 @@ class RelationDao extends AbstractBaseDao
     /**
      * Function to get data by reference value
      *
-     * @param int $referenceValue To store the reference value of the table.
+     * @param string $relId To store the reference value of the table.
+     * @param string $ssId To store the system setting value.
      *
      * @return array
      */
-    public static function getByReference($referenceValue): array
+    public static function getByReferenceAndSystem(string $relId, string $ssId): array
     {
         $wheres = [];
-        $wheres[] = '(rel.rel_id = ' . $referenceValue . ')';
-        $result = [];
+        $wheres[] = SqlHelper::generateStringCondition('rel.rel_id', $relId);
+        $wheres[] = SqlHelper::generateStringCondition('rel.rel_ss_id', $ssId);
         $results = self::loadData($wheres);
+        $result = [];
         if (count($results) === 1) {
             $result = $results[0];
-        }
-        return $result;
-    }
-
-    /**
-     * Function to get data by reference value
-     *
-     * @param int $referenceValue To store the reference value of the table.
-     * @param int $systemSettingValue To store the system setting value.
-     *
-     * @return array
-     */
-    public static function getByReferenceAndSystem($referenceValue, $systemSettingValue): array
-    {
-        $wheres = [];
-        $wheres[] = '(rel.rel_id = ' . $referenceValue . ')';
-        $wheres[] = '(rel.rel_ss_id  = ' . $systemSettingValue . ')';
-        $results = self::loadData($wheres);
-        $result = [];
-        if (\count($results) === 1) {
-            $result = $results[0];
-        }
-
-        return $result;
-    }
-
-    /**
-     * Function to get data by reference value
-     *
-     * @param int $ssId To store the system setting Id.
-     * @param int $relId To store the relation Id.
-     * @param string $name To store the contact name.
-     * @param string $phoneNumber To store the contact phone number.
-     *
-     * @return array
-     */
-    public static function loadByCpNameAndNumber(int $ssId, int $relId, string $name, string $phoneNumber): array
-    {
-        $query = "SELECT rel.rel_id, off.of_id, cp.cp_id
-                  FROM relation AS rel
-                       INNER JOIN office AS off ON off.of_rel_id = rel.rel_id
-                       INNER JOIN contact_person AS cp ON cp.cp_of_id = off.of_id
-                  WHERE (rel.rel_ss_id = $ssId) AND (rel.rel_id = $relId) AND (cp.cp_name = '$name') AND (cp.cp_phone = '$phoneNumber')";
-        $sqlResults = DB::select($query);
-        $result = [];
-        if (\count($sqlResults) === 1) {
-            $result = DataParser::objectToArray($sqlResults[0]);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Function to get data by reference value
-     *
-     * @param int $ssId To store the system setting Id.
-     * @param string $name To store the contact name.
-     *
-     * @return array
-     */
-    public static function loadByName($ssId, string $name): array
-    {
-        $query = "SELECT rel.rel_id, off.of_id, cp.cp_id
-                  FROM relation AS rel
-                       INNER JOIN office AS off ON off.of_rel_id = rel.rel_id
-                       INNER JOIN contact_person AS cp ON cp.cp_of_id = off.of_id
-                  WHERE (rel.rel_ss_id = $ssId) AND (rel.rel_name = '$name')";
-        $sqlResults = DB::select($query);
-        $result = [];
-        if (\count($sqlResults) === 1) {
-            $result = DataParser::objectToArray($sqlResults[0]);
-        }
-
-        return $result;
-    }
-
-
-    /**
-     * Function to get relation owner by system setting id
-     *
-     * @param int $ssId To store the system id.
-     *
-     * @return array
-     */
-    public static function getRelationOwnerBySystemId($ssId): array
-    {
-        $wheres = [];
-        $wheres[] = "(rel_active = 'Y')";
-        $wheres[] = "(rel_owner = 'Y')";
-        $wheres[] = '(rel_ss_id = ' . $ssId . ')';
-        $wheres[] = '(rel_deleted_on IS NULL)';
-        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        $query = 'SELECT rel_id, rel_name
-                        FROM relation ' . $strWhere;
-        $sqlResults = DB::select($query);
-        $result = [];
-        if (\count($sqlResults) === 1) {
-            $result = DataParser::objectToArray($sqlResults[0], ['rel_id', 'rel_name']);
         }
 
         return $result;
@@ -190,21 +95,16 @@ class RelationDao extends AbstractBaseDao
         }
         $query = 'SELECT rel.rel_id, rel.rel_ss_id, ss.ss_relation as rel_system,
                          rel.rel_number, rel.rel_name, rel.rel_short_name, rel.rel_email, rel.rel_website,
-                         rel.rel_phone, rel.rel_vat, rel.rel_owner, rel.rel_remark, rel.rel_active,
-                         rel.rel_manager_id, rel.rel_main_contact_id, rel.rel_ids_id, rel.rel_source_id,
-                         rel.rel_established, rel.rel_size_id, rel.rel_employee, rel.rel_revenue, rel.rel_deleted_reason,
-                         manager.us_name as rel_manager_name, mc.cp_name as rel_main_contact_name,
-                         ids.ids_name as rel_ids_name, src.sty_name as rel_source_name,
-                         sz.sty_name as rel_size
+                         rel.rel_phone, rel.rel_vat, rel.rel_remark, rel.rel_active, rel.rel_of_id, o.of_name as rel_office,
+                         rel.rel_cp_id, cp.cp_name as rel_pic, rel.rel_deleted_on, rel.rel_deleted_reason
                   FROM   relation as rel
                          INNER JOIN system_setting as ss on rel.rel_ss_id = ss.ss_id
-                         LEFT OUTER JOIN users as manager on manager.us_id = rel.rel_manager_id
-                         LEFT OUTER JOIN contact_person as mc on mc.cp_id = rel.rel_main_contact_id
-                         LEFT OUTER JOIN industry as ids on ids.ids_id = rel.rel_ids_id
-                         LEFT OUTER JOIN system_type as src on src.sty_id = rel.rel_source_id
-                         LEFT OUTER JOIN system_type as sz on sz.sty_id = rel.rel_size_id' . $strWhere;
+                         LEFT OUTER JOIN office as o on rel.rel_of_id = o.of_id
+                         LEFT OUTER JOIN contact_person as cp on rel.rel_cp_id = cp.cp_id ' . $strWhere;
         if (empty($orders) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orders);
+        } else {
+            $query .= ' ORDER BY rel.rel_name, rel.rel_id';
         }
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
@@ -229,14 +129,11 @@ class RelationDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT count(DISTINCT (rel_id)) AS total_rows
+        $query = 'SELECT count(DISTINCT (rel.rel_id)) AS total_rows
                   FROM relation as rel
-                  INNER JOIN system_setting as ss on rel.rel_ss_id = ss.ss_id
-                  LEFT OUTER JOIN users as manager on manager.us_id = rel.rel_manager_id
-                  LEFT OUTER JOIN contact_person as mc on mc.cp_id = rel.rel_main_contact_id
-                  LEFT OUTER JOIN industry as ids on ids.ids_id = rel.rel_ids_id
-                  LEFT OUTER JOIN system_type as src on src.sty_id = rel.rel_source_id
-                  LEFT OUTER JOIN system_type as sz on sz.sty_id = rel.rel_size_id' . $strWhere;
+                         INNER JOIN system_setting as ss on rel.rel_ss_id = ss.ss_id
+                         LEFT OUTER JOIN office as o on rel.rel_of_id = o.of_id
+                         LEFT OUTER JOIN contact_person as cp on rel.rel_cp_id = cp.cp_id' . $strWhere;
 
         $sqlResults = DB::select($query);
         if (count($sqlResults) === 1) {
@@ -247,51 +144,20 @@ class RelationDao extends AbstractBaseDao
     }
 
     /**
-     * Function to get data by reference value
+     * Function to get record for single select field.
      *
-     * @param int $id To store the reference value of the table.
-     *
-     * @return array
-     */
-    public static function loadSimpleDataById($id): array
-    {
-        $wheres = [];
-        $wheres[] = '(rel_id = ' . $id . ')';
-        $data = self::loadSimpleData($wheres);
-        if (\count($data) === 1) {
-            return $data[0];
-        }
-
-        return [];
-    }
-
-    /**
-     * Function to get all record.
-     *
+     * @param string|array $textColumn To store the column name that will be show as a text.
      * @param array $wheres To store the list condition query.
-     * @param int $limit To store the limit of the data.
-     * @param int $offset To store the offset of the data to apply limit.
+     * @param array $orders To store the list sorting query.
      *
      * @return array
      */
-    public static function loadSimpleData(array $wheres = [], int $limit = 0, int $offset = 0): array
+    public static function loadSingleSelectData($textColumn, array $wheres = [], array $orders = []): array
     {
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
-        $query = 'SELECT rel_id, rel_ss_id, rel_number, rel_name, rel_email, rel_website,
-                      rel_phone, rel_vat, rel_owner, rel_active
-                        FROM relation ' . $strWhere;
-        if ($limit > 0) {
-            $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-        }
-        $result = DB::select($query);
+        $data = self::loadData($wheres, $orders, 20);
 
-        return DataParser::arrayObjectToArray($result);
-
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'rel_id');
     }
-
 
     /**
      * Function to get all record.

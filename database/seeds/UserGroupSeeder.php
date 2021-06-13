@@ -11,6 +11,6 @@ class UserGroupSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('user_group')->insert(['usg_ss_id' => 2, 'usg_name' => 'New Administrator', 'usg_active' => 'Y', 'usg_uid' => 'e1f3fd78-41e9-3fbf-a397-79e8b8bea427', 'usg_created_on' => date('Y-m-d H:i:s'), 'usg_created_by' => 1]);
+        DB::table('user_group')->insert(['usg_id' => '76a6fd86-edb8-3501-ae74-6e4833d5312b', 'usg_name' => 'Admin', 'usg_active' => 'Y', 'usg_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'usg_created_on' => date('Y-m-d H:i:s')]);
     }
 }

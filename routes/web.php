@@ -154,4 +154,19 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'System/Access/SerialNumber');
     });
+    # CRM - Relation
+    Route::match(['get', 'post'], '/rel/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Crm/Relation');
+    });
+    # CRM - Office
+    Route::match(['get', 'post'], '/of/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Crm/Office');
+    });
+    # CRM - Contact Person
+    Route::match(['get', 'post'], '/cp/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Crm/ContactPerson');
+    });
 });

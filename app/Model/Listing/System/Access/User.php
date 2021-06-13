@@ -49,10 +49,10 @@ class User extends AbstractListingModel
         $ssField = $this->Field->getSingleSelect('ss', 'us_system_settings', $this->getStringParameter('us_system_settings'));
         $ssField->setHiddenField('us_ss_id', $this->getStringParameter('us_ss_id'));
         $ssField->setEnableNewButton(false);
-        $this->ListingForm->addField(Trans::getWord('systemSetting'), $ssField);
         $this->ListingForm->addField(Trans::getWord('name'), $this->Field->getText('us_name', $this->getStringParameter('us_name')));
         $this->ListingForm->addField(Trans::getWord('username'), $this->Field->getText('us_username', $this->getStringParameter('us_username')));
-        $this->ListingForm->addField(Trans::getWord('confirm'), $this->Field->getYesNo('us_confirm', $this->getStringParameter('us_confirm')));
+        $this->ListingForm->addField(Trans::getWord('systemName'), $ssField);
+        $this->ListingForm->addField(Trans::getWord('verified'), $this->Field->getYesNo('us_confirm', $this->getStringParameter('us_confirm')));
         $this->ListingForm->addField(Trans::getWord('active'), $this->Field->getYesNo('us_active', $this->getStringParameter('us_active')));
         $this->ListingForm->setGridDimension(4);
     }
@@ -69,8 +69,7 @@ class User extends AbstractListingModel
             'us_name' => Trans::getWord('name'),
             'us_username' => Trans::getWord('email'),
             'us_system' => Trans::getWord('system'),
-            'us_confirm' => Trans::getWord('confirm'),
-            'us_allow_mail' => Trans::getWord('allowMail'),
+            'us_confirm' => Trans::getWord('verified'),
             'us_active' => Trans::getWord('active'),
         ]);
         # Load the data for User.
@@ -78,7 +77,6 @@ class User extends AbstractListingModel
         $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['us_id']);
         $this->ListingTable->setColumnType('us_confirm', 'yesno');
         $this->ListingTable->setColumnType('us_system', 'yesno');
-        $this->ListingTable->setColumnType('us_allow_mail', 'yesno');
         $this->ListingTable->setColumnType('us_active', 'yesno');
     }
 

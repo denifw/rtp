@@ -59,11 +59,11 @@ class OfficeDao extends AbstractBaseDao
     /**
      * Function to get data by reference value
      *
-     * @param int $referenceValue To store the reference value of the table.
+     * @param string $referenceValue To store the reference value of the table.
      *
      * @return array
      */
-    public static function getByReference($referenceValue): array
+    public static function getByReference(string $referenceValue): array
     {
         $wheres = [];
         $wheres[] = SqlHelper::generateNumericCondition('ofc.of_id', $referenceValue);
@@ -78,73 +78,17 @@ class OfficeDao extends AbstractBaseDao
     /**
      * Function to get data by relation id
      *
-     * @param int $relId To store the id of relation.
+     * @param string $relId To store the id of relation.
      *
      * @return array
      */
-    public static function getDataByRelation($relId): array
+    public static function getDataByRelation(string $relId): array
     {
         $wheres = [];
         $wheres[] = SqlHelper::generateNumericCondition('ofc.of_rel_id', $relId);
-        $wheres[] = '(ofc.of_deleted_on IS NULL)';
+        $wheres[] = SqlHelper::generateNullCondition('ofc.of_deleted_on');
         return self::loadData($wheres);
     }
-
-    /**
-     * Function to get office by id relation.
-     *
-     * @param int $relId To store the relation id.
-     *
-     * @return array
-     */
-    public static function loadActiveDataByRelation($relId): array
-    {
-        $wheres = [];
-        $wheres[] = SqlHelper::generateNumericCondition('ofc.of_rel_id', $relId);
-        $wheres[] = '(ofc.of_deleted_on IS NULL)';
-        $wheres[] = SqlHelper::generateStringCondition('ofc.of_active', 'Y');
-        return self::loadData($wheres);
-    }
-
-    /**
-     * Function to get main office of relation
-     *
-     * @param int $relId To store the relation id.
-     *
-     * @return array
-     */
-    public static function loadMainOfficeByRelation($relId): array
-    {
-        $wheres = [];
-        $wheres[] = SqlHelper::generateNumericCondition('ofc.of_rel_id', $relId);
-        $wheres[] = '(ofc.of_deleted_on IS NULL)';
-        $wheres[] = SqlHelper::generateStringCondition('ofc.of_active', 'Y');
-        $wheres[] = SqlHelper::generateStringCondition('ofc.of_main', 'Y');
-        $data = self::loadData($wheres, [], 1);
-        if (count($data) === 1) {
-            return $data[0];
-        }
-        return [];
-    }
-
-    /**
-     * Function to check is the main office already setup or not.
-     *
-     * @param int $relId To store the relation id.
-     *
-     * @return bool
-     */
-    public static function isRelationHasMainOffice($relId): bool
-    {
-        $wheres = [];
-        $wheres[] = '(of_deleted_on IS NULL)';
-        $wheres[] = "(of_active ='Y')";
-        $wheres[] = "(of_main='Y')";
-        $wheres[] = '(of_rel_id = ' . $relId . ')';
-
-        return !empty(self::loadSimpleData($wheres));
-    }
-
 
     /**
      * Function to get all record.
@@ -162,16 +106,18 @@ class OfficeDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT ofc.of_id, ofc.of_rel_id, ofc.of_name, ofc.of_main, ofc.of_invoice, ofc.of_address,
+        $query = 'SELECT ofc.of_id, ofc.of_rel_id, ofc.of_name, ofc.of_invoice, ofc.of_address,
                         ofc.of_cnt_id, ofc.of_stt_id, ofc.of_cty_id, ofc.of_dtc_id, ofc.of_postal_code, ofc.of_longitude,
                         ofc.of_latitude, ofc.of_active, rel.rel_name as of_relation, cnt.cnt_name as of_country,
-                        stt.stt_name as of_state, cty.cty_name as of_city, dtc.dtc_name as of_district
-                    FROM office as ofc INNER JOIN
-                        relation as rel ON ofc.of_rel_id = rel.rel_id LEFT OUTER JOIN
-                        country as cnt ON ofc.of_cnt_id = cnt.cnt_id LEFT OUTER JOIN
-                        state as stt ON ofc.of_stt_id = stt.stt_id LEFT OUTER JOIN
-                        city as cty ON ofc.of_cty_id = cty.cty_id LEFT OUTER JOIN
-                        district as dtc ON ofc.of_dtc_id = dtc.dtc_id ' . $strWhere;
+                        stt.stt_name as of_state, cty.cty_name as of_city, dtc.dtc_name as of_district,
+                        ofc.of_cp_id, cp.cp_name as of_manager
+                    FROM office as ofc
+                        INNER JOIN relation as rel ON ofc.of_rel_id = rel.rel_id
+                        LEFT OUTER JOIN contact_person as cp ON ofc.of_cp_id = cp.cp_id
+                        LEFT OUTER JOIN country as cnt ON ofc.of_cnt_id = cnt.cnt_id
+                        LEFT OUTER JOIN state as stt ON ofc.of_stt_id = stt.stt_id
+                        LEFT OUTER JOIN city as cty ON ofc.of_cty_id = cty.cty_id
+                        LEFT OUTER JOIN district as dtc ON ofc.of_dtc_id = dtc.dtc_id ' . $strWhere;
         if (empty($orderBy) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orderBy);
         } else {
@@ -288,16 +234,16 @@ class OfficeDao extends AbstractBaseDao
     /**
      * Function to get record for single select field.
      *
+     * @param string|array $textColumn To store the column name that will be show as a text.
      * @param array $wheres To store the list condition query.
      * @param array $orders To store the list sorting query.
-     * @param int $limit To store the limit of the data.
      *
      * @return array
      */
-    public static function loadSingleSelectData(array $wheres = [], array $orders = [], int $limit = 30): array
+    public static function loadSingleSelectData($textColumn, array $wheres = [], array $orders = []): array
     {
-        $data = self::loadData($wheres, $orders, $limit);
+        $data = self::loadData($wheres, $orders, 20);
 
-        return parent::doPrepareSingleSelectData($data, 'of_name', 'of_id');
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'of_id');
     }
 }

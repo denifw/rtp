@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             PageCategorySeeder::class,
             PageSeeder::class,
             PageRightSeeder::class,
+            ApiAccessSeeder::class,
             # System - Master
             CountrySeeder::class,
             StateSeeder::class,
@@ -39,6 +40,11 @@ class DatabaseSeeder extends Seeder
             ContactPersonSeeder::class,
             UserSeeder::class,
             UserMappingSeeder::class,
+            UserGroupSeeder::class,
+            UserGroupDetailSeeder::class,
+            UserGroupPageSeeder::class,
+            UserGroupRightSeeder::class,
+            UserGroupApiSeeder::class,
             # System - Document
             DocumentGroupSeeder::class,
             DocumentTypeSeeder::class,

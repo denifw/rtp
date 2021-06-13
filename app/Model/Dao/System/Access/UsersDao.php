@@ -128,7 +128,8 @@ class UsersDao extends AbstractBaseDao
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
         $query = 'SELECT us.us_id, us.us_name, us.us_username, us.us_password, us.us_system, us.us_picture,
-                        us.us_lg_id, us.us_menu_style, lg.lg_locale as us_lg_locale, lg.lg_iso as us_lg_iso
+                        us.us_lg_id, us.us_menu_style, lg.lg_locale as us_language, lg.lg_iso as us_lg_iso,
+                        us.us_confirm, us.us_active
 					FROM users as us
 					    INNER JOIN languages as lg ON us.us_lg_id = lg.lg_id' . $strWhere;
         if (empty($orderBy) === false) {
@@ -186,6 +187,5 @@ class UsersDao extends AbstractBaseDao
 
         return parent::doPrepareSingleSelectData($data, $textColumn, 'us_id');
     }
-
 
 }

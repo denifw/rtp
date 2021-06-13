@@ -82,7 +82,7 @@ class EmailConfirmationController extends AbstractBaseAuthController
         $usDao = new UsersDao();
         $usDao->doUpdateTransaction($userToken['ut_us_id'], $colVal);
 
-        $ump = UserMappingDao::getByUserIdAndSystemId($userToken['ut_us_id'], $userToken['ut_ss_id']);
+        $ump = UserMappingDao::getUnconfirmUserMapping($userToken['ut_us_id'], $userToken['ut_ss_id']);
         $umpDao = new UserMappingDao();
         $umpColVal = [
             'ump_confirm' => 'Y'

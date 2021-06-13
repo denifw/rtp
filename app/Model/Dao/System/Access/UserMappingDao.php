@@ -216,6 +216,29 @@ class UserMappingDao extends AbstractBaseDao
     }
 
     /**
+     * Function to get all record by user id.
+     *
+     * @param string $userId To store the id of the user.
+     * @param string $ssId To store the id of the system.
+     *
+     * @return array
+     */
+    public static function getUnconfirmUserMapping(string $userId, string $ssId): array
+    {
+        $wheres = [];
+        $wheres[] = SqlHelper::generateStringCondition('ump.ump_ss_id', $ssId);
+        $wheres[] = SqlHelper::generateStringCondition('ump.ump_us_id', $userId);
+        $wheres[] = SqlHelper::generateStringCondition('ump.ump_active', 'Y');
+        $wheres[] = SqlHelper::generateNullCondition('ump.ump_deleted_on');
+        $result = self::loadData($wheres);
+        if (count($result) === 1) {
+            return $result[0];
+        }
+        return [];
+
+    }
+
+    /**
      * Function to get all record.
      *
      * @param array $wheres To store the list condition query.

@@ -14,11 +14,11 @@
                         <span class=" fa fa-angle-down"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-usermenu pull-right">
-                        {!! $switcher !!}
-                        <li><a href="{{url('/changePassword')}}"><i
-                                    class="fa fa-edit pull-right"></i> {{\App\Frame\Formatter\Trans::getWord('changePassword')}}
-                            </a>
-                        </li>
+{{--                        {!! $switcher !!}--}}
+{{--                        <li><a href="{{url('/changePassword')}}"><i--}}
+{{--                                    class="fa fa-edit pull-right"></i> {{\App\Frame\Formatter\Trans::getWord('changePassword')}}--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
                         <li><a href="javascript:;" onclick="App.logoutSystem()"><i
                                     class="fa fa-sign-out pull-right"></i> {{\App\Frame\Formatter\Trans::getWord('logout')}}
                             </a>

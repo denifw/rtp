@@ -132,10 +132,14 @@ abstract class AbstractBaseDao extends Model
     public function doUpdateTransaction(string $primaryKeyValue, array $fieldData): void
     {
         $user = new UserSession();
-        $colValue = array_merge($fieldData, [
-            $this->TablePrefix . '_updated_on' => date('Y-m-d H:i:s'),
-            $this->TablePrefix . '_updated_by' => $user->getId(),
-        ]);
+        if ($user->isSet() === true) {
+            $colValue = array_merge($fieldData, [
+                $this->TablePrefix . '_updated_on' => date('Y-m-d H:i:s'),
+                $this->TablePrefix . '_updated_by' => $user->getId(),
+            ]);
+        } else {
+            $colValue = $fieldData;
+        }
         DB::table($this->table)
             ->where($this->primaryKey, $primaryKeyValue)
             ->update($colValue);

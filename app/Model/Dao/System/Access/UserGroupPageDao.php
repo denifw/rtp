@@ -11,6 +11,7 @@
 namespace App\Model\Dao\System\Access;
 
 use App\Frame\Formatter\DataParser;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseDao;
 use Illuminate\Support\Facades\DB;
 
@@ -47,17 +48,17 @@ class UserGroupPageDao extends AbstractBaseDao
     /**
      * Function to get all data based on user group id.
      *
-     * @param int $userGroupId To store the id of user group.
+     * @param string $usgId To store the id of user group.
      *
      * @return array
      */
-    public static function loadUserGroupPage($userGroupId): array
+    public static function loadUserGroupFormData(string $usgId): array
     {
         $wheres = [];
-        $wheres[] = "(pg.pg_system = 'N')";
-        $wheres[] = "(pg.pg_active = 'Y')";
-        $wheres[] = "(pg.pg_default = 'N')";
-        $wheres[] = '(pg.pg_deleted_on IS NULL)';
+        $wheres[] = SqlHelper::generateStringCondition('pg.pg_system', 'N');
+        $wheres[] = SqlHelper::generateStringCondition('pg.pg_active', 'Y');
+        $wheres[] = SqlHelper::generateStringCondition('pg.pg_default', 'N');
+        $wheres[] = SqlHelper::generateNullCondition('pg.pg_deleted_on');
         $strWhere = ' WHERE ' . implode(' AND ', $wheres);
 
         # Set Select query;
@@ -66,20 +67,12 @@ class UserGroupPageDao extends AbstractBaseDao
                     page_category AS pc on pg.pg_pc_id = pc.pc_id LEFT OUTER JOIN
                      (SELECT ugp_id, ugp_pg_id, (CASE WHEN (ugp_deleted_on IS NULL) THEN 'Y' ELSE 'N' END) AS active
                           FROM user_group_page
-                          WHERE (ugp_usg_id = " . $userGroupId . ')) AS ugp ON pg.pg_id = ugp.ugp_pg_id' . $strWhere;
+                          WHERE " . SqlHelper::generateStringCondition('ugp_usg_id', $usgId) . ') AS ugp ON pg.pg_id = ugp.ugp_pg_id' . $strWhere;
         # Set Where condition.
-        $query .= ' ORDER BY ugp_active DESC, pg.pg_default, pg.pg_title, pc.pc_name';
+        $query .= ' ORDER BY ugp_active DESC, pg.pg_default, pg.pg_title, pc.pc_name, pg.pg_id';
         $result = DB::select($query);
 
-        return DataParser::arrayObjectToArray($result, [
-            'pg_id',
-            'pg_title',
-            'pg_description',
-            'pg_category',
-            'pg_default',
-            'ugp_id',
-            'ugp_active',
-        ]);
+        return DataParser::arrayObjectToArray($result);
 
     }
 }

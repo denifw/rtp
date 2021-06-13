@@ -17,6 +17,7 @@ class CreateApiAccessTable extends Migration
             $table->uuid('aa_id')->primary();
             $table->string('aa_name', 128);
             $table->string('aa_description', 256);
+            $table->char('aa_default', 1)->default('Y');
             $table->char('aa_active', 1)->default('Y');
             $table->uuid('aa_created_by');
             $table->dateTime('aa_created_on');
