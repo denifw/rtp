@@ -133,10 +133,6 @@ return [
         'title' => 'Provinsi',
         'description' => 'Provinsi'
     ],
-    'ssr' => [
-        'title' => 'Sistem Layanan',
-        'description' => 'Sistem Layanan'
-    ],
     'ss' => [
         'title' => 'Pengaturan Sistem',
         'description' => 'Pengaturan Sistem'

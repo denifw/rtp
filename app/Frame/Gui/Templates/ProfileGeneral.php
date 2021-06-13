@@ -33,7 +33,7 @@ class ProfileGeneral extends AbstractTemplate
     {
         $image = asset('images/image-not-found.jpg');
         if ($this->isValidData('img_path') === true) {
-            $image = asset('storage/' . $this->getData('img_path'));
+            $image = $this->getData('img_path');
         }
 
         $result = '<div class="card">';
@@ -46,7 +46,7 @@ class ProfileGeneral extends AbstractTemplate
         $result .= '<h2>' . $this->getData('title') . '</h2>';
         if ($this->isValidData('subtitle') === true) {
             $subtitle = $this->getData('subtitle');
-            if (\is_array($subtitle) === true) {
+            if (is_array($subtitle) === true) {
                 foreach ($subtitle as $row) {
                     $result .= '<h5>' . $row . '</h5>';
                 }
@@ -56,7 +56,7 @@ class ProfileGeneral extends AbstractTemplate
         }
         $result .= '</div>';
         $result .= '<div class="clearfix"></div>';
-        if ($this->isValidData('infos') === true && \is_array($this->getData('infos')) === true) {
+        if ($this->isValidData('infos') === true && is_array($this->getData('infos')) === true) {
             $result .= '<div class="text-center">';
             $result .= '<table class="tile_info">';
             $infos = $this->getData('infos');
@@ -97,7 +97,7 @@ class ProfileGeneral extends AbstractTemplate
         }
         if (empty($url) === false) {
             $result .= '<div class="card-footer">';
-            if (\is_array($url) === true) {
+            if (is_array($url) === true) {
                 foreach ($url AS $row) {
                     $result .= '<button type="button" class="' . $row['class'] . '" onclick="' . $row['url'] . '">';
                     $result .= '<i class="' . $row['icon'] . '"> </i> ' . $row['text'];

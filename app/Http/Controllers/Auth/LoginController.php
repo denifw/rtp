@@ -11,6 +11,7 @@ use App\Http\Controllers\AbstractBaseAuthController;
 use App\Model\Dao\System\Access\UserMappingDao;
 use App\Model\Dao\System\Access\UsersDao;
 use App\Model\Dao\System\Access\UserTokenDao;
+use App\Model\Dao\System\Document\DocumentDao;
 use Exception;
 
 class LoginController extends AbstractBaseAuthController
@@ -82,6 +83,9 @@ class LoginController extends AbstractBaseAuthController
             }
             if (empty($userSetting) === true) {
                 Message::throwMessage(Trans::getMessageWord('invalidUsernamePassword'));
+            }
+            if (empty($userSetting['ss_logo_id']) === false) {
+                $userSetting['ss_logo'] = DocumentDao::getDocumentPathById($userSetting['ss_logo_id']);
             }
             $user = array_merge($user, $userSetting);
             $this->setSession($user);

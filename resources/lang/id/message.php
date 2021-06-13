@@ -36,7 +36,7 @@ return [
 //    'shipmentArchiveConfirmation' => 'Shipment Archive Confirmation',
 //    'pleaseConfirmToCargoEvent' => 'Please confirm to start adding cargo event.',
 //    'deleteEventConfirmation' => 'Are you sure to delete this event data?',
-//    'deleteConfirmation' => 'Are you sure to delete this data?',
+    'deleteConfirmation' => 'Apakah anda yakin menghapus data ini?',
 //    'deleteCargoConfirmation' => 'Are you sure to delete this cargo data?',
 //    'deleteBoardingOfficerConfirmation' => 'Are you sure to delete this boarding officer data?',
 //    'deleteUserGroupConfirmation' => 'Are you sure to delete this user group data?',

@@ -38,11 +38,11 @@ class SystemSettingDao extends AbstractBaseDao
         'ss_thousand_separator',
         'ss_lg_id',
         'ss_cur_id',
-        'ss_logo',
+        'ss_logo_id',
         'ss_name_space',
         'ss_system',
         'ss_active',
-        'ss_icon',
+        'ss_icon_id',
         'ss_rel_id',
     ];
     /**
@@ -100,7 +100,7 @@ class SystemSettingDao extends AbstractBaseDao
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
         $query = 'SELECT ss.ss_id, ss.ss_relation, ss.ss_lg_id, lg.lg_locale as ss_language, ss.ss_cur_id, cur.cur_iso as ss_currency,
-                        ss.ss_decimal_number, ss.ss_decimal_separator, ss.ss_thousand_separator, ss.ss_logo, ss.ss_icon,
+                        ss.ss_decimal_number, ss.ss_decimal_separator, ss.ss_thousand_separator, ss.ss_logo_id, ss.ss_icon_id,
                         ss.ss_name_space, ss.ss_api_key, ss.ss_rel_id, ss.ss_rel_id, ss.ss_system, ss.ss_active
                     FROM system_setting as ss
                         INNER JOIN languages as lg ON ss.ss_lg_id = lg.lg_id
@@ -109,7 +109,7 @@ class SystemSettingDao extends AbstractBaseDao
         if (empty($orderBy) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orderBy);
         } else {
-            $query .= ' ORDER BY ss.ss_system DESC, ss.ss_name, ss.ss_id';
+            $query .= ' ORDER BY ss.ss_system DESC, ss.ss_relation, ss.ss_id';
         }
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;

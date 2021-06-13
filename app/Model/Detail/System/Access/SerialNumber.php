@@ -8,15 +8,14 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Detail\Setting;
+namespace App\Model\Detail\System\Access;
 
 use App\Frame\Formatter\DateTimeParser;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractFormModel;
-use App\Model\Dao\Relation\OfficeDao;
-use App\Model\Dao\Setting\SerialNumberDao;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
+use App\Model\Dao\System\Access\SerialNumberDao;
 
 /**
  * Class to handle the creation of detail SerialNumber page
@@ -36,24 +35,22 @@ class SerialNumber extends AbstractFormModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'serialNumber', 'sn_id');
+        parent::__construct(get_class($this), 'sn', 'sn_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
-            'sn_ss_id' => $this->User->getSsId(),
-            'sn_sc_id' => $this->getIntParameter('sn_sc_id'),
-            'sn_of_id' => $this->getIntParameter('sn_of_id'),
+            'sn_ss_id' => $this->getStringParameter('sn_ss_id'),
+            'sn_sc_id' => $this->getStringParameter('sn_sc_id'),
+            'sn_of_id' => $this->getStringParameter('sn_of_id'),
             'sn_relation' => $this->getStringParameter('sn_relation', 'N'),
-            'sn_srv_id' => $this->getIntParameter('sn_srv_id'),
-            'sn_srt_id' => $this->getIntParameter('sn_srt_id'),
             'sn_prefix' => $this->getStringParameter('sn_prefix'),
             'sn_separator' => $this->getStringParameter('sn_separator', '-'),
             'sn_postfix' => $this->getStringParameter('sn_postfix'),
@@ -79,11 +76,9 @@ class SerialNumber extends AbstractFormModel
     {
         if ($this->getFormAction() === null) {
             $colVal = [
-                'sn_sc_id' => $this->getIntParameter('sn_sc_id'),
-                'sn_of_id' => $this->getIntParameter('sn_of_id'),
+                'sn_sc_id' => $this->getStringParameter('sn_sc_id'),
+                'sn_of_id' => $this->getStringParameter('sn_of_id'),
                 'sn_relation' => $this->getStringParameter('sn_relation'),
-                'sn_srv_id' => $this->getIntParameter('sn_srv_id'),
-                'sn_srt_id' => $this->getIntParameter('sn_srt_id'),
                 'sn_prefix' => $this->getStringParameter('sn_prefix'),
                 'sn_separator' => $this->getStringParameter('sn_separator', '-'),
                 'sn_postfix' => $this->getStringParameter('sn_postfix'),
@@ -109,7 +104,7 @@ class SerialNumber extends AbstractFormModel
      */
     public function loadData(): array
     {
-        return SerialNumberDao::getByReferenceAndSystemSetting($this->getDetailReferenceValue(), $this->User->getSsId());
+        return SerialNumberDao::getByReference($this->getDetailReferenceValue());
 
     }
 
@@ -122,7 +117,7 @@ class SerialNumber extends AbstractFormModel
     {
         $this->Tab->addPortlet('general', $this->getGeneralFieldSet());
         if ($this->isValidParameter('sn_deleted_on') === true) {
-            $this->View->addErrorMessage(Trans::getMessageWord('deletedData', [
+            $this->View->addErrorMessage(Trans::getMessageWord('deletedData', '', [
                 'user' => $this->getStringParameter('sn_deleted_by'),
                 'time' => DateTimeParser::format($this->getStringParameter('sn_deleted_on')),
                 'reason' => $this->getStringParameter('sn_deleted_reason')
@@ -138,6 +133,7 @@ class SerialNumber extends AbstractFormModel
     public function loadValidationRole(): void
     {
         if ($this->getFormAction() === null) {
+            $this->Validation->checkRequire('sn_ss_id');
             $this->Validation->checkRequire('sn_sc_id');
             $this->Validation->checkRequire('sn_format');
             $this->Validation->checkMaxLength('sn_separator', 1);
@@ -149,17 +145,15 @@ class SerialNumber extends AbstractFormModel
             $this->Validation->checkUnique('sn_sc_id', 'serial_number', [
                 'sn_id' => $this->getDetailReferenceValue(),
             ], [
-                'sn_ss_id' => $this->User->getSsId(),
-                'sn_of_id' => $this->getIntParameter('sn_of_id'),
-                'sn_srv_id' => $this->getIntParameter('sn_srv_id'),
-                'sn_srt_id' => $this->getIntParameter('sn_srt_id'),
+                'sn_ss_id' => $this->getStringParameter('sn_ss_id'),
+                'sn_of_id' => $this->getStringParameter('sn_of_id'),
                 'sn_active' => 'Y',
             ]);
             $this->Validation->checkUnique('sn_prefix', 'serial_number', [
                 'sn_id' => $this->getDetailReferenceValue(),
             ], [
-                'sn_ss_id' => $this->User->getSsId(),
-                'sn_sc_id' => $this->getIntParameter('sn_sc_id'),
+                'sn_ss_id' => $this->getStringParameter('sn_ss_id'),
+                'sn_sc_id' => $this->getStringParameter('sn_sc_id'),
                 'sn_postfix' => $this->getStringParameter('sn_postfix'),
                 'sn_active' => 'Y',
             ]);
@@ -177,30 +171,26 @@ class SerialNumber extends AbstractFormModel
     private function getGeneralFieldSet(): Portlet
     {
         # Create Fields.
+        # System Settings
+        $ssField = $this->Field->getSingleSelect('ss', 'sn_system', $this->getStringParameter('sn_system'));
+        $ssField->setHiddenField('sn_ss_id', $this->getStringParameter('sn_ss_id'));
+        $ssField->setEnableDetailButton(false);
+        $ssField->setEnableNewButton(false);
+        $ssField->setAutoCompleteFields([
+            'sn_rel_id' => 'ss_rel_id'
+        ]);
         # Serial Code field
-        $serialCodeField = $this->Field->getSingleSelect('serialCode', 'sn_serial_code', $this->getStringParameter('sn_serial_code'));
-        $serialCodeField->setHiddenField('sn_sc_id', $this->getIntParameter('sn_sc_id'));
+        $serialCodeField = $this->Field->getSingleSelect('sc', 'sn_serial_code', $this->getStringParameter('sn_serial_code'));
+        $serialCodeField->setHiddenField('sn_sc_id', $this->getStringParameter('sn_sc_id'));
         $serialCodeField->setEnableDetailButton(false);
         $serialCodeField->setEnableNewButton(false);
-
-        $officeField = $this->Field->getSelect('sn_of_id', $this->getIntParameter('sn_of_id'));
-        $officeField->addOptions(OfficeDao::loadActiveDataByRelation($this->User->getRelId()), 'of_name', 'of_id');
-        $officeField->setPleaseSelect();
-
-        # Service Field
-        $systemServiceField = $this->Field->getSingleSelect('service', 'sn_service', $this->getStringParameter('sn_service'));
-        $systemServiceField->setHiddenField('sn_srv_id', $this->getIntParameter('sn_srv_id'));
-        $systemServiceField->addParameter('ssr_ss_id', $this->User->getSsId());
-        $systemServiceField->setEnableNewButton(false);
-        $systemServiceField->setEnableDetailButton(false);
-
-        # Service Field
-        $serviceTermField = $this->Field->getSingleSelect('serviceTerm', 'sn_service_term', $this->getStringParameter('sn_service_term'));
-        $serviceTermField->setHiddenField('sn_srt_id', $this->getIntParameter('sn_srt_id'));
-        $serviceTermField->addParameterById('srt_srv_id', 'sn_srv_id', Trans::getWord('service'));
-        $serviceTermField->setEnableNewButton(false);
-        $serviceTermField->setEnableDetailButton(false);
-
+        # Office field
+        $officeField = $this->Field->getSingleSelect('of', 'sn_office', $this->getStringParameter('sn_office'));
+        $officeField->setHiddenField('sn_of_id', $this->getStringParameter('sn_of_id'));
+        $officeField->addParameterById('ss_id', 'sn_ss_id', Trans::getWord('systemName'));
+        $officeField->addOptionalParameterById('of_rel_id', 'sn_rel_id');
+        $officeField->setEnableDetailButton(false);
+        $officeField->setEnableNewButton(false);
         # Prefix Field
         $prefixField = $this->Field->getText('sn_prefix', $this->getStringParameter('sn_prefix'));
         # Separator Field
@@ -223,18 +213,18 @@ class SerialNumber extends AbstractFormModel
         # Add field to field set
         $fieldSet = new FieldSet($this->Validation);
         $fieldSet->setGridDimension(4);
+        $fieldSet->addField(Trans::getWord('systemName'), $ssField, true);
         $fieldSet->addField(Trans::getWord('serialCode'), $serialCodeField, true);
-        $fieldSet->addField(Trans::getWord('service'), $systemServiceField);
-        $fieldSet->addField(Trans::getWord('serviceTerm'), $serviceTermField);
         $fieldSet->addField(Trans::getWord('office'), $officeField);
-        $fieldSet->addField(Trans::getWord('prefix'), $prefixField);
-        $fieldSet->addField(Trans::getWord('postfix'), $postfixField);
         $fieldSet->addField(Trans::getWord('relation'), $this->Field->getYesNo('sn_relation', $this->getStringParameter('sn_relation')));
         $fieldSet->addField(Trans::getWord('yearly'), $yearlyField);
         $fieldSet->addField(Trans::getWord('monthly'), $monthlyField);
+        $fieldSet->addField(Trans::getWord('prefix'), $prefixField);
+        $fieldSet->addField(Trans::getWord('postfix'), $postfixField);
         $fieldSet->addField(Trans::getWord('length'), $lengthField);
         $fieldSet->addField(Trans::getWord('separator'), $separatorField);
         $fieldSet->addField(Trans::getWord('format'), $formatField, true);
+        $fieldSet->addHiddenField($this->Field->getHidden('sn_rel_id', $this->getStringParameter('sn_rel_id')));
 
         # Create a portlet box.
         $portlet = new Portlet('SnGeneralPtl', $this->getDefaultPortletTitle());

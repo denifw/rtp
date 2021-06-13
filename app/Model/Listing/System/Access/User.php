@@ -9,12 +9,12 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Listing\User;
+namespace App\Model\Listing\System\Access;
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
-use App\Model\Dao\System\SystemSettingDao;
+use App\Model\Dao\System\Access\UsersDao;
 
 /**
  * Class to control the system of User.
@@ -35,7 +35,7 @@ class User extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'user');
+        parent::__construct(get_class($this), 'us');
         $this->setParameters($parameters);
     }
 
@@ -46,8 +46,9 @@ class User extends AbstractListingModel
      */
     public function loadSearchForm(): void
     {
-        $ssField = $this->Field->getSelect('ss_id', $this->getIntParameter('ss_id'));
-        $ssField->addOptions(SystemSettingDao::loadAllData(), 'ss_relation', 'ss_id');
+        $ssField = $this->Field->getSingleSelect('ss', 'us_system_settings', $this->getStringParameter('us_system_settings'));
+        $ssField->setHiddenField('us_ss_id', $this->getStringParameter('us_ss_id'));
+        $ssField->setEnableNewButton(false);
         $this->ListingForm->addField(Trans::getWord('systemSetting'), $ssField);
         $this->ListingForm->addField(Trans::getWord('name'), $this->Field->getText('us_name', $this->getStringParameter('us_name')));
         $this->ListingForm->addField(Trans::getWord('username'), $this->Field->getText('us_username', $this->getStringParameter('us_username')));
@@ -73,9 +74,7 @@ class User extends AbstractListingModel
             'us_active' => Trans::getWord('active'),
         ]);
         # Load the data for User.
-        $columns = array_merge(array_keys($this->ListingTable->getHeaderRow()), ['us_id']);
-        $listingData = $this->loadData($columns);
-        $this->ListingTable->addRows($listingData);
+        $this->ListingTable->addRows($this->loadData());
         $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['us_id']);
         $this->ListingTable->setColumnType('us_confirm', 'yesno');
         $this->ListingTable->setColumnType('us_system', 'yesno');
@@ -90,77 +89,52 @@ class User extends AbstractListingModel
      */
     protected function getTotalRows(): int
     {
-        # Set Select query;
-        $query = 'SELECT count(DISTINCT (us_id)) AS total_rows
-                   FROM users';
-        # Set where condition.
-        $query .= $this->getWhereCondition();
-
-        return $this->loadTotalListingRows($query);
+        return UsersDao::loadTotalData($this->getWhereCondition());
     }
 
 
     /**
      * Get query to get the listing data.
      *
-     * @param array $outFields To store the out field from selection data.
-     *
      * @return array
      */
-    private function loadData(array $outFields): array
+    private function loadData(): array
     {
-        # Set Select query;
-        $query = 'SELECT us_id, us_name, us_username, us_active, us_allow_mail, us_system, us_confirm
-                    FROM users';
-        # Set Where condition.
-        $query .= $this->getWhereCondition();
-        # Set group by query.
-        $query .= ' GROUP BY us_id, us_name, us_username, us_active, us_allow_mail, us_system, us_confirm';
-        # Set order by query.
-        if (empty($this->ListingSort->getSelectedField()) === false) {
-            $query .= $this->ListingSort->getOrderByQuery();
-        } else {
-            $query .= ' ORDER BY us_name';
-        }
-
-        return $this->loadDatabaseRow($query, $outFields);
+        return UsersDao::loadData(
+            $this->getWhereCondition(),
+            $this->ListingSort->getOrderByFields(),
+            $this->getLimitTable(),
+            $this->getLimitOffsetTable());
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return string
+     * @return array
      */
-    private function getWhereCondition(): string
+    private function getWhereCondition(): array
     {
         # Set where conditions
         $wheres = [];
-
-        if ($this->isValidParameter('ss_id') === true) {
+        if ($this->isValidParameter('us_ss_id') === true) {
             $wheres[] = '(us_id IN (SELECT ump_us_id
-                                    FROM user_mapping 
-                                    WHERE (ump_deleted_on IS NULL) AND (ump_ss_id = ' . $this->getIntParameter('ss_id') . ')
-                                    GROUP BY ump_us_id ))';
+                                    FROM user_mapping
+                                    WHERE ' . SqlHelper::generateNullCondition('ump_deleted_on') .
+                ' AND ' . SqlHelper::generateStringCondition('ump_ss_id', $this->getStringParameter('us_ss_id')) .
+                ' GROUP BY ump_us_id ))';
         }
         if ($this->isValidParameter('us_name') === true) {
-            $wheres[] = StringFormatter::generateLikeQuery('us_name', $this->getStringParameter('us_name'));
+            $wheres[] = SqlHelper::generateLikeCondition('us_name', $this->getStringParameter('us_name'));
         }
         if ($this->isValidParameter('us_username') === true) {
-            $wheres[] = StringFormatter::generateLikeQuery('us_username', $this->getStringParameter('us_username'));
+            $wheres[] = SqlHelper::generateLikeCondition('us_username', $this->getStringParameter('us_username'));
         }
         if ($this->isValidParameter('us_active') === true) {
-            $wheres[] = '(us_active = \'' . $this->getStringParameter('us_active') . '\')';
+            $wheres[] = SqlHelper::generateStringCondition('us_active', $this->getStringParameter('us_active'));
         }
         if ($this->isValidParameter('us_confirm') === true) {
-            $wheres[] = '(us_confirm = \'' . $this->getStringParameter('us_confirm') . '\')';
+            $wheres[] = SqlHelper::generateStringCondition('us_confirm', $this->getStringParameter('us_confirm'));
         }
-
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
-
-        # return the where query.
-        return $strWhere;
+        return $wheres;
     }
 }

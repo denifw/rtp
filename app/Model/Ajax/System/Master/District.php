@@ -39,13 +39,13 @@ class District extends AbstractBaseAjaxModel
         $wheres[] = SqlHelper::generateNullCondition('dtc.dtc_deleted_on');
         $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_active', 'Y');
         if ($this->isValidParameter('dtc_cnt_id') === true) {
-            $wheres[] = SqlHelper::generateNumericCondition('dtc.dtc_cnt_id', $this->getStringParameter('dtc_cnt_id'));
+            $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_cnt_id', $this->getStringParameter('dtc_cnt_id'));
         }
         if ($this->isValidParameter('dtc_stt_id') === true) {
-            $wheres[] = SqlHelper::generateNumericCondition('dtc.dtc_stt_id', $this->getStringParameter('dtc_stt_id'));
+            $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_stt_id', $this->getStringParameter('dtc_stt_id'));
         }
         if ($this->isValidParameter('dtc_cty_id') === true) {
-            $wheres[] = SqlHelper::generateNumericCondition('dtc.dtc_cty_id', $this->getStringParameter('dtc_cty_id'));
+            $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_cty_id', $this->getStringParameter('dtc_cty_id'));
         }
         return DistrictDao::loadSingleSelectData('dtc_name', $wheres);
     }
@@ -64,13 +64,13 @@ class District extends AbstractBaseAjaxModel
         $wheres[] = SqlHelper::generateNullCondition('dtc.dtc_deleted_on');
         $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_active', 'Y');
         if ($this->isValidParameter('dtc_cnt_id') === true) {
-            $wheres[] = SqlHelper::generateNumericCondition('dtc.dtc_cnt_id', $this->getStringParameter('dtc_cnt_id'));
+            $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_cnt_id', $this->getStringParameter('dtc_cnt_id'));
         }
         if ($this->isValidParameter('dtc_stt_id') === true) {
-            $wheres[] = SqlHelper::generateNumericCondition('dtc.dtc_stt_id', $this->getStringParameter('dtc_stt_id'));
+            $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_stt_id', $this->getStringParameter('dtc_stt_id'));
         }
         if ($this->isValidParameter('dtc_cty_id') === true) {
-            $wheres[] = SqlHelper::generateNumericCondition('dtc.dtc_cty_id', $this->getStringParameter('dtc_cty_id'));
+            $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_cty_id', $this->getStringParameter('dtc_cty_id'));
         }
         return DistrictDao::loadSingleSelectData('dtc_name', $wheres);
 
@@ -90,13 +90,13 @@ class District extends AbstractBaseAjaxModel
         $wheres[] = SqlHelper::generateNullCondition('dtc.dtc_deleted_on');
         $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_active', 'Y');
         if ($this->isValidParameter('dtc_cnt_id') === true) {
-            $wheres[] = SqlHelper::generateNumericCondition('dtc.dtc_cnt_id', $this->getStringParameter('dtc_cnt_id'));
+            $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_cnt_id', $this->getStringParameter('dtc_cnt_id'));
         }
         if ($this->isValidParameter('dtc_stt_id') === true) {
-            $wheres[] = SqlHelper::generateNumericCondition('dtc.dtc_stt_id', $this->getStringParameter('dtc_stt_id'));
+            $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_stt_id', $this->getStringParameter('dtc_stt_id'));
         }
         if ($this->isValidParameter('dtc_cty_id') === true) {
-            $wheres[] = SqlHelper::generateNumericCondition('dtc.dtc_cty_id', $this->getStringParameter('dtc_cty_id'));
+            $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_cty_id', $this->getStringParameter('dtc_cty_id'));
         }
         return DistrictDao::loadSingleSelectData(['dtc_name', 'cty_name', 'stt_name', 'cnt_name'], $wheres);
     }

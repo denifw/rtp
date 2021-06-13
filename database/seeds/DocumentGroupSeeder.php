@@ -11,18 +11,6 @@ class DocumentGroupSeeder extends Seeder
      */
     public function run()
     {
-
-        DB::table('document_group')->where('dcg_id', 6)->update([
-            'dcg_code' => 'bt',
-            'dcg_description' => 'Bank Transaction',
-            'dcg_table' => 'bank_transaction',
-            'dcg_value_field' => 'bt_id',
-            'dcg_text_field' => 'bt_number'
-        ]);
-        DB::table('document_group')->where('dcg_id', 7)->update([
-            'dcg_code' => 'ca',
-            'dcg_description' => 'Cash Payment',
-        ]);
-        DB::table('document_group')->insert(['dcg_code' => 'ea', 'dcg_description' => 'Electronic Account', 'dcg_table' => 'electronic_account', 'dcg_value_field' => 'ea_id', 'dcg_text_field' => 'ea_code', 'dcg_active' => 'Y', 'dcg_uid' => 'a9a2f830-738a-35b6-b406-ef1a3276f199', 'dcg_created_on' => date('Y-m-d H:i:s'), 'dcg_created_by' => 1]);
+        DB::table('document_group')->insert(['dcg_id' => '1b3e105d-b7c7-35b8-a885-9e2d984adba4', 'dcg_code' => 'ss', 'dcg_description' => 'System Setting', 'dcg_table' => 'system_setting', 'dcg_value_field' => 'ss_id', 'dcg_text_field' => 'ss_relation', 'dcg_active' => 'Y', 'dcg_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'dcg_created_on' => date('Y-m-d H:i:s')]);
     }
 }

@@ -8,7 +8,7 @@
  * @copyright 2019 MataLOG
  */
 
-namespace App\Model\Dao\Relation;
+namespace App\Model\Dao\Crm;
 
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
@@ -36,13 +36,7 @@ class ContactPersonDao extends AbstractBaseDao
         'cp_email',
         'cp_phone',
         'cp_of_id',
-        'cp_office_manager',
         'cp_active',
-        'cp_salutation_id',
-        'cp_dpt_id',
-        'cp_jbt_id',
-        'cp_birthday',
-        'cp_deleted_reason'
     ];
 
     /**
@@ -52,25 +46,6 @@ class ContactPersonDao extends AbstractBaseDao
     public function __construct()
     {
         parent::__construct('contact_person', 'cp', self::$Fields);
-    }
-
-    /**
-     * Abstract function to load the seeder query for table contact_person.
-     *
-     * @return array
-     */
-    public function loadSeeder(): array
-    {
-        return $this->generateSeeder([
-            'cp_number',
-            'cp_name',
-            'cp_email',
-            'cp_phone',
-            'cp_active',
-            'cp_office_manager',
-            'cp_birthday',
-            'cp_deleted_reason',
-        ]);
     }
 
 
@@ -138,8 +113,8 @@ class ContactPersonDao extends AbstractBaseDao
      * Function to get all record.
      *
      * @param array $wheres To store the list condition query.
-     * @param int   $limit  To store the limit of the data.
-     * @param int   $offset To store the offset of the data to apply limit.
+     * @param int $limit To store the limit of the data.
+     * @param int $offset To store the offset of the data to apply limit.
      *
      * @return array
      */
@@ -149,11 +124,11 @@ class ContactPersonDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT cp.cp_id, cp.cp_number, cp.cp_name, cp.cp_email, cp.cp_phone, cp.cp_active, cp.cp_of_id, o.of_name as cp_office, 
+        $query = 'SELECT cp.cp_id, cp.cp_number, cp.cp_name, cp.cp_email, cp.cp_phone, cp.cp_active, cp.cp_of_id, o.of_name as cp_office,
                          cp.cp_office_manager, o.of_rel_id as cp_rel_id, rel.rel_name as cp_relation,
                          cp.cp_salutation_id, cp.cp_dpt_id, cp.cp_jbt_id, cp.cp_birthday, cp.cp_deleted_reason,
                          slt.sty_name as cp_salutation_name, jbt.jbt_name as cp_jbt_name, dpt.dpt_name as cp_dpt_name
-                        FROM contact_person as cp 
+                        FROM contact_person as cp
                              INNER JOIN office as o ON cp.cp_of_id = o.of_id
                              INNER JOIN relation as rel ON o.of_rel_id = rel.rel_id
                              LEFT OUTER JOIN system_type as slt ON slt.sty_id = cp.cp_salutation_id

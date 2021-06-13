@@ -120,4 +120,28 @@ class SystemServiceDao extends AbstractBaseDao
 
     }
 
+    /**
+     * Function to get all record.
+     *
+     * @param string $ssId To store the reference of system setting
+     *
+     * @return array
+     */
+    public static function loadSystemServiceData(string $ssId): array
+    {
+        $wheres = [];
+        $wheres[] = SqlHelper::generateStringCondition('srv.srv_active', 'Y');
+        $wheres[] = SqlHelper::generateNullCondition('srv.srv_deleted_on');
+        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
+        $query = "SELECT srv.srv_id, srv.srv_code, srv.srv_name, ssr.ssr_id, (CASE WHEN (ssr.active IS NULL) THEN 'N' ELSE ssr.active END) AS ssr_active
+                FROM service AS srv
+                    LEFT OUTER JOIN (SELECT ssr_id, ssr_srv_id, (CASE WHEN (ssr_deleted_on IS NULL) THEN 'Y' ELSE 'N' END) AS active
+                          FROM system_service
+                          WHERE " . SqlHelper::generateStringCondition('ssr_ss_id', $ssId) . ') AS ssr ON srv.srv_id = ssr.ssr_srv_id' . $strWhere;
+        $query .= ' ORDER BY ssr_active DESC, srv.srv_name, srv.srv_id';
+        $result = DB::select($query);
+        return DataParser::arrayObjectToArray($result);
+
+    }
+
 }

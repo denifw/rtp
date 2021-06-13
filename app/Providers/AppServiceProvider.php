@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Frame\Formatter\StringFormatter;
 use App\Frame\Formatter\Trans;
 use App\Frame\System\Session\UserSession;
+use App\Model\Dao\System\Document\DocumentDao;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 
@@ -29,11 +30,7 @@ class AppServiceProvider extends ServiceProvider
                 if (empty($user->getMenuStyle()) === false) {
                     $bodyClass = $user->getMenuStyle();
                 }
-                $ns = StringFormatter::replaceSpecialCharacter($user->Settings->getNameSpace(), '');
-                $logoPath = 'storage/' . $ns . '/systemsetting/logo/' . $user->Settings->getLogo();
-                if (file_exists(public_path($logoPath)) === true) {
-                    $logo = asset($logoPath);
-                }
+                $logo = DocumentDao::getDocumentPathById($user->Settings->getLogoId());
                 if ($user->isMappingEnabled()) {
                     $switcher = '<li><a href="' . url('switchSystem') . '"> ' . Trans::getWord('switchSystem') . '</a></li>';
                 }

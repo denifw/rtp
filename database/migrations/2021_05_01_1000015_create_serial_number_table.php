@@ -26,9 +26,10 @@ class CreateSerialNumberTable extends Migration
             $table->string('sn_prefix', 16)->nullable();
             $table->char('sn_yearly', 1)->default('Y');
             $table->char('sn_monthly', 1)->default('Y');
-            $table->integer('sn_length')->default(10);
+            $table->integer('sn_length')->default(5);
             $table->integer('sn_increment')->default(1);
-            $table->string('sn_postfix', 10)->nullable();
+            $table->string('sn_postfix', 16)->nullable();
+            $table->char('sn_format', 1)->nullable();
             $table->char('sn_active', 1)->default('Y');
             $table->uuid('sn_created_by');
             $table->dateTime('sn_created_on');

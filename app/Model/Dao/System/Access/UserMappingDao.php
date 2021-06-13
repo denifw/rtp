@@ -107,7 +107,7 @@ class UserMappingDao extends AbstractBaseDao
         $wheres[] = SqlHelper::generateNullCondition('ss.ss_deleted_on');
         $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         $query = 'SELECT  ss.ss_id, lg.lg_locale as ss_lg_locale, lg.lg_iso as ss_lg_iso, ss.ss_decimal_number,
-                          ss.ss_decimal_separator, ss.ss_thousand_separator, ss.ss_logo, ss.ss_name_space, ss.ss_system,
+                          ss.ss_decimal_separator, ss.ss_thousand_separator, ss.ss_logo_id, ss.ss_name_space, ss.ss_system,
                           rel.rel_id, rel.rel_name, rel.rel_short_name, ss.ss_cur_id, cur.cur_iso as ss_currency_iso, cur.cur_name as ss_currency,
                           ss.ss_rel_id, ss.ss_relation
 					FROM system_setting as ss
@@ -159,9 +159,9 @@ class UserMappingDao extends AbstractBaseDao
         $wheres[] = SqlHelper::generateStringCondition('ss_active', 'Y');
         $wheres[] = SqlHelper::generateNullCondition('ss_deleted_on');
         $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        $query = 'SELECT  ss_id, ss_logo, ss_relation, ss_system
+        $query = 'SELECT  ss_id, ss_logo_id, ss_relation, ss_system
 					FROM system_setting ' . $strWhere;
-        $query .= ' GROUP BY ss_id, ss_logo, ss_relation, ss_system';
+        $query .= ' GROUP BY ss_id, ss_logo_id, ss_relation, ss_system';
         $query .= ' ORDER BY ss_system DESC, ss_relation, ss_id';
         $sqlResult = DB::select($query);
         if (empty($sqlResult) === false) {
@@ -232,7 +232,7 @@ class UserMappingDao extends AbstractBaseDao
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
         $query = 'SELECT ump.ump_id, ss.ss_id , lg.lg_locale as ss_lg_locale, lg.lg_iso as ss_lg_iso, ss.ss_decimal_number,
-                          ss.ss_decimal_separator, ss.ss_thousand_separator, ss.ss_logo, ss.ss_name_space, ss.ss_system,
+                          ss.ss_decimal_separator, ss.ss_thousand_separator, ss.ss_logo_id, ss.ss_name_space, ss.ss_system,
                           rel.rel_id, rel.rel_name, rel.rel_short_name, cp.cp_id, cp.cp_name, ofc.of_id, ofc.of_name,
                           ss.ss_cur_id, cur.cur_iso as ss_currency_iso, cur.cur_name as ss_currency, ss.ss_relation,
                             ss.ss_rel_id

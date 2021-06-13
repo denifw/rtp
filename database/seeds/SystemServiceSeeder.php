@@ -11,10 +11,9 @@ class SystemServiceSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('system_service')->insert(['ssr_ss_id' => 2, 'ssr_srv_id' => 3, 'ssr_srt_id' => 16, 'ssr_active' => 'Y', 'ssr_uid' => '9298c9bf-3443-37cb-b779-62b0d6c44871', 'ssr_created_on' => date('Y-m-d H:i:s'), 'ssr_created_by' => 1]);
-        DB::table('system_service')->insert(['ssr_ss_id' => 2, 'ssr_srv_id' => 3, 'ssr_srt_id' => 17, 'ssr_active' => 'Y', 'ssr_uid' => '5d353462-d904-3025-80dd-8f5fa51fcd0d', 'ssr_created_on' => date('Y-m-d H:i:s'), 'ssr_created_by' => 1]);
-        DB::table('system_service')->insert(['ssr_ss_id' => 2, 'ssr_srv_id' => 3, 'ssr_srt_id' => 19, 'ssr_active' => 'Y', 'ssr_uid' => '7b5fc4af-2b89-3fc2-bea5-7539671d287d', 'ssr_created_on' => date('Y-m-d H:i:s'), 'ssr_created_by' => 1]);
-        DB::table('system_service')->insert(['ssr_ss_id' => 2, 'ssr_srv_id' => 3, 'ssr_srt_id' => 15, 'ssr_active' => 'Y', 'ssr_uid' => '455134d3-5511-3801-b9e8-275ec8d3e67c', 'ssr_created_on' => date('Y-m-d H:i:s'), 'ssr_created_by' => 1]);
-        DB::table('system_service')->insert(['ssr_ss_id' => 2, 'ssr_srv_id' => 3, 'ssr_srt_id' => 18, 'ssr_active' => 'Y', 'ssr_uid' => '6954a895-af45-3c50-9350-c43e435c63ea', 'ssr_created_on' => date('Y-m-d H:i:s'), 'ssr_created_by' => 1]);
+        DB::table('system_service')->insert(['ssr_id' => '089358d8-a802-3b1e-be40-deb83df0b5ac', 'ssr_ss_id' => '2dbef151-3fd3-37e2-9fad-33635f3fc81a', 'ssr_srv_id' => '020a60ee-d45d-34ae-9c9f-765319e9d6a7', 'ssr_active' => 'Y', 'ssr_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'ssr_created_on' => date('Y-m-d H:i:s')]);
+        DB::table('system_service')->insert(['ssr_id' => '6d590175-22c3-30cb-a06c-fd2aab6f6e62', 'ssr_ss_id' => '2dbef151-3fd3-37e2-9fad-33635f3fc81a', 'ssr_srv_id' => '373387ad-5421-3500-93e6-318a950d5bfb', 'ssr_active' => 'Y', 'ssr_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'ssr_created_on' => date('Y-m-d H:i:s')]);
+        DB::table('system_service')->insert(['ssr_id' => '944b88d2-63a5-3cec-8619-92cee4884f0c', 'ssr_ss_id' => 'a629c5e3-2dd5-3a10-a7e9-a04cc0d6dff8', 'ssr_srv_id' => '373387ad-5421-3500-93e6-318a950d5bfb', 'ssr_active' => 'Y', 'ssr_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'ssr_created_on' => date('Y-m-d H:i:s')]);
+        DB::table('system_service')->insert(['ssr_id' => 'dea9bc4c-b76c-32eb-b71b-ee9ce70103f6', 'ssr_ss_id' => 'a629c5e3-2dd5-3a10-a7e9-a04cc0d6dff8', 'ssr_srv_id' => '020a60ee-d45d-34ae-9c9f-765319e9d6a7', 'ssr_active' => 'Y', 'ssr_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'ssr_created_on' => date('Y-m-d H:i:s')]);
     }
 }

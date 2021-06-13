@@ -16,6 +16,8 @@ class CreateUserGroupTable extends Migration
         Schema::create('user_group', function (Blueprint $table) {
             $table->uuid('usg_id')->primary();
             $table->string('usg_name', 128);
+            $table->uuid('usg_ss_id')->unsigned()->nullable();
+            $table->foreign('usg_ss_id', 'tbl_usg_ss_id_fkey')->references('ss_id')->on('system_setting');
             $table->char('usg_active', 1)->default('Y');
             $table->uuid('usg_created_by');
             $table->dateTime('usg_created_on');

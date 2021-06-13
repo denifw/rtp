@@ -33,7 +33,7 @@ class SerialCode extends AbstractBaseAjaxModel
     {
         $wheres = [];
         if ($this->isValidParameter('search_key') === true) {
-            $wheres[] = SqlHelper::generateLikeCondition('sc_description', $this->getStringParameter('search_key'));
+            $wheres[] = SqlHelper::generateOrLikeCondition(['sc_code', 'sc_description'], $this->getStringParameter('search_key'));
         }
         $wheres[] = SqlHelper::generateNullCondition('sc_deleted_on');
         $wheres[] = SqlHelper::generateStringCondition('sc_active', 'Y');

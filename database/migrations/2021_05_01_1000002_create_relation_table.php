@@ -15,7 +15,7 @@ class CreateRelationTable extends Migration
     {
         Schema::create('relation', function (Blueprint $table) {
             $table->uuid('rel_id')->primary();
-            $table->uuid('rel_ss_id')->nullable();
+            $table->uuid('rel_ss_id')->unsigned()->nullable();
             $table->foreign('rel_ss_id', 'tbl_rel_ss_id_fkey')->references('ss_id')->on('system_setting');
             $table->string('rel_number', 64);
             $table->string('rel_name', 256);

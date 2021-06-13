@@ -21,9 +21,10 @@ class CreateDocumentTable extends Migration
             $table->foreign('doc_dct_id', 'tbl_doc_dct_id_fkey')->references('dct_id')->on('document_type');
             $table->uuid('doc_group_reference');
             $table->uuid('doc_type_reference')->nullable();
-            $table->string('doc_file_name', 255);
+            $table->string('doc_file_name', 256);
+            $table->string('doc_description', 256)->nullable();
             $table->double('doc_file_size');
-            $table->string('doc_file_type', 125);
+            $table->string('doc_file_type', 128);
             $table->char('doc_public', 1)->default('Y');
             $table->uuid('doc_created_by');
             $table->dateTime('doc_created_on');

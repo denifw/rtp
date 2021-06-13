@@ -11,18 +11,7 @@ class ServiceSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('service')
-            ->where('srv_id', 1)
-            ->update(['srv_image' => 'warehouse.png']);
-        DB::table('service')
-            ->where('srv_id', 2)
-            ->update(['srv_image' => 'inklaring.png']);
-        DB::table('service')
-            ->where('srv_id', 3)
-            ->update([
-                'srv_name' => 'Delivery',
-                'srv_code' => 'delivery',
-                'srv_image' => 'trucking.png',
-            ]);
+        DB::table('service')->insert(['srv_id' => '373387ad-5421-3500-93e6-318a950d5bfb', 'srv_name' => 'Wholesale', 'srv_code' => 'allin', 'srv_active' => 'Y', 'srv_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'srv_created_on' => date('Y-m-d H:i:s')]);
+        DB::table('service')->insert(['srv_id' => '020a60ee-d45d-34ae-9c9f-765319e9d6a7', 'srv_name' => 'Cost And Fee', 'srv_code' => 'caf', 'srv_active' => 'Y', 'srv_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'srv_created_on' => date('Y-m-d H:i:s')]);
     }
 }

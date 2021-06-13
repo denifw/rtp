@@ -56,107 +56,6 @@ class DocumentDao extends AbstractBaseDao
     }
 
     /**
-     * Function to get all the data by id.
-     *
-     * @param string $ssId To store the id of system setting.
-     * @param string $code To store the id of system setting.
-     *
-     * @return array
-     */
-    public static function loadSystemSettingLogo(string $ssId, string $code): array
-    {
-        $wheres = [];
-        $wheres[] = SqlHelper::generateLikeCondition('dct.dct_code', $code);
-        $wheres[] = SqlHelper::generateStringCondition('doc.doc_ss_id', $ssId);
-        $wheres[] = SqlHelper::generateStringCondition('doc.doc_group_reference', $ssId);
-        $wheres[] = SqlHelper::generateNullCondition('doc.doc_deleted_on');
-        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        $query = 'SELECT doc_id, doc_file_name, doc_created_on, dct_code, dcg_code, ss.ss_name_space
-                    FROM document as doc INNER JOIN
-                    document_type as dct ON doc.doc_dct_id = dct.dct_id INNER JOIN
-                     document_group as dcg ON dct.dct_dcg_id = dcg.dcg_id INNER JOIN
-                      system_setting as ss ON doc.doc_ss_id = ss.ss_id ' . $strWhere;
-        $query .= ' GROUP BY doc_id, doc_file_name, doc_created_on, dct_code, dcg_code, ss.ss_name_space ';
-        $query .= ' ORDER BY doc_created_on DESC ';
-        $query .= ' LIMIT 1 OFFSET 0 ';
-        $sqlResults = DB::select($query);
-        $result = [];
-        if (count($sqlResults) === 1) {
-            $result = DataParser::objectToArray($sqlResults[0]);
-            $nameSpace = StringFormatter::replaceSpecialCharacter(strtolower($result['ss_name_space']), '');
-            $dcg = StringFormatter::replaceSpecialCharacter(strtolower($result['dcg_code']), '');
-            $dct = StringFormatter::replaceSpecialCharacter(strtolower($result['dct_code']), '');
-            $result['path'] = $nameSpace . '/' . $dcg . '/' . $dct . '/' . $result['doc_file_name'];
-        }
-
-        return $result;
-
-    }
-
-    /**
-     * Function to get all the data by id.
-     *
-     * @param int $ssId To store the id of system setting.
-     * @param int $docId To store the id of document.
-     *
-     * @return array
-     */
-    public static function loadEquipmentImage($ssId, int $docId): array
-    {
-        $wheres = [];
-//        $wheres[] = '(dct.dct_code = ' . $code . ')';
-        $wheres[] = '(doc_ss_id = ' . $ssId . ')';
-        $wheres[] = '(doc_id = ' . $docId . ')';
-        $wheres[] = '(doc_deleted_on IS NULL)';
-        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        $query = 'SELECT doc_id, doc_file_name, doc_created_on, dct_code, dcg_code, ss.ss_name_space
-                    FROM document as doc INNER JOIN
-                    document_type as dct ON doc.doc_dct_id = dct.dct_id INNER JOIN
-                     document_group as dcg ON dct.dct_dcg_id = dcg.dcg_id INNER JOIN
-                      system_setting as ss ON doc.doc_ss_id = ss.ss_id ' . $strWhere;
-        $query .= ' GROUP BY doc_id, doc_file_name, doc_created_on, dct_code, dcg_code, ss.ss_name_space ';
-        $query .= ' ORDER BY doc_created_on DESC ';
-        $query .= ' LIMIT 1 OFFSET 0 ';
-        $sqlResults = DB::select($query);
-        $result = [];
-        if (count($sqlResults) === 1) {
-            $result = DataParser::objectToArray($sqlResults[0]);
-            $nameSpace = StringFormatter::replaceSpecialCharacter(strtolower($result['ss_name_space']), '');
-            $dcg = StringFormatter::replaceSpecialCharacter(strtolower($result['dcg_code']), '');
-            $dct = StringFormatter::replaceSpecialCharacter(strtolower($result['dct_code']), '');
-            $result['path'] = $nameSpace . '/' . $dcg . '/' . $dct . '/' . $result['doc_file_name'];
-        }
-
-        return $result;
-
-    }
-
-    /**
-     * Function to get all the data by id.
-     *
-     * @param int $reference To store the reference of the document.
-     *
-     * @return array
-     */
-    public static function loadCompleteDataByReference($reference): array
-    {
-        $query = 'SELECT doc.doc_id, doc.doc_file_name, doc.doc_file_type, dct.dct_code, dcg.dcg_code, ss.ss_name_space
-                        FROM document as doc INNER JOIN
-                        document_type AS dct ON doc.doc_dct_id = dct.dct_id INNER JOIN
-                        document_group AS dcg ON dct.dct_dcg_id = dcg.dcg_id INNER JOIN
-                        system_setting as ss ON doc.doc_ss_id = ss.ss_id
-                  WHERE (doc.doc_id = ' . $reference . ')';
-        $sqlResults = DB::select($query);
-        $result = [];
-        if (count($sqlResults) === 1) {
-            $result = DataParser::objectToArray($sqlResults[0]);
-        }
-
-        return $result;
-
-    }
-
-    /**
      * Abstract function to do insert transaction.
      *
      * @param array $fieldData To store the field value per column.
@@ -175,38 +74,34 @@ class DocumentDao extends AbstractBaseDao
     /**
      * Function to get data by reference value
      *
-     * @param int $referenceValue To store the reference value of the table.
+     * @param string $referenceValue To store the reference value of the table.
      *
      * @return array
      */
-    public static function getByReference($referenceValue): array
+    public static function getByReference(string $referenceValue): array
     {
-        $query = 'SELECT doc.doc_id, doc.doc_dct_id, dct.dct_code, dct.dct_dcg_id, dcg.dcg_code, doc.doc_group_reference,
-                    doc.doc_type_reference, doc.doc_file_name, doc.doc_file_size, doc.doc_file_type, doc.doc_public,
-                    doc.doc_description
-                        FROM document as doc INNER JOIN
-                        document_type as dct ON doc.doc_dct_id = dct.dct_id INNER JOIN
-                        document_group as dcg ON dct.dct_dcg_id = dcg.dcg_id
-                        WHERE (doc.doc_id = ' . $referenceValue . ')';
-        $sqlResults = DB::select($query);
-        $result = [];
-        if (count($sqlResults) === 1) {
-            $result = DataParser::objectToArray($sqlResults[0]);
+        $wheres = [];
+        $wheres[] = SqlHelper::generateStringCondition('doc.doc_id', $referenceValue);
+
+        $data = self::loadData($wheres);
+        if (count($data) === 1) {
+            return $data[0];
         }
 
-        return $result;
+        return [];
     }
 
     /**
      * Function to get all record.
      *
      * @param array $wheres To store the list condition query.
+     * @param array $orderBy To store the list condition query.
      * @param int $limit To store the limit of the data.
      * @param int $offset To store the offset of the data to apply limit.
      *
      * @return array
      */
-    public static function loadData(array $wheres = [], int $limit = 0, int $offset = 0): array
+    public static function loadData(array $wheres = [], array $orderBy = [], int $limit = 0, int $offset = 0): array
     {
         $strWhere = '';
         if (empty($wheres) === false) {
@@ -221,7 +116,11 @@ class DocumentDao extends AbstractBaseDao
                             INNER JOIN document_group as dcg ON dct.dct_dcg_id = dcg.dcg_id
                             INNER JOIN users AS us ON us.us_id = doc.doc_created_by
                             INNER JOIN system_setting as ss ON doc.doc_ss_id = ss.ss_id' . $strWhere;
-        $query .= ' ORDER BY doc.doc_created_on DESC, doc.doc_id ';
+        if (empty($orderBy) === false) {
+            $query .= ' ORDER BY ' . implode(', ', $orderBy);
+        } else {
+            $query .= ' ORDER BY doc.doc_created_on DESC, doc.doc_id ';
+        }
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
         }
@@ -325,13 +224,13 @@ class DocumentDao extends AbstractBaseDao
         $paths[] = 'storage';
         if (empty($doc) === false) {
             if (array_key_exists('ss_name_space', $doc)) {
-                $paths[] = StringFormatter::replaceSpecialCharacter(strtolower($doc['ss_name_space']), '');
+                $paths[] = StringFormatter::replaceSpecialCharacter(strtolower($doc['ss_name_space']));
             }
             if (array_key_exists('dcg_code', $doc)) {
-                $paths[] = StringFormatter::replaceSpecialCharacter(strtolower($doc['dcg_code']), '');
+                $paths[] = StringFormatter::replaceSpecialCharacter(strtolower($doc['dcg_code']));
             }
             if (array_key_exists('dct_code', $doc)) {
-                $paths[] = StringFormatter::replaceSpecialCharacter(strtolower($doc['dct_code']), '');
+                $paths[] = StringFormatter::replaceSpecialCharacter(strtolower($doc['dct_code']));
             }
             if (array_key_exists('doc_file_name', $doc)) {
                 $paths[] = $doc['doc_file_name'];
@@ -339,6 +238,40 @@ class DocumentDao extends AbstractBaseDao
         }
         return asset(implode('/', $paths));
 
+    }
+
+    /**
+     * Function to get all record.
+     *
+     * @param ?string $docId To store the document file.
+     *
+     * @return string
+     */
+    public static function getDocumentPathById(?string $docId): string
+    {
+        $results = asset('images/image-not-found.jpg');
+        if (empty($docId) === false) {
+            $doc = self::getByReference($docId);
+            $path = 'storage';
+            if (empty($doc) === false) {
+                if (array_key_exists('ss_name_space', $doc)) {
+                    $path .= '/' . StringFormatter::replaceSpecialCharacter(strtolower($doc['ss_name_space']));
+                }
+                if (array_key_exists('dcg_code', $doc)) {
+                    $path .= '/' . StringFormatter::replaceSpecialCharacter(strtolower($doc['dcg_code']));
+                }
+                if (array_key_exists('dct_code', $doc)) {
+                    $path .= '/' . StringFormatter::replaceSpecialCharacter(strtolower($doc['dct_code']));
+                }
+                if (array_key_exists('doc_file_name', $doc)) {
+                    $path .= '/' . $doc['doc_file_name'];
+                }
+                if (file_exists(public_path($path)) === true) {
+                    $results = asset($path);
+                }
+            }
+        }
+        return $results;
     }
 
     /**
@@ -369,7 +302,7 @@ class DocumentDao extends AbstractBaseDao
         if ($returnMultiple === false) {
             $limit = 1;
         }
-        $data = self::loadData($wheres, $limit);
+        $data = self::loadData($wheres, [], $limit);
         if ($returnMultiple === true) {
             return $data;
         }

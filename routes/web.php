@@ -134,4 +134,24 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'System/Master/Unit');
     });
+    # System - Access - System Setting
+    Route::match(['get', 'post'], '/ss/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Access/SystemSetting');
+    });
+    # System - Access - Users
+    Route::match(['get', 'post'], '/us/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Access/User');
+    });
+    # System - Access - UserGroup
+    Route::match(['get', 'post'], '/usg/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Access/UserGroup');
+    });
+    # System - Access - Serial Number
+    Route::match(['get', 'post'], '/sn/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Access/SerialNumber');
+    });
 });

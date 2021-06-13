@@ -13,6 +13,7 @@ namespace App\Frame\Document;
 use App\Frame\Exceptions\Message;
 use App\Frame\Formatter\StringFormatter;
 use App\Model\Dao\System\Document\DocumentDao;
+use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\ImageManagerStatic;
@@ -52,17 +53,17 @@ class FileUpload
     /**
      * Basic constructor to start up the object that generates new excel files.
      *
-     * @param int $documentId To store the id of the document.
+     * @param string $documentId To store the id of the document.
      */
-    public function __construct($documentId)
+    public function __construct(string $documentId)
     {
-        if (empty($documentId) === false && is_numeric($documentId) === true && $documentId > 0) {
-            $this->Attributes = DocumentDao::loadCompleteDataByReference($documentId);
+        if (empty($documentId) === false) {
+            $this->Attributes = DocumentDao::getByReference($documentId);
             if (empty($this->Attributes) === true) {
-                Message::throwMessage('Invalid page object in file class.');
+                Message::throwMessage('Invalid document ID for uploading file.');
             }
         } else {
-            Message::throwMessage('Invalid page object in file class.');
+            Message::throwMessage('Invalid document ID for uploading file.');
         }
     }
 
@@ -76,13 +77,13 @@ class FileUpload
     public function upload(UploadedFile $file): void
     {
         if ($file === null) {
-            Message::throwMessage('Invalid file object in file class.', 'DEBUG');
+            Message::throwMessage('Invalid file object in file upload class.');
         } else {
             $this->File = $file;
             $path = 'public/';
-            $path .= StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['ss_name_space']), '');
-            $path .= '/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['dcg_code']), '');
-            $path .= '/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['dct_code']), '');
+            $path .= StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['ss_name_space']));
+            $path .= '/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['dcg_code']));
+            $path .= '/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['dct_code']));
             $success = $file->storeAs($path, $this->Attributes['doc_file_name']);
             if ($success === false) {
                 Message::throwMessage('Failed to upload the file', 'ERROR');
@@ -97,23 +98,23 @@ class FileUpload
      *
      * @return string
      */
-    public function uploadBinaryFile($strFile): string
+    public function uploadBinaryFile(string $strFile): string
     {
         $path = '';
         if (empty($strFile) === true) {
-            Message::throwMessage('Invalid file object in file class.');
+            Message::throwMessage('Invalid file object in file upload class.');
         }
         try {
-            $path = self::$BasePath . '/public/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['ss_name_space']), '');
-            $path .= '/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['dcg_code']), '');
-            $path .= '/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['dct_code']), '');
+            $path = self::$BasePath . '/public/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['ss_name_space']));
+            $path .= '/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['dcg_code']));
+            $path .= '/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['dct_code']));
             $this->createDirectory($path);
             $fileName = storage_path($path) . '/' . $this->Attributes['doc_file_name'];
             if (file_put_contents($fileName, base64_decode($strFile, true)) === false) {
                 Message::throwMessage('Failed to store file.', 'ERROR');
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Message::throwMessage($e->getMessage(), 'ERROR');
         }
 
@@ -124,8 +125,8 @@ class FileUpload
     /**
      * Upload thumbnail image.
      *
-     * @param int $width  The width of image.
-     * @param int $height The width of image.
+     * @param ?int $width The width of image.
+     * @param ?int $height The width of image.
      *
      * @return void
      */
@@ -133,9 +134,9 @@ class FileUpload
     {
         if (in_array($this->File->getClientOriginalExtension(), ['jpeg', 'png', 'jpg', 'gif'], true) === true) {
             $basePath = 'app/public/';
-            $path = StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['ss_name_space']), '');
-            $path .= '/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['dcg_code']), '');
-            $path .= '/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['dct_code']), '');
+            $path = StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['ss_name_space']));
+            $path .= '/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['dcg_code']));
+            $path .= '/' . StringFormatter::replaceSpecialCharacter(mb_strtolower($this->Attributes['dct_code']));
             $path .= '/thumbs/';
             $this->createDirectory($basePath . $path);
             $img = ImageManagerStatic::make($this->File)->resize($width, $height, function ($constraint) {
@@ -175,7 +176,7 @@ class FileUpload
             if (empty($path) === false && $this->isDirectoryExist($path) === false) {
                 File::makeDirectory(storage_path($path), 0755, true);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Message::throwMessage($e->getMessage() . ' - ' . $path);
         }
     }

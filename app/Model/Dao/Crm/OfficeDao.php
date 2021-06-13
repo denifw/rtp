@@ -8,7 +8,7 @@
  * @copyright 2019 MataLOG
  */
 
-namespace App\Model\Dao\Relation;
+namespace App\Model\Dao\Crm;
 
 use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseDao;
@@ -33,7 +33,6 @@ class OfficeDao extends AbstractBaseDao
     private static $Fields = [
         'of_id',
         'of_rel_id',
-        'of_main',
         'of_name',
         'of_invoice',
         'of_address',
@@ -44,6 +43,7 @@ class OfficeDao extends AbstractBaseDao
         'of_postal_code',
         'of_longitude',
         'of_latitude',
+        'of_cp_id',
         'of_active',
     ];
 
@@ -54,34 +54,6 @@ class OfficeDao extends AbstractBaseDao
     public function __construct()
     {
         parent::__construct('office', 'of', self::$Fields);
-    }
-
-    /**
-     * Abstract function to load the seeder query for table office.
-     *
-     * @return array
-     */
-    public function loadSeeder(): array
-    {
-        return $this->generateSeeder([
-            'of_name',
-            'of_invoice',
-            'of_address',
-            'of_postal_code',
-            'of_main',
-            'of_active',
-        ]);
-    }
-
-
-    /**
-     * function to get all available fields
-     *
-     * @return array
-     */
-    public static function getFields(): array
-    {
-        return self::$Fields;
     }
 
     /**
@@ -191,10 +163,10 @@ class OfficeDao extends AbstractBaseDao
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
         $query = 'SELECT ofc.of_id, ofc.of_rel_id, ofc.of_name, ofc.of_main, ofc.of_invoice, ofc.of_address,
-                        ofc.of_cnt_id, ofc.of_stt_id, ofc.of_cty_id, ofc.of_dtc_id, ofc.of_postal_code, ofc.of_longitude, 
+                        ofc.of_cnt_id, ofc.of_stt_id, ofc.of_cty_id, ofc.of_dtc_id, ofc.of_postal_code, ofc.of_longitude,
                         ofc.of_latitude, ofc.of_active, rel.rel_name as of_relation, cnt.cnt_name as of_country,
                         stt.stt_name as of_state, cty.cty_name as of_city, dtc.dtc_name as of_district
-                    FROM office as ofc INNER JOIN 
+                    FROM office as ofc INNER JOIN
                         relation as rel ON ofc.of_rel_id = rel.rel_id LEFT OUTER JOIN
                         country as cnt ON ofc.of_cnt_id = cnt.cnt_id LEFT OUTER JOIN
                         state as stt ON ofc.of_stt_id = stt.stt_id LEFT OUTER JOIN

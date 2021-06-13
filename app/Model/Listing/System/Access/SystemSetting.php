@@ -8,11 +8,12 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Listing\System;
+namespace App\Model\Listing\System\Access;
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
+use App\Model\Dao\System\Access\SystemSettingDao;
 
 /**
  * Class to control the system of SystemSetting.
@@ -33,7 +34,7 @@ class SystemSetting extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'systemSetting');
+        parent::__construct(get_class($this), 'ss');
         $this->setParameters($parameters);
     }
 
@@ -69,7 +70,7 @@ class SystemSetting extends AbstractListingModel
         # set header column table
         $this->ListingTable->setHeaderRow([
             'ss_relation' => Trans::getWord('relation'),
-            'lg_locale' => Trans::getWord('language'),
+            'ss_language' => Trans::getWord('language'),
             'ss_name_space' => Trans::getWord('nameSpace'),
             'ss_decimal_number' => Trans::getWord('decimalNumber'),
             'ss_decimal_separator' => Trans::getWord('decimalSeparator'),
@@ -79,9 +80,7 @@ class SystemSetting extends AbstractListingModel
 
         ]);
         # Load the data for SystemSetting.
-        $columns = array_merge(array_keys($this->ListingTable->getHeaderRow()), ['ss_id']);
-        $listingData = $this->loadData($columns);
-        $this->ListingTable->addRows($listingData);
+        $this->ListingTable->addRows($this->loadData());
         $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['ss_id']);
         $this->ListingTable->setColumnType('ss_decimal_number', 'integer');
         $this->ListingTable->setColumnType('ss_system', 'yesno');
@@ -97,68 +96,56 @@ class SystemSetting extends AbstractListingModel
      */
     protected function getTotalRows(): int
     {
-        # Set Select query;
-        $query = 'SELECT count(DISTINCT (ss_id)) AS total_rows
-                   FROM system_setting as ss INNER JOIN 
-                   languages as lg ON ss.ss_lg_id = lg.lg_id ';
-        # Set where condition.
-        $query .= $this->getWhereCondition();
-
-        return $this->loadTotalListingRows($query);
+        return SystemSettingDao::loadTotalData($this->getWhereCondition());
     }
 
 
     /**
      * Get query to get the listing data.
      *
-     * @param array $outFields To store the out field from selection data.
-     *
      * @return array
      */
-    private function loadData(array $outFields): array
+    private function loadData(): array
     {
-        # Set Select query;
-        $query = 'SELECT ss.ss_id, ss.ss_relation, ss.ss_lg_id, ss.ss_decimal_number, ss.ss_decimal_separator, ss.ss_thousand_separator,
-                      lg.lg_iso, lg.lg_locale, ss.ss_logo, ss.ss_name_space, ss.ss_system, ss.ss_active
-                   FROM system_setting as ss INNER JOIN 
-                   languages as lg ON ss.ss_lg_id = lg.lg_id ';
-        # Set Where condition.
-        $query .= $this->getWhereCondition();
-        # Set group by query.
-        $query .= ' GROUP BY ss.ss_id, ss.ss_relation, ss.ss_lg_id, ss.ss_decimal_number, ss.ss_decimal_separator, ss.ss_thousand_separator,
-                      lg.lg_iso, lg.lg_locale, ss.ss_logo, ss.ss_name_space, ss.ss_system, ss.ss_active';
-        # Set order by query.
-        if (empty($this->ListingSort->getSelectedField()) === false) {
-            $query .= $this->ListingSort->getOrderByQuery();
+        $data = SystemSettingDao::loadData(
+            $this->getWhereCondition(),
+            $this->ListingSort->getOrderByFields(),
+            $this->getLimitTable(),
+            $this->getLimitOffsetTable());
+        $results = [];
+        foreach ($data as $row) {
+            if ($row['ss_decimal_separator'] === '.') {
+                $row['ss_decimal_separator'] = Trans::getWord('dot') . ' (' . $row['ss_decimal_separator'] . ')';
+            } else {
+                $row['ss_decimal_separator'] = Trans::getWord('comma') . ' (' . $row['ss_decimal_separator'] . ')';
+            }
+            if ($row['ss_thousand_separator'] === '.') {
+                $row['ss_thousand_separator'] = Trans::getWord('dot') . ' (' . $row['ss_thousand_separator'] . ')';
+            } else {
+                $row['ss_thousand_separator'] = Trans::getWord('comma') . ' (' . $row['ss_thousand_separator'] . ')';
+            }
+            $results[] = $row;
         }
-
-        return $this->loadDatabaseRow($query, $outFields);
+        return $results;
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return string
+     * @return array
      */
-    private function getWhereCondition(): string
+    private function getWhereCondition(): array
     {
         # Set where conditions
         $wheres = [];
 
         if ($this->isValidParameter('ss_relation') === true) {
-            $wheres[] = StringFormatter::generateLikeQuery('ss.ss_relation', $this->getStringParameter('ss_relation'));
+            $wheres[] = SqlHelper::generateLikeCondition('ss.ss_relation', $this->getStringParameter('ss_relation'));
         }
 
         if ($this->isValidParameter('ss_active') === true) {
-            $wheres[] = "(ss.ss_active = '" . $this->getStringParameter('ss_active') . "')";
+            $wheres[] = SqlHelper::generateStringCondition('ss.ss_active', $this->getStringParameter('ss_active'));
         }
-
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
-
-        # return the where query.
-        return $strWhere;
+        return $wheres;
     }
 }

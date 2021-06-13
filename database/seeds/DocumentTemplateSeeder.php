@@ -11,7 +11,5 @@ class DocumentTemplateSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('document_template')->where('dt_id', 19)->update([ 'dt_description' => 'Default Template', 'dt_path' => 'Finance/CashAndBank/CashPayment/CashReceive/DefaultTemplate', ]);
-        DB::table('document_template')->where('dt_id', 20)->update([ 'dt_description' => 'Default Template', 'dt_path' => 'Finance/CashAndBank/CashPayment/CashSettlement/DefaultTemplate', ]);
     }
 }

@@ -8,12 +8,12 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Listing\Setting;
+namespace App\Model\Listing\System\Access;
 
 use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
-use App\Model\Dao\Relation\OfficeDao;
+use App\Model\Dao\System\Access\SerialNumberDao;
 
 /**
  * Class to control the system of SerialNumber.
@@ -34,7 +34,7 @@ class SerialNumber extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'serialNumber');
+        parent::__construct(get_class($this), 'sn');
         $this->setParameters($parameters);
     }
 
@@ -45,12 +45,12 @@ class SerialNumber extends AbstractListingModel
      */
     public function loadSearchForm(): void
     {
+        # System Field
+        $ssField = $this->Field->getSingleSelect('ss', 'sn_system', $this->getStringParameter('ss_system'));
+        $ssField->setHiddenField('sn_ss_id', $this->getStringParameter('sn_ss_id'));
+        $ssField->setEnableNewButton(false);
+        $this->ListingForm->addField(Trans::getWord('systemName'), $ssField);
         $this->ListingForm->addField(Trans::getWord('serialCode'), $this->Field->getText('sc_code', $this->getStringParameter('sc_code')));
-        if ($this->User->isUserSystem() === false) {
-            $officeField = $this->Field->getSelect('sn_of_id', $this->getIntParameter('sn_of_id'));
-            $officeField->addOptions(OfficeDao::loadActiveDataByRelation($this->User->getRelId()), 'of_name', 'of_id');
-            $this->ListingForm->addField(Trans::getWord('office'), $officeField);
-        }
         $this->ListingForm->addField(Trans::getWord('active'), $this->Field->getYesNo('sn_active', $this->getStringParameter('sn_active')));
 
     }
@@ -64,10 +64,9 @@ class SerialNumber extends AbstractListingModel
     {
         # set header column table
         $this->ListingTable->setHeaderRow([
-            'sc_description' => Trans::getWord('serialCode'),
+            'sn_system' => Trans::getWord('systemName'),
+            'sn_sc_description' => Trans::getWord('serialCode'),
             'of_name' => Trans::getWord('office'),
-            'srv_name' => Trans::getWord('service'),
-            'srt_name' => Trans::getWord('serviceTerm'),
             'sn_relation' => Trans::getWord('relation'),
             'sn_prefix' => Trans::getWord('prefix'),
             'sn_length' => Trans::getWord('length'),
@@ -100,18 +99,7 @@ class SerialNumber extends AbstractListingModel
      */
     protected function getTotalRows(): int
     {
-        # Set Select query;
-        $query = 'SELECT count(DISTINCT (sn.sn_id)) AS total_rows
-                   FROM serial_number as sn INNER JOIN
-                        serial_code as sc ON sn.sn_sc_id = sc.sc_id INNER JOIN
-                        system_setting as ss ON sn.sn_ss_id = ss.ss_id LEFT OUTER JOIN
-                        service as srv ON sn.sn_srv_id = srv.srv_id LEFT OUTER JOIN
-                        service_term as srt ON sn.sn_srt_id = srt.srt_id  LEFT OUTER JOIN
-                        office as o ON sn.sn_of_id = o.of_id ';
-        # Set where condition.
-        $query .= $this->getWhereCondition();
-
-        return $this->loadTotalListingRows($query);
+        return SerialNumberDao::loadTotalData($this->getWhereCondition());
     }
 
 
@@ -123,37 +111,19 @@ class SerialNumber extends AbstractListingModel
      */
     private function loadData(): array
     {
-        # Set Select query;
-        $query = "SELECT sn.sn_id, sn.sn_sc_id, sc.sc_code, sc.sc_description, sn.sn_ss_id, sn.sn_relation, sn.sn_separator,
-                        sn.sn_prefix, sn.sn_yearly, sn.sn_monthly, sn.sn_length, sn.sn_increment, sn.sn_postfix,
-                        sn.sn_srv_id, srv.srv_name, sn.sn_srt_id, srt.srt_name, sn.sn_of_id, o.of_name,
-                        (CASE WHEN sn.sn_deleted_on is null then sn.sn_active else 'N' END) as sn_active
-                  FROM serial_number as sn INNER JOIN
-                        serial_code as sc ON sn.sn_sc_id = sc.sc_id INNER JOIN
-                        system_setting as ss ON sn.sn_ss_id = ss.ss_id LEFT OUTER JOIN
-                        service as srv ON sn.sn_srv_id = srv.srv_id LEFT OUTER JOIN
-                        service_term as srt ON sn.sn_srt_id = srt.srt_id  LEFT OUTER JOIN
-                        office as o ON sn.sn_of_id = o.of_id";
-        # Set Where condition.
-        $query .= $this->getWhereCondition();
-        # Set group by query.
-        $query .= ' GROUP BY sn.sn_id, sn.sn_sc_id, sc.sc_code, sc.sc_description, sn.sn_ss_id, sn.sn_relation, sn.sn_separator,
-                        sn.sn_prefix, sn.sn_yearly, sn.sn_monthly, sn.sn_length, sn.sn_increment, sn.sn_postfix, sn.sn_active,
-                        sn.sn_srv_id, srv.srv_name, sn.sn_srt_id, srt.srt_name, sn.sn_of_id, o.of_name, sn.sn_deleted_on';
-        # Set order by query.
-        if (empty($this->ListingSort->getSelectedField()) === false) {
-            $query .= $this->ListingSort->getOrderByQuery();
-        }
-
-        return $this->loadDatabaseRow($query);
+        return SerialNumberDao::loadData(
+            $this->getWhereCondition(),
+            $this->ListingSort->getOrderByFields(),
+            $this->getLimitTable(),
+            $this->getLimitOffsetTable());
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return string
+     * @return array
      */
-    private function getWhereCondition(): string
+    private function getWhereCondition(): array
     {
         # Set where conditions
         $wheres = [];
@@ -161,8 +131,8 @@ class SerialNumber extends AbstractListingModel
         if ($this->isValidParameter('sc_code') === true) {
             $wheres[] = SqlHelper::generateLikeCondition('sc.sc_code', $this->getStringParameter('sc_code'));
         }
-        if ($this->isValidParameter('sn_of_id') === true) {
-            $wheres[] = '(sn_of_id = ' . $this->getIntParameter('sn_of_id') . ')';
+        if ($this->isValidParameter('sn_ss_id') === true) {
+            $wheres[] = SqlHelper::generateStringCondition('sn.sn_ss_id', $this->getStringParameter('sn_ss_id'));
         }
         if ($this->isValidParameter('sn_active') === true) {
             $value = $this->getStringParameter('sn_active');
@@ -175,15 +145,6 @@ class SerialNumber extends AbstractListingModel
 
             }
         }
-
-        $wheres[] = '(sn.sn_ss_id = ' . $this->User->getSsId() . ')';
-
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
-
-        # return the where query.
-        return $strWhere;
+        return $wheres;
     }
 }

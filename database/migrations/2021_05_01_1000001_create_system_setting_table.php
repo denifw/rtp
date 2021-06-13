@@ -23,11 +23,11 @@ class CreateSystemSettingTable extends Migration
             $table->integer('ss_decimal_number');
             $table->char('ss_decimal_separator', 1)->default('.');
             $table->char('ss_thousand_separator', 1)->default(',');
-            $table->string('ss_logo', 256)->nullable();
-            $table->string('ss_icon', 256)->nullable();
             $table->string('ss_name_space', 256);
             $table->string('ss_api_key', 256)->nullable();
             $table->uuid('ss_rel_id')->nullable();
+            $table->uuid('ss_logo_id')->nullable();
+            $table->uuid('ss_icon_id')->nullable();
             $table->char('ss_system', 1)->default('N');
             $table->char('ss_active', 1)->default('Y');
             $table->uuid('ss_created_by');

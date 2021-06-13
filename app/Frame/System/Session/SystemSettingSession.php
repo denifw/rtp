@@ -150,9 +150,9 @@ class SystemSettingSession
      *
      * @return string
      */
-    public function getLogo(): string
+    public function getLogoId(): string
     {
-        return $this->getStringValue('ss_logo');
+        return $this->getStringValue('ss_logo_id');
     }
 
     /**

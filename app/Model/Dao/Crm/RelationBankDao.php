@@ -8,7 +8,7 @@
  * @copyright 2020 PT Spada Media Informatika
  */
 
-namespace App\Model\Dao\Relation;
+namespace App\Model\Dao\Crm;
 
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
