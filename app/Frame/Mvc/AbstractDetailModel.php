@@ -11,6 +11,7 @@
 
 namespace App\Frame\Mvc;
 
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Html\Buttons\Button;
@@ -552,14 +553,14 @@ abstract class AbstractDetailModel extends AbstractBaseLayout
      * Function to get the bank Field Set.
      *
      * @param string $docGroup To store the document group reference.
-     * @param int $groupReference To store the document reference.
+     * @param string $groupReference To store the document reference.
      * @param string $docType To store the document group reference.
-     * @param int $typeReference To store the document reference.
+     * @param string $typeReference To store the document reference.
      * @param bool $allowUpdate To set trigger to update document.
      *
      * @return Portlet
      */
-    protected function getBaseDocumentPortlet(string $docGroup, $groupReference, string $docType = '', $typeReference = 0, bool $allowUpdate = true): Portlet
+    protected function getBaseDocumentPortlet(string $docGroup, string $groupReference, string $docType = '', string $typeReference = '', bool $allowUpdate = true): Portlet
     {
         $docDeleteModal = $this->getBaseDocumentDeleteModal();
         if ($allowUpdate) {
@@ -576,30 +577,33 @@ abstract class AbstractDetailModel extends AbstractBaseLayout
             'action' => Trans::getWord('delete'),
         ]);
         $wheres = [];
-        $wheres[] = "(dcg.dcg_code = '" . $docGroup . "')";
-        $wheres[] = '(doc.doc_group_reference = ' . $groupReference . ')';
+        $wheres[] = SqlHelper::generateStringCondition('dcg.dcg_code', $docGroup, '=', 'low');
+        $wheres[] = SqlHelper::generateStringCondition('doc.doc_group_reference', $groupReference);
         if (empty($docType) === false) {
+            $wheres[] = SqlHelper::generateStringCondition('dct.dct_code', $docType, '=', 'low');
             $wheres[] = "(dct.dct_code = '" . $docType . "')";
-            if ($typeReference > 0) {
-                $wheres[] = '(doc.doc_type_reference = ' . $typeReference . ')';
+            if (empty($typeReference) === false) {
+                $wheres[] = SqlHelper::generateStringCondition('doc.doc_type_reference', $typeReference);
             }
         }
-        $wheres[] = '(doc.doc_deleted_on IS NULL)';
+        $wheres[] = SqlHelper::generateNullCondition('doc.doc_deleted_on');
         $data = DocumentDao::loadData($wheres);
         $results = [];
+        $i = 0;
         foreach ($data as $row) {
-            $btn = new Button('btnGnDocDown' . $row['doc_id'], '');
+            $btn = new Button('btnGnDocDown' . $i, '');
             $btn->setIcon(Icon::Download)->btnWarning()->viewIconOnly();
             $btn->addAttribute('onclick', "App.popup('" . url('/download?doc_id=' . $row['doc_id']) . "')");
             $row['download'] = $btn;
-            if ($allowUpdate && (int)$row['doc_group_reference'] === $groupReference) {
-                $btnDel = new ModalButton('btnGnDocDel' . $row['doc_id'], '', $docDeleteModal->getModalId());
+            if ($allowUpdate && $row['doc_group_reference'] === $groupReference) {
+                $btnDel = new ModalButton('btnGnDocDel' . $i, '', $docDeleteModal->getModalId());
                 $btnDel->setIcon(Icon::Trash)->btnDanger()->viewIconOnly();
-                $btnDel->setEnableCallBack('document', 'getByReferenceForDelete');
+                $btnDel->setEnableCallBack('doc', 'getByReferenceForDelete');
                 $btnDel->addParameter('doc_id', $row['doc_id']);
                 $row['action'] = $btnDel;
             }
             $results[] = $row;
+            $i++;
         }
         $docTable->addRows($results);
         # Create a portlet box.
@@ -640,7 +644,7 @@ abstract class AbstractDetailModel extends AbstractBaseLayout
         $fieldSet = new FieldSet($this->Validation);
         $fieldSet->setGridDimension(6, 6);
         # Create document type field.
-        $dctFields = $this->Field->getSingleSelect('documentType', 'dct_code', $this->getParameterForModal('dct_code', $showModal));
+        $dctFields = $this->Field->getSingleSelect('dct', 'dct_code', $this->getParameterForModal('dct_code', $showModal));
         $dctFields->setHiddenField('doc_dct_id', $this->getParameterForModal('doc_dct_id', $showModal));
         $dctFields->addParameter('dcg_code', $docGroup);
         $dctFields->setEnableDetailButton(false);

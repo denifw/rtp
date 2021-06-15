@@ -66,7 +66,7 @@ class OfficeDao extends AbstractBaseDao
     public static function getByReference(string $referenceValue): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateNumericCondition('ofc.of_id', $referenceValue);
+        $wheres[] = SqlHelper::generateStringCondition('ofc.of_id', $referenceValue);
         $data = self::loadData($wheres);
         if (count($data) === 1) {
             return $data[0];
@@ -85,7 +85,7 @@ class OfficeDao extends AbstractBaseDao
     public static function getDataByRelation(string $relId): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateNumericCondition('ofc.of_rel_id', $relId);
+        $wheres[] = SqlHelper::generateStringCondition('ofc.of_rel_id', $relId);
         $wheres[] = SqlHelper::generateNullCondition('ofc.of_deleted_on');
         return self::loadData($wheres);
     }
@@ -121,7 +121,7 @@ class OfficeDao extends AbstractBaseDao
         if (empty($orderBy) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orderBy);
         } else {
-            $query .= ' ORDER BY ofc.of_main DESC, ofc.of_name, ofc.of_id';
+            $query .= ' ORDER BY ofc.of_name, ofc.of_id';
         }
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
@@ -155,7 +155,6 @@ class OfficeDao extends AbstractBaseDao
 
                 $adCty .= ', ' . $data['of_district'];
                 $adCty .= ', ' . $data['of_city'];
-                $data['of_full_district'] = $data['of_district'] . ', ' . $data['of_city'] . ', ' . $data['of_state'] . ', ' . $data['of_country'];
             }
             if (empty($data['of_postal_code']) === false) {
                 $address .= ', ' . $data['of_postal_code'];

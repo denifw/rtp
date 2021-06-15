@@ -51,7 +51,21 @@ class Office extends AbstractBaseAjaxModel
         }
         $wheres[] = SqlHelper::generateStringCondition('ofc.of_active', 'Y');
         $wheres[] = SqlHelper::generateNullCondition('ofc.of_deleted_on');
-        return OfficeDao::loadSingleSelectData($wheres);
+        return OfficeDao::loadSingleSelectData('of_name', $wheres);
+    }
+
+
+    /**
+     * Function to load the data by id
+     *
+     * @return array
+     */
+    public function getById(): array
+    {
+        if ($this->isValidParameter('of_id') === true) {
+            return OfficeDao::getByReference($this->getStringParameter('of_id'));
+        }
+        return [];
     }
 
 }

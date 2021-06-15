@@ -81,7 +81,7 @@ return [
 //    'missingRequiredDocument' => 'Missing Required Document',
 //    'movementCompleteValidation' => 'Please fill in the VOLUME or WEIGHT information for all broken goods',
 //    'sign_another_device' => 'Your credential has been used in another device. Please re-login again.',
-//    'noSerialNumberFound' => 'Not found Serial Number config data for :code.',
+    'noSerialNumberFound' => 'Nomor Serial untuk kode :code tidak ditemukan.',
 //    'unablePublishSalesOrder' => 'Unable to publish this sales order, please provide service information.',
 //    'cancelSalesOrderConfirmation' => 'Are you sure to cancel this sales order?',
 //    'soCanceledReason' => 'This SO has been canceled by <strong>:user</strong>,  because : <br /><strong>:reason</strong>',

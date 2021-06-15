@@ -33,6 +33,7 @@ Route::group(['middleware' => ['app_auth']], static function () {
     Route::get('/logout', 'Auth\LoginController@doLogout');
     Route::get('/doSwitch', 'Auth\LoginController@doSwitch');
     Route::get('/seed', 'SeederController@index');
+    Route::get('/download', 'DownloadController@doControl');
     # system table
     Route::match(['get', 'post'], '/st/{pc?}', static function ($pc = 'listing') {
         $control = new PageController();
@@ -83,6 +84,11 @@ Route::group(['middleware' => ['app_auth']], static function () {
     Route::match(['get', 'post'], '/dtt/{pc?}', static function ($pc = 'listing') {
         $control = new PageController();
         return $control->doControl($pc, 'System/Document/DocumentTemplateType');
+    });
+    # Document
+    Route::match(['get', 'post'], '/doc/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Document/Document');
     });
     # System - Master Country
     Route::match(['get', 'post'], '/cnt/{pc?}', static function ($pc = 'listing') {

@@ -49,12 +49,12 @@ class FileDownload
     /**
      * Basic constructor to start up the object that generates new excel files.
      *
-     * @param int $documentId To store the id of the document.
+     * @param string $documentId To store the id of the document.
      */
-    public function __construct($documentId)
+    public function __construct(string $documentId)
     {
-        if (empty($documentId) === false && is_numeric($documentId) === true && $documentId > 0) {
-            $this->Attributes = DocumentDao::loadCompleteDataByReference($documentId);
+        if (empty($documentId) === false) {
+            $this->Attributes = DocumentDao::getByReference($documentId);
             if (empty($this->Attributes) === true) {
                 Message::throwMessage('File Not found.', 'ERROR');
             }
@@ -70,9 +70,9 @@ class FileDownload
      */
     public function loadFile(): void
     {
-        $this->Path .= '/' . StringFormatter::replaceSpecialCharacter(strtolower($this->Attributes['ss_name_space']), '');
-        $this->Path .= '/' . StringFormatter::replaceSpecialCharacter(strtolower($this->Attributes['dcg_code']), '');
-        $this->Path .= '/' . StringFormatter::replaceSpecialCharacter(strtolower($this->Attributes['dct_code']), '');
+        $this->Path .= '/' . StringFormatter::replaceSpecialCharacter(strtolower($this->Attributes['ss_name_space']));
+        $this->Path .= '/' . StringFormatter::replaceSpecialCharacter(strtolower($this->Attributes['dcg_code']));
+        $this->Path .= '/' . StringFormatter::replaceSpecialCharacter(strtolower($this->Attributes['dct_code']));
         $this->Path .= '/' . $this->Attributes['doc_file_name'];
 
         if ($this->isFileExist($this->Path) === false) {

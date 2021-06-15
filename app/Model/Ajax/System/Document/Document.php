@@ -44,7 +44,7 @@ class Document extends AbstractBaseAjaxModel
     {
         $result = [];
         if ($this->isValidParameter('doc_id') === true) {
-            $data = DocumentDao::getByReference($this->getIntParameter('doc_id'));
+            $data = DocumentDao::getByReference($this->getStringParameter('doc_id'));
             if (empty($data) === false) {
                 $keys = array_keys($data);
                 foreach ($keys as $key) {
