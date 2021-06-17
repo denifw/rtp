@@ -11,8 +11,9 @@
 
 namespace App\Model\Ajax\Master\Finance;
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseAjaxModel;
+use App\Model\Dao\Master\Finance\CostCodeGroupDao;
 
 /**
  * Class to handle the ajax request fo CostCode.
@@ -33,17 +34,13 @@ class CostCodeGroup extends AbstractBaseAjaxModel
     {
         if ($this->isValidParameter('ccg_ss_id')) {
             $wheres = [];
-            $wheres[] = '(' . StringFormatter::generateLikeQuery('ccg_code', $this->getStringParameter('search_key')) . ' OR ' . StringFormatter::generateLikeQuery('ccg_name', $this->getStringParameter('search_key')) . ')';
-            $wheres[] = '(ccg_ss_id = ' . $this->getStringParameter('ccg_ss_id') . ')';
-            $wheres[] = '(ccg_deleted_on IS NULL)';
-            $wheres[] = "(ccg_active = 'Y')";
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-            $query = "SELECT ccg_id, (ccg_code || ' - ' || ccg_name) as ccg_text
-                        FROM cost_code_group " . $strWhere;
-            $query .= ' ORDER BY ccg_code, ccg_id';
-            $query .= ' LIMIT 30 OFFSET 0';
-
-            return $this->loadDataForSingleSelect($query, 'ccg_text', 'ccg_id');
+            if ($this->isValidParameter('search_key') === true) {
+                $wheres[] = SqlHelper::generateOrLikeCondition(['ccg_code', 'ccg_name'], $this->getStringParameter('search_key'));
+            }
+            $wheres[] = SqlHelper::generateStringCondition('ccg_ss_id', $this->getStringParameter('ccg_ss_id'));
+            $wheres[] = SqlHelper::generateStringCondition('ccg_active', 'Y');
+            $wheres[] = SqlHelper::generateNullCondition('ccg_deleted_on');
+            return CostCodeGroupDao::loadSingleSelectData(['ccg_code', 'ccg_name'], $wheres);
         }
 
         return [];

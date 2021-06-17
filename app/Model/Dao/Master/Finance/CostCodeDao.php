@@ -10,6 +10,7 @@
 
 namespace App\Model\Dao\Master\Finance;
 
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
 use Illuminate\Support\Facades\DB;
@@ -47,46 +48,22 @@ class CostCodeDao extends AbstractBaseDao
         parent::__construct('cost_code', 'cc', self::$Fields);
     }
 
-    /**
-     * Abstract function to load the seeder query for table cost_code.
-     *
-     * @return array
-     */
-    public function loadSeeder(): array
-    {
-        return $this->generateSeeder([
-            'cc_code',
-            'cc_name',
-            'cc_active',
-        ]);
-    }
-
-
-    /**
-     * function to get all available fields
-     *
-     * @return array
-     */
-    public static function getFields(): array
-    {
-        return self::$Fields;
-    }
 
     /**
      * Function to get data by reference value
      *
-     * @param int $referenceValue To store the reference value of the table.
-     * @param int $systemSettingValue To store the system setting value.
+     * @param string $referenceValue To store the reference value of the table.
+     * @param string $systemSettingValue To store the system setting value.
      *
      * @return array
      */
-    public static function getByReferenceAndSystem($referenceValue, $systemSettingValue): array
+    public static function getByReferenceAndSystem(string $referenceValue, string $systemSettingValue): array
     {
         $wheres = [];
-        $wheres[] = '(cc.cc_ss_id = ' . $systemSettingValue . ')';
-        $wheres[] = '(cc.cc_id = ' . $referenceValue . ')';
+        $wheres[] = SqlHelper::generateStringCondition('cc.cc_ss_id', $systemSettingValue);
+        $wheres[] = SqlHelper::generateStringCondition('cc.cc_id', $referenceValue);
         $data = self::loadData($wheres);
-        if (\count($data) === 1) {
+        if (count($data) === 1) {
             return $data[0];
         }
         return [];
@@ -95,29 +72,15 @@ class CostCodeDao extends AbstractBaseDao
     /**
      * Function to get all the active record.
      *
-     * @param int $ccgId To store the reference value of the table.
+     * @param string $ccgId To store the reference value of the table.
      *
      * @return array
      */
-    public static function getByGroupId($ccgId): array
+    public static function getByGroupId(string $ccgId): array
     {
         $wheres = [];
+        $wheres[] = SqlHelper::generateStringCondition('cc.cc_ccg_id', $ccgId);
         $wheres[] = '(cc.cc_ccg_id = ' . $ccgId . ')';
-
-        return self::loadData($wheres);
-    }
-
-    /**
-     * Function to get all the active record.
-     *
-     * @param array $wheres To store the list condition query.
-     *
-     * @return array
-     */
-    public static function loadActiveData(array $wheres = []): array
-    {
-        $wheres[] = "(cc.cc_active = 'Y')";
-        $wheres[] = '(cc.cc_deleted_on IS NULL)';
 
         return self::loadData($wheres);
     }
@@ -185,17 +148,17 @@ class CostCodeDao extends AbstractBaseDao
     /**
      * Function to get record for single select field.
      *
+     * @param string|array $textColumn To store the column name that will be show as a text.
      * @param array $wheres To store the list condition query.
      * @param array $orders To store the list sorting query.
-     * @param int $limit To store the limit of the data.
      *
      * @return array
      */
-    public static function loadSingleSelectData(array $wheres = [], array $orders = [], int $limit = 20): array
+    public static function loadSingleSelectData($textColumn, array $wheres = [], array $orders = []): array
     {
-        $data = self::loadData($wheres, $orders, $limit);
+        $data = self::loadData($wheres, $orders, 20);
 
-        return parent::doPrepareSingleSelectData($data, ['cc_code', 'cc_name'], 'cc_id');
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'cc_id');
     }
 
 

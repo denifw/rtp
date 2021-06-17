@@ -9,7 +9,7 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Detail\Relation;
+namespace App\Model\Detail\Crm;
 
 use App\Frame\Formatter\Trans;
 use App\Frame\Gui\Icon;
@@ -20,10 +20,6 @@ use App\Frame\Gui\Modal;
 use App\Frame\Gui\Portlet;
 use App\Frame\Gui\Table;
 use App\Frame\System\SerialNumber\SerialNumber;
-use App\Model\Dao\Relation\ContactPersonDao;
-use App\Model\Dao\Relation\OfficeDao;
-use App\Model\Dao\Relation\RelationDao;
-use App\Model\Dao\System\Location\DistrictDao;
 
 /**
  * Class to handle the creation of detail Office page

@@ -9,25 +9,18 @@
  * @copyright 2019 PT Spada Media Informatika
  */
 
-namespace App\Model\Detail\User;
+namespace App\Model\Detail\System\Access;
 
 use App\Frame\Formatter\DataParser;
 use App\Frame\Formatter\Trans;
 use App\Frame\Gui\Html\Buttons\Button;
 use App\Frame\Gui\Html\Buttons\HyperLink;
-use App\Frame\Gui\Html\Buttons\ModalButton;
 use App\Frame\Gui\Html\Buttons\SubmitButton;
 use App\Frame\Gui\Icon;
-use App\Frame\Gui\Modal;
-use App\Frame\Gui\Table;
 use App\Frame\Mvc\AbstractFormModel;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
 use App\Frame\Gui\TableDatas;
-use App\Model\Dao\User\UserGroupDetailDao;
-use App\Model\Dao\User\UserMappingDao;
-use App\Model\Dao\User\UsersDao;
-use App\Model\Dao\User\UserTokenDao;
 use App\Model\Mail\MappingUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;

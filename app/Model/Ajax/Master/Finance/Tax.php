@@ -12,8 +12,8 @@
 namespace App\Model\Ajax\Master\Finance;
 
 use App\Frame\Formatter\SqlHelper;
-use App\Frame\Formatter\StringFormatter;
 use App\Frame\Mvc\AbstractBaseAjaxModel;
+use App\Model\Dao\Master\Finance\TaxDao;
 
 /**
  * Class to handle the ajax request fo Tax.
@@ -34,25 +34,13 @@ class Tax extends AbstractBaseAjaxModel
     {
         if ($this->isValidParameter('tax_ss_id') === true) {
             $wheres = [];
-            $wheres[] = SqlHelper::generateLikeCondition('tax_name', $this->getStringParameter('search_key'));
-            $wheres[] = '(tax_deleted_on IS NULL)';
-            $wheres[] = "(tax_id IN (select td_tax_id
-                                    FROM tax_detail
-                                    where td_active = 'Y' and td_deleted_on IS NULL
-                                    group by td_tax_id))";
-            $wheres[] = "(tax_active = 'Y')";
-
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-            $query = 'SELECT tax_id, tax_name, (CASE WHEN tax_percent is null then 0 else tax_percent END) as tax_percent
-                            FROM tax as t LEFT OUTER JOIN
-                                (select td_tax_id, SUM(td_percent) as tax_percent
-                                from tax_detail 
-                                where td_active = \'Y\' and td_deleted_on is null
-                                group by td_tax_id) as td ON t.tax_id = td.td_tax_id' . $strWhere;
-            $query .= ' ORDER BY tax_name, tax_id';
-            $query .= ' LIMIT 30 OFFSET 0';
-
-            return $this->loadDataForSingleSelect($query, 'tax_name', 'tax_id', true);
+            if ($this->isValidParameter('search_key') === true) {
+                $wheres[] = SqlHelper::generateLikeCondition('tax_name', $this->getStringParameter('search_key'));
+            }
+            $wheres[] = SqlHelper::generateNullCondition('tax_deleted_on');
+            $wheres[] = SqlHelper::generateNullCondition('tax_percent', false);
+            $wheres[] = SqlHelper::generateStringCondition('tax_active', 'Y');
+            return TaxDao::loadSingleSelectData('tax_name', $wheres);
         }
         return [];
     }

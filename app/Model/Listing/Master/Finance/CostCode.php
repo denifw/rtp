@@ -11,8 +11,10 @@
 
 namespace App\Model\Listing\Master\Finance;
 
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
+use App\Model\Dao\Master\Finance\CostCodeDao;
 
 /**
  * Class to manage the creation of the listing CostCode page.
@@ -33,7 +35,7 @@ class CostCode extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'costCode');
+        parent::__construct(get_class($this), 'cc');
         $this->setParameters($parameters);
     }
 
@@ -45,8 +47,8 @@ class CostCode extends AbstractListingModel
     public function loadSearchForm(): void
     {
         # Cost Code Group
-        $ccgField = $this->Field->getSingleSelect('costCodeGroup', 'cc_group', $this->getStringParameter('cc_group'));
-        $ccgField->setHiddenField('cc_ccg_id', $this->getIntParameter('cc_ccg_id'));
+        $ccgField = $this->Field->getSingleSelect('ccg', 'cc_group', $this->getStringParameter('cc_group'));
+        $ccgField->setHiddenField('cc_ccg_id', $this->getStringParameter('cc_ccg_id'));
         $ccgField->setEnableDetailButton(false);
         $ccgField->addParameter('ccg_ss_id', $this->User->getSsId());
         $ccgField->setEnableNewButton(false);
@@ -90,14 +92,7 @@ class CostCode extends AbstractListingModel
      */
     protected function getTotalRows(): int
     {
-        # Set Select query;
-        $query = 'SELECT count(DISTINCT (cc.cc_id)) AS total_rows
-                   FROM cost_code AS cc INNER JOIN
-                       cost_code_group as ccg ON ccg.ccg_id = cc.cc_ccg_id';
-        # Set where condition.
-        $query .= $this->getWhereCondition();
-
-        return $this->loadTotalListingRows($query);
+        return CostCodeDao::loadTotalData($this->getWhereCondition());
     }
 
 
@@ -108,67 +103,40 @@ class CostCode extends AbstractListingModel
      */
     private function loadData(): array
     {
-        # Set Select query;
-        $query = "SELECT cc.cc_id, cc.cc_code, cc.cc_name, cc.cc_ccg_id, ccg.ccg_code,ccg.ccg_name,
-                        cc.cc_active
-                  FROM cost_code AS cc INNER JOIN
-                       cost_code_group as ccg ON ccg.ccg_id = cc.cc_ccg_id";
-        # Set Where condition.
-        $query .= $this->getWhereCondition();
-        # Set group by query.
-        $query .= ' GROUP BY cc.cc_id, cc.cc_code, cc.cc_name, cc.cc_ccg_id, ccg.ccg_code,ccg.ccg_name, cc.cc_active';
-        # Set order by query.
-        $query .= ' ORDER BY ccg.ccg_code, cc.cc_code, cc.cc_id';
-
-        $data = $this->loadDatabaseRow($query);
-        return $this->doPrepareData($data);
-    }
-
-    /**
-     * Function to do prepare data
-     *
-     * @param array $data To store the listing data.
-     *
-     * @return array
-     */
-    private function doPrepareData(array $data): array
-    {
+        $data = CostCodeDao::loadData(
+            $this->getWhereCondition(),
+            $this->ListingSort->getOrderByFields(),
+            $this->getLimitTable(),
+            $this->getLimitOffsetTable()
+        );
         $results = [];
-
         foreach ($data as $row) {
             $row['cc_group'] = $row['ccg_code'] . ' - ' . $row['ccg_name'];
             $results[] = $row;
         }
-
         return $results;
-
     }
+
 
     /**
      * Function to get the where condition.
      *
-     * @return string
+     * @return array
      */
-    private function getWhereCondition(): string
+    private function getWhereCondition(): array
     {
         # Set where conditions
         $wheres = [];
         if ($this->isValidParameter('cc_code')) {
-            $wheres[] = '(CAST(cc.cc_code AS TEXT) like \'%' . mb_strtolower($this->getStringParameter('cc_code')) . '%\')';
+            $wheres[] = SqlHelper::generateLikeCondition('cc.cc_code', $this->getStringParameter('cc_code'));
         }
         if ($this->isValidParameter('cc_active')) {
-            $wheres[] = '(cc.cc_active = \'' . $this->getStringParameter('cc_active') . '\')';
+            $wheres[] = SqlHelper::generateStringCondition('cc.cc_active', $this->getStringParameter('cc_active'));
         }
         if ($this->isValidParameter('cc_ccg_id')) {
-            $wheres[] = '(cc.cc_ccg_id = ' . $this->getIntParameter('cc_ccg_id') . ')';
+            $wheres[] = SqlHelper::generateStringCondition('cc.cc_ccg_id', $this->getStringParameter('cc_ccg_id'));
         }
-        $wheres[] = '(cc.cc_ss_id = ' . $this->User->getSsId() . ')';
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
-
-        # return the where query.
-        return $strWhere;
+        $wheres[] = SqlHelper::generateStringCondition('cc.cc_ss_id', $this->User->getSsId());
+        return $wheres;
     }
 }

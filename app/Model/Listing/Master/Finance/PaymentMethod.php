@@ -11,9 +11,10 @@
 
 namespace App\Model\Listing\Master\Finance;
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
+use App\Model\Dao\Master\Finance\PaymentMethodDao;
 
 /**
  * Class to manage the creation of the listing CostCode page.
@@ -34,7 +35,7 @@ class PaymentMethod extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'paymentMethod');
+        parent::__construct(get_class($this), 'pm');
         $this->setParameters($parameters);
     }
 
@@ -68,7 +69,6 @@ class PaymentMethod extends AbstractListingModel
         $this->ListingTable->addRows($listingData);
         # Add special settings to the table
         $this->ListingTable->setColumnType('pm_active', 'yesno');
-        $this->ListingTable->setColumnType('pm_days', 'integer');
         if ($this->isAllowUpdate() === true) {
             $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['pm_id']);
         }
@@ -81,13 +81,7 @@ class PaymentMethod extends AbstractListingModel
      */
     protected function getTotalRows(): int
     {
-        # Set Select query;
-        $query = 'SELECT count(DISTINCT (pm_id)) AS total_rows
-                   FROM payment_method ';
-        # Set where condition.
-        $query .= $this->getWhereCondition();
-
-        return $this->loadTotalListingRows($query);
+        return PaymentMethodDao::loadTotalData($this->getWhereCondition());
     }
 
 
@@ -98,38 +92,30 @@ class PaymentMethod extends AbstractListingModel
      */
     private function loadData(): array
     {
-        # Set Select query;
-        $query = "SELECT pm_id, pm_name, pm_active
-                  FROM payment_method ";
-        # Set Where condition.
-        $query .= $this->getWhereCondition();
-        # Set group by query.
-        $query .= ' GROUP BY pm_id, pm_name, pm_active';
-        # Set order by query.
-        $query .= ' ORDER BY pm_name, pm_id';
-
-        return $this->loadDatabaseRow($query);
+        return PaymentMethodDao::loadData(
+            $this->getWhereCondition(),
+            $this->ListingSort->getOrderByFields(),
+            $this->getLimitTable(),
+            $this->getLimitOffsetTable()
+        );
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return string
+     * @return array
      */
-    private function getWhereCondition(): string
+    private function getWhereCondition(): array
     {
         # Set where conditions
         $wheres = [];
         if ($this->isValidParameter('pm_name')) {
-            $wheres[] = StringFormatter::generateLikeQuery('pm_name', $this->getStringParameter('pm_name'));
+            $wheres[] = SqlHelper::generateLikeCondition('pm_name', $this->getStringParameter('pm_name'));
         }
         if ($this->isValidParameter('pm_active')) {
-            $wheres[] = '(pm_active = \'' . $this->getStringParameter('pm_active') . '\')';
+            $wheres[] = SqlHelper::generateStringCondition('pm_active', $this->getStringParameter('pm_active'));
         }
-        $wheres[] = '(pm_ss_id = ' . $this->User->getSsId() . ')';
-        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-
-        # return the where query.
-        return $strWhere;
+        $wheres[] = SqlHelper::generateStringCondition('pm_ss_id', $this->User->getSsId());
+        return $wheres;
     }
 }

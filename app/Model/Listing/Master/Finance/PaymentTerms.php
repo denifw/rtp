@@ -11,9 +11,11 @@
 
 namespace App\Model\Listing\Master\Finance;
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
+use App\Model\Dao\Master\Finance\PaymentMethodDao;
+use App\Model\Dao\Master\Finance\PaymentTermsDao;
 
 /**
  * Class to manage the creation of the listing CostCode page.
@@ -34,7 +36,7 @@ class PaymentTerms extends AbstractListingModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'paymentTerms');
+        parent::__construct(get_class($this), 'pt');
         $this->setParameters($parameters);
     }
 
@@ -82,13 +84,7 @@ class PaymentTerms extends AbstractListingModel
      */
     protected function getTotalRows(): int
     {
-        # Set Select query;
-        $query = 'SELECT count(DISTINCT (pt_id)) AS total_rows
-                   FROM payment_terms ';
-        # Set where condition.
-        $query .= $this->getWhereCondition();
-
-        return $this->loadTotalListingRows($query);
+        return PaymentTermsDao::loadTotalData($this->getWhereCondition());
     }
 
 
@@ -99,38 +95,30 @@ class PaymentTerms extends AbstractListingModel
      */
     private function loadData(): array
     {
-        # Set Select query;
-        $query = "SELECT pt_id, pt_name, pt_days, pt_active
-                  FROM payment_terms ";
-        # Set Where condition.
-        $query .= $this->getWhereCondition();
-        # Set group by query.
-        $query .= ' GROUP BY pt_id, pt_name, pt_days, pt_active';
-        # Set order by query.
-        $query .= ' ORDER BY pt_days, pt_id';
-
-        return $this->loadDatabaseRow($query);
+        return PaymentTermsDao::loadData(
+            $this->getWhereCondition(),
+            $this->ListingSort->getOrderByFields(),
+            $this->getLimitTable(),
+            $this->getLimitOffsetTable()
+        );
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return string
+     * @return array
      */
-    private function getWhereCondition(): string
+    private function getWhereCondition(): array
     {
         # Set where conditions
         $wheres = [];
         if ($this->isValidParameter('pt_name')) {
-            $wheres[] = StringFormatter::generateLikeQuery('pt_name', $this->getStringParameter('pt_name'));
+            $wheres[] = SqlHelper::generateLikeCondition('pt_name', $this->getStringParameter('pt_name'));
         }
         if ($this->isValidParameter('pt_active')) {
-            $wheres[] = '(pt_active = \'' . $this->getStringParameter('pt_active') . '\')';
+            $wheres[] = SqlHelper::generateStringCondition('pt_active', $this->getStringParameter('pt_active'));
         }
-        $wheres[] = '(pt_ss_id = ' . $this->User->getSsId() . ')';
-        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-
-        # return the where query.
-        return $strWhere;
+        $wheres[] = SqlHelper::generateStringCondition('pt_ss_id', $this->User->getSsId());
+        return $wheres;
     }
 }

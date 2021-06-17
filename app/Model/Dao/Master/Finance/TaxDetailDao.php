@@ -11,6 +11,7 @@
 
 namespace App\Model\Dao\Master\Finance;
 
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
 use Illuminate\Support\Facades\DB;
@@ -37,6 +38,14 @@ class TaxDetailDao extends AbstractBaseDao
         'td_active',
         'td_percent',
     ];
+    /**
+     * Property to store the numeric fields.
+     *
+     * @var array
+     */
+    protected $NumericFields = [
+        'td_percent',
+    ];
 
     /**
      * Base dao constructor for tax.
@@ -48,42 +57,18 @@ class TaxDetailDao extends AbstractBaseDao
     }
 
     /**
-     * Abstract function to load the seeder query for table tax.
-     *
-     * @return array
-     */
-    public function loadSeeder(): array
-    {
-        return $this->generateSeeder([
-            'td_name',
-            'td_active',
-        ]);
-    }
-
-
-    /**
-     * function to get all available fields
-     *
-     * @return array
-     */
-    public static function getFields(): array
-    {
-        return self::$Fields;
-    }
-
-    /**
      * Function to get data by reference value
      *
-     * @param int $referenceValue To store the reference value of the table.
+     * @param string $referenceValue To store the reference value of the table.
      *
      * @return array
      */
-    public static function getByReference($referenceValue): array
+    public static function getByReference(string $referenceValue): array
     {
         $wheres = [];
-        $wheres[] = '(td_id = ' . $referenceValue . ')';
+        $wheres[] = SqlHelper::generateStringCondition('td_id', $referenceValue);
         $data = self::loadData($wheres);
-        if (\count($data) === 1) {
+        if (count($data) === 1) {
             return $data[0];
         }
         return [];
@@ -92,14 +77,14 @@ class TaxDetailDao extends AbstractBaseDao
     /**
      * Function to get data by tax id
      *
-     * @param int $taxId To store the Tax Id Value.
+     * @param string $taxId To store the Tax Id Value.
      *
      * @return array
      */
-    public static function getByTaxId($taxId): array
+    public static function getByTaxId(string $taxId): array
     {
         $wheres = [];
-        $wheres[] = '(td_tax_id = ' . $taxId . ')';
+        $wheres[] = SqlHelper::generateStringCondition('td_tax_id', $taxId);
         return self::loadData($wheres);
     }
 
@@ -107,12 +92,13 @@ class TaxDetailDao extends AbstractBaseDao
      * Function to get all record.
      *
      * @param array $wheres To store the list condition query.
-     * @param int   $limit  To store the limit of the data.
-     * @param int   $offset To store the offset of the data to apply limit.
+     * @param array $orders To store the list condition query.
+     * @param int $limit To store the limit of the data.
+     * @param int $offset To store the offset of the data to apply limit.
      *
      * @return array
      */
-    public static function loadData(array $wheres = [], int $limit = 0, int $offset = 0): array
+    public static function loadData(array $wheres = [], array $orders = [], int $limit = 0, int $offset = 0): array
     {
         $strWhere = '';
         if (empty($wheres) === false) {
@@ -120,29 +106,34 @@ class TaxDetailDao extends AbstractBaseDao
         }
         $query = 'SELECT td_id, td_name, td_active, td_percent, td_tax_id
                         FROM tax_detail ' . $strWhere;
+        if (empty($orders) === false) {
+            $query .= ' ORDER BY ' . implode(', ', $orders);
+        } else {
+            $query .= ' ORDER BY td_name, td_id';
+        }
         $query .= ' ORDER BY td_name, td_id';
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
         }
         $result = DB::select($query);
 
-        return DataParser::arrayObjectToArray($result, self::$Fields);
+        return DataParser::arrayObjectToArray($result);
     }
 
     /**
      * Function to get all record.
      *
-     * @param int $taxId To store the limit of the data.
+     * @param string $taxId To store the limit of the data.
      *
      * @return float
      */
-    public static function getTotalPercentageByTaxId($taxId): float
+    public static function getTotalPercentageByTaxId(string $taxId): float
     {
         $result = 0.0;
         $wheres = [];
-        $wheres[] = '(td_tax_id = ' . $taxId . ')';
-        $wheres[] = '(td_deleted_on is null)';
-        $wheres[] = "(td_active = 'Y')";
+        $wheres[] = SqlHelper::generateStringCondition('td_tax_id', $taxId);
+        $wheres[] = SqlHelper::generateStringCondition('td_active', 'Y');
+        $wheres[] = SqlHelper::generateNullCondition('td_deleted_on');
         $strWhere = '';
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);

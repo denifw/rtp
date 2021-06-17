@@ -175,4 +175,39 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'Crm/ContactPerson');
     });
+    # Master - Cost Code Group
+    Route::match(['get', 'post'], '/ccg/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Master/Finance/CostCodeGroup');
+    });
+    # Master - Cost Code
+    Route::match(['get', 'post'], '/cc/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Master/Finance/CostCode');
+    });
+    # Master - Payment Terms
+    Route::match(['get', 'post'], '/pt/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Master/Finance/PaymentTerms');
+    });
+    # Master - Payment Method
+    Route::match(['get', 'post'], '/pm/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Master/Finance/PaymentMethod');
+    });
+    # Master - Tax
+    Route::match(['get', 'post'], '/tax/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Master/Finance/Tax');
+    });
+    # Master - Tax Detail
+    Route::match(['get', 'post'], '/td/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Master/Finance/TaxDetail');
+    });
+    # Master - Bank Account
+    Route::match(['get', 'post'], '/ba/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Master/Finance/BankAccount');
+    });
 });

@@ -8,7 +8,7 @@
  * @copyright  2021 PT Makmur Berkat Teknologi.
  */
 
-namespace App\Model\Listing\Finance\CashAndBank;
+namespace App\Model\Listing\Master\Finance;
 
 use App\Frame\Formatter\NumberFormatter;
 use App\Frame\Formatter\SqlHelper;
@@ -18,7 +18,7 @@ use App\Frame\Gui\Html\Labels\LabelDanger;
 use App\Frame\Gui\Html\Labels\LabelDark;
 use App\Frame\Gui\Html\Labels\LabelSuccess;
 use App\Frame\Mvc\AbstractListingModel;
-use App\Model\Dao\Finance\CashAndBank\BankAccountDao;
+use App\Model\Dao\Master\Finance\BankAccountDao;
 
 /**
  * Class to control the system of BankAccount.
@@ -51,8 +51,8 @@ class BankAccount extends AbstractListingModel
     public function loadSearchForm(): void
     {
         # User
-        $usField = $this->Field->getSingleSelect('user', 'ba_user', $this->getStringParameter('ba_user'), 'loadBankAccountManager');
-        $usField->setHiddenField('ba_us_id', $this->getIntParameter('ba_us_id'));
+        $usField = $this->Field->getSingleSelect('us', 'ba_user', $this->getStringParameter('ba_user'), 'loadBankAccountManager');
+        $usField->setHiddenField('ba_us_id', $this->getStringParameter('ba_us_id'));
         $usField->addParameter('ba_ss_id', $this->User->getSsId());
         $usField->setEnableDetailButton(false);
         $usField->setEnableNewButton(false);
@@ -60,12 +60,12 @@ class BankAccount extends AbstractListingModel
             $usField->addParameter('ba_us_id', $this->User->getId());
         }
 
-        $this->ListingForm->addField(Trans::getFinanceWord('code'), $this->Field->getText('ba_code', $this->getStringParameter('ba_code')));
-        $this->ListingForm->addField(Trans::getFinanceWord('description'), $this->Field->getText('ba_description', $this->getStringParameter('ba_description')));
-        $this->ListingForm->addField(Trans::getFinanceWord('accountManager'), $usField);
-        $this->ListingForm->addField(Trans::getFinanceWord('mainAccount'), $this->Field->getYesNo('ba_main', $this->getStringParameter('ba_main')));
-        $this->ListingForm->addField(Trans::getFinanceWord('blocked'), $this->Field->getYesNo('ba_blocked', $this->getStringParameter('ba_blocked')));
-        $this->ListingForm->addField(Trans::getFinanceWord('deleted'), $this->Field->getYesNo('ba_deleted', $this->getStringParameter('ba_deleted')));
+        $this->ListingForm->addField(Trans::getWord('code'), $this->Field->getText('ba_code', $this->getStringParameter('ba_code')));
+        $this->ListingForm->addField(Trans::getWord('description'), $this->Field->getText('ba_description', $this->getStringParameter('ba_description')));
+        $this->ListingForm->addField(Trans::getWord('accountManager'), $usField);
+        $this->ListingForm->addField(Trans::getWord('mainAccount'), $this->Field->getYesNo('ba_main', $this->getStringParameter('ba_main')));
+        $this->ListingForm->addField(Trans::getWord('blocked'), $this->Field->getYesNo('ba_blocked', $this->getStringParameter('ba_blocked')));
+        $this->ListingForm->addField(Trans::getWord('deleted'), $this->Field->getYesNo('ba_deleted', $this->getStringParameter('ba_deleted')));
 
         $this->ListingForm->setGridDimension(4);
     }
@@ -79,16 +79,16 @@ class BankAccount extends AbstractListingModel
     {
         # set header column table
         $this->ListingTable->setHeaderRow([
-            'ba_code' => Trans::getFinanceWord('code'),
-            'ba_description' => Trans::getFinanceWord('description'),
-            'ba_bank' => Trans::getFinanceWord('bank'),
-            'ba_account' => Trans::getFinanceWord('account'),
-            'ba_user' => Trans::getFinanceWord('manager'),
-            'ba_balance' => Trans::getFinanceWord('balance'),
-            'ba_main' => Trans::getFinanceWord('mainAccount'),
-            'ba_receivable' => Trans::getFinanceWord('receivable'),
-            'ba_payable' => Trans::getFinanceWord('payable'),
-            'ba_status' => Trans::getFinanceWord('status'),
+            'ba_code' => Trans::getWord('code'),
+            'ba_description' => Trans::getWord('description'),
+            'ba_bank' => Trans::getWord('bank'),
+            'ba_account' => Trans::getWord('account'),
+            'ba_user' => Trans::getWord('manager'),
+            'ba_balance' => Trans::getWord('balance'),
+            'ba_main' => Trans::getWord('mainAccount'),
+            'ba_receivable' => Trans::getWord('ar'),
+            'ba_payable' => Trans::getWord('ap'),
+            'ba_status' => Trans::getWord('status'),
         ]);
         # Load the data for BankAccount.
         $this->ListingTable->addRows($this->loadData());
@@ -146,11 +146,11 @@ class BankAccount extends AbstractListingModel
                 $row['ba_balance'] = $row['ba_currency'] . ' ' . $number->doFormatFloat($row['ba_balance']);
             }
             if (empty($row['ba_deleted_on']) === false) {
-                $status = new LabelDanger(Trans::getFinanceWord('deleted'));
+                $status = new LabelDanger(Trans::getWord('deleted'));
             } elseif (empty($row['ba_block_on']) === false) {
-                $status = new LabelDark(Trans::getFinanceWord('blocked'));
+                $status = new LabelDark(Trans::getWord('blocked'));
             } else {
-                $status = new LabelSuccess(Trans::getFinanceWord('active'));
+                $status = new LabelSuccess(Trans::getWord('active'));
             }
             $row['ba_status'] = $status;
             $results[] = $row;
@@ -167,13 +167,13 @@ class BankAccount extends AbstractListingModel
     {
         # Set where conditions
         $wheres = [];
-        $wheres[] = SqlHelper::generateNumericCondition('ba.ba_ss_id', $this->User->getSsId());
+        $wheres[] = SqlHelper::generateStringCondition('ba.ba_ss_id', $this->User->getSsId());
         $allowSeeAllAccount = $this->PageSetting->checkPageRight('AllowSeeAllAccount');
         if ($allowSeeAllAccount === false) {
-            $wheres[] = SqlHelper::generateNumericCondition('ba.ba_us_id', $this->User->getId());
+            $wheres[] = SqlHelper::generateStringCondition('ba.ba_us_id', $this->User->getId());
         }
         if ($allowSeeAllAccount === true && $this->isValidParameter('ba_us_id') === true) {
-            $wheres[] = SqlHelper::generateNumericCondition('ba.ba_us_id', $this->getIntParameter('ba_us_id'));
+            $wheres[] = SqlHelper::generateStringCondition('ba.ba_us_id', $this->getStringParameter('ba_us_id'));
         }
         if ($this->isValidParameter('ba_code') === true) {
             $wheres[] = SqlHelper::generateStringCondition('ba.ba_code', $this->getStringParameter('ba_code'));

@@ -8,7 +8,7 @@
  * @copyright  2021 PT Makmur Berkat Teknologi.
  */
 
-namespace App\Model\Dao\Finance\CashAndBank;
+namespace App\Model\Dao\Master\Finance;
 
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
@@ -50,6 +50,14 @@ class BankAccountDao extends AbstractBaseDao
         'ba_block_on',
         'ba_block_reason',
     ];
+    /**
+     * Property to store the numeric fields.
+     *
+     * @var array
+     */
+    protected $NumericFields = [
+        'ba_limit',
+    ];
 
     /**
      * Base dao constructor for bank_account.
@@ -58,38 +66,6 @@ class BankAccountDao extends AbstractBaseDao
     public function __construct()
     {
         parent::__construct('bank_account', 'ba', self::$Fields);
-    }
-
-    /**
-     * Abstract function to load the seeder query for table bank_account.
-     *
-     * @return array
-     */
-    public function loadSeeder(): array
-    {
-        return $this->generateSeeder([
-            'ba_code',
-            'ba_description',
-            'ba_account_number',
-            'ba_account_name',
-            'ba_bank_branch',
-            'ba_main',
-            'ba_receivable',
-            'ba_payable',
-            'ba_block_on',
-            'ba_block_reason',
-        ]);
-    }
-
-
-    /**
-     * function to get all available fields
-     *
-     * @return array
-     */
-    public static function getFields(): array
-    {
-        return self::$Fields;
     }
 
     /**

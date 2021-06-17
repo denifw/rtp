@@ -8,7 +8,7 @@
  * @copyright 2021 PT Makmur Berkat Teknologi.
  */
 
-namespace App\Model\Detail\User;
+namespace App\Model\Detail\System\Access;
 
 use App\Frame\Formatter\Trans;
 use App\Frame\Gui\Html\Buttons\HyperLink;
@@ -16,7 +16,7 @@ use App\Frame\Gui\Html\Buttons\SubmitButton;
 use App\Frame\Mvc\AbstractFormModel;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
-use App\Model\Dao\User\UsersDao;
+use App\Model\Dao\System\Access\UsersDao;
 
 /**
  * Class to handle the creation of detail UserChangePassword page
@@ -44,12 +44,12 @@ class UserChangePassword extends AbstractFormModel
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
 
-        return 0;
+        return '';
     }
 
     /**

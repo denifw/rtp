@@ -10,9 +10,10 @@
 
 namespace App\Model\Listing\Master\Finance;
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractListingModel;
+use App\Model\Dao\Master\Finance\TaxDao;
 
 /**
  * Class to manage the creation of the listing Tax page.
@@ -59,7 +60,7 @@ class Tax extends AbstractListingModel
         $this->ListingTable->setHeaderRow(
             [
                 'tax_name' => Trans::getWord('description'),
-                'tax_percent' => Trans::getFinanceWord('percentage'),
+                'tax_percent' => Trans::getWord('percentage'),
                 'tax_active' => Trans::getWord('active'),
             ]
         );
@@ -81,16 +82,7 @@ class Tax extends AbstractListingModel
      */
     protected function getTotalRows(): int
     {
-        # Set Select query;
-        $query = "SELECT count(DISTINCT (t.tax_id)) AS total_rows
-        FROM tax as t LEFT OUTER JOIN
-        (SELECT td_tax_id, SUM(td_percent) as total from tax_detail
-          WHERE td_active = 'Y' and td_deleted_on is null
-          GROUP BY td_tax_id) as td ON t.tax_id = td.td_tax_id";
-        # Set where condition.
-        $query .= $this->getWhereCondition();
-
-        return $this->loadTotalListingRows($query);
+        return TaxDao::loadTotalData($this->getWhereCondition());
     }
 
 
@@ -101,45 +93,30 @@ class Tax extends AbstractListingModel
      */
     private function loadData(): array
     {
-        # Set Select query;
-        $query = "SELECT t.tax_id, t.tax_name, t.tax_active, (CASE WHEN td.total IS NULL THEN 0 ELSE td.total END) as tax_percent
-        FROM tax as t LEFT OUTER JOIN
-        (SELECT td_tax_id, SUM(td_percent) as total from tax_detail
-          WHERE td_active = 'Y' and td_deleted_on is null
-          GROUP BY td_tax_id) as td ON t.tax_id = td.td_tax_id";
-        # Set Where condition.
-        $query .= $this->getWhereCondition();
-        # Set group by query.
-        $query .= ' GROUP BY t.tax_id, t.tax_name, td.total, t.tax_active';
-        # Set order by query.
-        if (empty($this->ListingSort->getSelectedField()) === false) {
-            $query .= $this->ListingSort->getOrderByQuery();
-        } else {
-            $query .= ' ORDER BY t.tax_name, t.tax_id';
-        }
-
-        return $this->loadDatabaseRow($query);
+        return TaxDao::loadData(
+            $this->getWhereCondition(),
+            $this->ListingSort->getOrderByFields(),
+            $this->getLimitTable(),
+            $this->getLimitOffsetTable()
+        );
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return string
+     * @return array
      */
-    private function getWhereCondition(): string
+    private function getWhereCondition(): array
     {
         # Set where conditions
         $wheres = [];
         if ($this->isValidParameter('tax_name')) {
-            $wheres[] = StringFormatter::generateLikeQuery('t.tax_name', $this->getStringParameter('tax_name'));
+            $wheres[] = SqlHelper::generateLikeCondition('tax.tax_name', $this->getStringParameter('tax_name'));
         }
         if ($this->isValidParameter('tax_active')) {
-            $wheres[] = '(t.tax_active = \'' . $this->getStringParameter('tax_active') . '\')';
+            $wheres[] = SqlHelper::generateStringCondition('tax.tax_active', $this->getStringParameter('tax_active'));
         }
-        $wheres[] = '(t.tax_ss_id = ' . $this->User->getSsId() . ')';
-        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-
-        # return the where query.
-        return $strWhere;
+        $wheres[] = SqlHelper::generateStringCondition('tax.tax_ss_id', $this->User->getSsId());
+        return $wheres;
     }
 }

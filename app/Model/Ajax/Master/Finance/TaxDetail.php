@@ -34,9 +34,11 @@ class TaxDetail extends AbstractBaseAjaxModel
     {
         $results = [];
         if ($this->isValidParameter('td_id') === true) {
-            $number = new NumberFormatter();
-            $results = TaxDetailDao::getByReference($this->getIntParameter('td_id'));
-            $results['td_percent_number'] = $number->doFormatFloat((float)$results['td_percent']);
+            $results = TaxDetailDao::getByReference($this->getStringParameter('td_id'));
+            if (empty($results) === false) {
+                $number = new NumberFormatter();
+                $results['td_percent_number'] = $number->doFormatFloat((float)$results['td_percent']);
+            }
         }
 
         return $results;

@@ -10,8 +10,9 @@
 
 namespace App\Model\Ajax\Master\Finance;
 
-use App\Frame\Formatter\StringFormatter;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseAjaxModel;
+use App\Model\Dao\Master\Finance\PaymentMethodDao;
 
 /**
  * Class to handle the ajax request fo Bank.
@@ -31,18 +32,15 @@ class PaymentMethod extends AbstractBaseAjaxModel
      */
     public function loadSingleSelectData(): array
     {
-        if($this->isValidParameter('pm_ss_id')) {
+        if ($this->isValidParameter('pm_ss_id')) {
             $wheres = [];
-            $wheres[] = StringFormatter::generateLikeQuery('pm_name', $this->getStringParameter('search_key'));
-            $wheres[] = '(pm_ss_id = '.$this->getIntParameter('pm_ss_id').')';
-            $wheres[] = '(pm_deleted_on is null)';
-            $wheres[] = "(pm_active = 'Y')";
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-            $query = 'SELECT pm_id, pm_name
-                    FROM payment_method ' . $strWhere;
-            $query .= ' ORDER BY pm_name, pm_id';
-            $query .= ' LIMIT 30 OFFSET 0';
-            return $this->loadDataForSingleSelect($query, 'pm_name', 'pm_id');
+            if ($this->isValidParameter('search_key') === true) {
+                $wheres[] = SqlHelper::generateLikeCondition('pm_name', $this->getStringParameter('search_key'));
+            }
+            $wheres[] = SqlHelper::generateStringCondition('pm_ss_id', $this->getStringParameter('pm_ss_id'));
+            $wheres[] = SqlHelper::generateStringCondition('pm_active', 'Y');
+            $wheres[] = SqlHelper::generateNullCondition('pm_deleted_on');
+            return PaymentMethodDao::loadSingleSelectData('pm_name', $wheres);
         }
         return [];
     }

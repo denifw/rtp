@@ -17,6 +17,8 @@ class CreateCostCodeTable extends Migration
             $table->uuid('cc_id')->primary();
             $table->uuid('cc_ss_id')->unsigned();
             $table->foreign('cc_ss_id', 'tbl_cc_ss_id_foreign')->references('ss_id')->on('system_setting');
+            $table->uuid('cc_ccg_id')->unsigned();
+            $table->foreign('cc_ccg_id', 'tbl_cc_ccg_id_foreign')->references('ccg_id')->on('cost_code_group');
             $table->string('cc_code', 50);
             $table->string('cc_name', 150);
             $table->char('cc_active', 1)->default('Y');
