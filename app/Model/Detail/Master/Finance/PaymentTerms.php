@@ -32,18 +32,18 @@ class PaymentTerms extends AbstractFormModel
      *
      * @param array $parameters To store the parameter from http.
      */
-    public function __construct($parameters)
+    public function __construct(array $parameters)
     {
-        parent::__construct(get_class($this), 'paymentTerms', 'pt_id');
+        parent::__construct(get_class($this), 'pt', 'pt_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
             'pt_ss_id' => $this->User->getSsId(),
@@ -107,14 +107,14 @@ class PaymentTerms extends AbstractFormModel
             'pt_ss_id' => $this->User->getSsId()
         ]);
         $this->Validation->checkRequire('pt_days');
-        $this->Validation->checkInt('pt_days', 1);
+        $this->Validation->checkInt('pt_days', 0);
     }
 
 
     /**
      * Function to get the general Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getGeneralFieldSet(): Portlet
     {

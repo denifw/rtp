@@ -83,7 +83,7 @@ class TaxDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = "SELECT tax_id, tax_name, tax_active tax_percent
+        $query = "SELECT tax_id, tax_name, tax_active, tax_percent
                         FROM tax " . $strWhere;
         if (empty($orders) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orders);

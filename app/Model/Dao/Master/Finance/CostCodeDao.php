@@ -80,7 +80,6 @@ class CostCodeDao extends AbstractBaseDao
     {
         $wheres = [];
         $wheres[] = SqlHelper::generateStringCondition('cc.cc_ccg_id', $ccgId);
-        $wheres[] = '(cc.cc_ccg_id = ' . $ccgId . ')';
 
         return self::loadData($wheres);
     }

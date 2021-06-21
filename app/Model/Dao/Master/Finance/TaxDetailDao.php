@@ -35,7 +35,6 @@ class TaxDetailDao extends AbstractBaseDao
         'td_id',
         'td_tax_id',
         'td_name',
-        'td_active',
         'td_percent',
     ];
     /**
@@ -85,6 +84,7 @@ class TaxDetailDao extends AbstractBaseDao
     {
         $wheres = [];
         $wheres[] = SqlHelper::generateStringCondition('td_tax_id', $taxId);
+        $wheres[] = SqlHelper::generateNullCondition('td_deleted_on');
         return self::loadData($wheres);
     }
 
@@ -104,14 +104,13 @@ class TaxDetailDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT td_id, td_name, td_active, td_percent, td_tax_id
+        $query = 'SELECT td_id, td_name, td_percent, td_tax_id
                         FROM tax_detail ' . $strWhere;
         if (empty($orders) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orders);
         } else {
             $query .= ' ORDER BY td_name, td_id';
         }
-        $query .= ' ORDER BY td_name, td_id';
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
         }
@@ -124,16 +123,19 @@ class TaxDetailDao extends AbstractBaseDao
      * Function to get all record.
      *
      * @param string $taxId To store the limit of the data.
+     * @param ?string $detailId To store the limit of the data.
      *
      * @return float
      */
-    public static function getTotalPercentageByTaxId(string $taxId): float
+    public static function getTotalPercentageByTaxId(string $taxId, ?string $detailId): float
     {
         $result = 0.0;
         $wheres = [];
         $wheres[] = SqlHelper::generateStringCondition('td_tax_id', $taxId);
-        $wheres[] = SqlHelper::generateStringCondition('td_active', 'Y');
         $wheres[] = SqlHelper::generateNullCondition('td_deleted_on');
+        if (empty($detailId) === false) {
+            $wheres[] = SqlHelper::generateStringCondition('td_id', $detailId, '<>');
+        }
         $strWhere = '';
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);

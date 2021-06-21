@@ -110,14 +110,14 @@ class CostCodeGroup extends AbstractListingModel
         );
         $results = [];
         foreach ($data as $row) {
-            if ($row['ccg.ccg_type'] === 'S') {
-                $row['ccg.ccg_type_name'] = Trans::getWord('sales');
-            } elseif ($row['ccg.ccg_type'] === 'P') {
-                $row['ccg.ccg_type_name'] = Trans::getWord('purchase');
-            } elseif ($row['ccg.ccg_type'] === 'D') {
-                $row['ccg.ccg_type_name'] = Trans::getWord('deposit');
+            if ($row['ccg_type'] === 'S') {
+                $row['ccg_type_name'] = Trans::getWord('sales');
+            } elseif ($row['ccg_type'] === 'P') {
+                $row['ccg_type_name'] = Trans::getWord('purchase');
+            } elseif ($row['ccg_type'] === 'D') {
+                $row['ccg_type_name'] = Trans::getWord('deposit');
             } else {
-                $row['ccg.ccg_type_name'] = Trans::getWord('reimburse');
+                $row['ccg_type_name'] = Trans::getWord('reimburse');
             }
             $results[] = $row;
         }

@@ -19,7 +19,6 @@ class CreateTaxDetailTable extends Migration
             $table->foreign('td_tax_id', 'tbl_td_tax_id_fkey')->references('tax_id')->on('tax');
             $table->string('td_name', 125);
             $table->float('td_percent');
-            $table->char('td_active', 1)->default('Y');
             $table->uuid('td_created_by');
             $table->dateTime('td_created_on');
             $table->uuid('td_updated_by')->nullable();

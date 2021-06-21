@@ -14,6 +14,7 @@ namespace App\Model\Detail\Master\Finance;
 use App\Frame\Formatter\Trans;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Html\Buttons\ModalButton;
+use App\Frame\Gui\Html\Labels\Paragraph;
 use App\Frame\Gui\Icon;
 use App\Frame\Gui\Modal;
 use App\Frame\Gui\Portlet;
@@ -37,7 +38,7 @@ class Tax extends AbstractFormModel
      *
      * @param array $parameters To store the parameter from http.
      */
-    public function __construct($parameters)
+    public function __construct(array $parameters)
     {
         parent::__construct(get_class($this), 'tax', 'tax_id');
         $this->setParameters($parameters);
@@ -46,14 +47,14 @@ class Tax extends AbstractFormModel
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
             'tax_ss_id' => $this->User->getSsId(),
             'tax_name' => $this->getStringParameter('tax_name'),
-            'tax_active' => $this->getStringParameter('tax_active', 'Y'),
+            'tax_active' => 'Y',
         ];
         $taxDao = new TaxDao();
         $taxDao->doInsertTransaction($colVal);
@@ -73,22 +74,55 @@ class Tax extends AbstractFormModel
                 'td_tax_id' => $this->getDetailReferenceValue(),
                 'td_name' => $this->getStringParameter('td_name'),
                 'td_percent' => $this->getFloatParameter('td_percent'),
-                'td_active' => $this->getStringParameter('td_active', 'Y')
             ];
             $tdDao = new TaxDetailDao();
+            $tdId = null;
             if ($this->isValidParameter('td_id') === true) {
-                $tdDao->doUpdateTransaction($this->getIntParameter('td_id'), $tdColVal);
+                $tdId = $this->getStringParameter('td_id');
+                $tdDao->doUpdateTransaction($tdId, $tdColVal);
             } else {
                 $tdDao->doInsertTransaction($tdColVal);
+                $tdId = $tdDao->getLastInsertId();
             }
+            $this->doUpdateTaxPercent($tdId, $this->getFloatParameter('td_percent'), true);
+        } elseif ($this->getFormAction() === 'doDeleteDetail') {
+            $tdDao = new TaxDetailDao();
+            $tdId = $this->getStringParameter('td_id_del');
+            $tdDao->doDeleteTransaction($tdId);
+            $this->doUpdateTaxPercent($tdId, 0.0, false);
+
         } else {
             $colVal = [
                 'tax_name' => $this->getStringParameter('tax_name'),
-                'tax_active' => $this->getStringParameter('tax_active', 'Y'),
+                'tax_active' => $this->getStringParameter('tax_active'),
             ];
             $taxDao = new TaxDao();
             $taxDao->doUpdateTransaction($this->getDetailReferenceValue(), $colVal);
         }
+    }
+
+    /**
+     * Function to do the update of the transaction.;
+     *
+     * @param string $detailId To store the id for detail tax
+     * @param float $amount To store amount percentage
+     * @param bool $isAdding To store amount percentage
+     * @return void
+     */
+    private function doUpdateTaxPercent(string $detailId, float $amount, bool $isAdding): void
+    {
+
+        $current = TaxDetailDao::getTotalPercentageByTaxId($this->getDetailReferenceValue(), $detailId);
+        if ($isAdding === true) {
+            $percentage = $current + $amount;
+        } else {
+            $percentage = $current;
+        }
+        $taxDao = new TaxDao();
+        $taxDao->doUpdateTransaction($this->getDetailReferenceValue(), [
+            'tax_percent' => $percentage
+        ]);
+
     }
 
     /**
@@ -124,12 +158,14 @@ class Tax extends AbstractFormModel
         if ($this->getFormAction() === 'doUpdateDetail') {
             $this->Validation->checkRequire('td_name');
             $this->Validation->checkUnique('td_name', 'tax_detail', [
-                'td_id' => $this->getIntParameter('td_id')
+                'td_id' => $this->getStringParameter('td_id')
             ], [
                 'td_tax_id' => $this->getDetailReferenceValue()
             ]);
             $this->Validation->checkRequire('td_percent');
             $this->Validation->checkFloat('td_percent', -100, 100);
+        } elseif ($this->getFormAction() === 'doDeleteDetail') {
+            $this->Validation->checkRequire('td_id_del');
         } else {
             $this->Validation->checkRequire('tax_name');
             $this->Validation->checkUnique('tax_name', 'tax', [
@@ -142,13 +178,13 @@ class Tax extends AbstractFormModel
     /**
      * Function to get the general Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getGeneralFieldSet(): Portlet
     {
         # Create a form.
         $fieldSet = new FieldSet($this->Validation);
-        $fieldSet->setGridDimension(6, 6, 6, 12);
+        $fieldSet->setGridDimension(6, 6);
         # Add field to field set
         $fieldSet->addField(Trans::getWord('description'), $this->Field->getText('tax_name', $this->getStringParameter('tax_name')), true);
         $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('tax_active', $this->getStringParameter('tax_active')));
@@ -163,28 +199,29 @@ class Tax extends AbstractFormModel
     /**
      * Function to get the storage Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getDetailFieldSet(): Portlet
     {
         $modal = $this->getDetailModal();
         $this->View->addModal($modal);
+        $modalDelete = $this->getDetailDeleteModal();
+        $this->View->addModal($modalDelete);
         $table = new Table('TaxTdTbl');
         $table->setHeaderRow([
             'td_name' => Trans::getWord('description'),
-            'td_percent' => Trans::getFinanceWord('percentage'),
-            'td_active' => Trans::getWord('active'),
+            'td_percent' => Trans::getWord('percentage'),
         ]);
         $results = TaxDetailDao::getByTaxId($this->getDetailReferenceValue());
         $table->addRows($results);
         $table->setColumnType('td_percent', 'float');
-        $table->setColumnType('td_active', 'yesno');
         $table->addColumnAttribute('td_name', 'style', 'text-align: center');
-        $table->setUpdateActionByModal($modal, 'taxDetail', 'getByReference', ['td_id']);
+        $table->setUpdateActionByModal($modal, 'td', 'getById', ['td_id']);
+        $table->setDeleteActionByModal($modalDelete, 'td', 'getByIdForDelete', ['td_id']);
 
         # Create a portlet box.
         $portlet = new Portlet('TaxTdPtl', Trans::getWord('detail'));
-        $btnWhsMdl = new ModalButton('btnTaxTdMdl', Trans::getFinanceWord('addDetail'), $modal->getModalId());
+        $btnWhsMdl = new ModalButton('btnTaxTdMdl', Trans::getWord('addDetail'), $modal->getModalId());
         $btnWhsMdl->setIcon(Icon::Plus)->btnPrimary()->pullRight();
         $portlet->addButton($btnWhsMdl);
         $portlet->addTable($table);
@@ -196,11 +233,11 @@ class Tax extends AbstractFormModel
     /**
      * Function to get operator modal.
      *
-     * @return \App\Frame\Gui\Modal
+     * @return Modal
      */
     private function getDetailModal(): Modal
     {
-        $modal = new Modal('TaxTdMdl', Trans::getFinanceWord('taxDetail'));
+        $modal = new Modal('TaxTdMdl', Trans::getWord('taxDetail'));
         $modal->setFormSubmit($this->getMainFormId(), 'doUpdateDetail');
         $showModal = false;
         if ($this->getFormAction() === 'doUpdateDetail' && $this->isValidPostValues() === false) {
@@ -211,9 +248,38 @@ class Tax extends AbstractFormModel
         $fieldSet->setGridDimension(6, 6);
         # Add field into field set.
         $fieldSet->addField(Trans::getWord('description'), $this->Field->getText('td_name', $this->getParameterForModal('td_name', $showModal)), true);
-        $fieldSet->addField(Trans::getFinanceWord('percentage') . ' (%)', $this->Field->getNumber('td_percent', $this->getParameterForModal('td_percent', $showModal)), true);
-        $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('td_active', $this->getParameterForModal('td_active', $showModal)));
+        $fieldSet->addField(Trans::getWord('percentage') . ' (%)', $this->Field->getNumber('td_percent', $this->getParameterForModal('td_percent', $showModal)), true);
         $fieldSet->addHiddenField($this->Field->getHidden('td_id', $this->getParameterForModal('td_id', $showModal)));
+        $modal->addFieldSet($fieldSet);
+
+        return $modal;
+    }
+
+    /**
+     * Function to get operator modal.
+     *
+     * @return Modal
+     */
+    private function getDetailDeleteModal(): Modal
+    {
+        $modal = new Modal('TaxTdDelMdl', Trans::getWord('deleteDetail'));
+        $modal->setFormSubmit($this->getMainFormId(), 'doDeleteDetail');
+        $showModal = false;
+        if ($this->getFormAction() === 'doDeleteDetail' && $this->isValidPostValues() === false) {
+            $modal->setShowOnLoad();
+            $showModal = true;
+        }
+        $fieldSet = new FieldSet($this->Validation);
+        $fieldSet->setGridDimension(6, 6);
+        # Add field into field set.
+        $fieldSet->addField(Trans::getWord('description'), $this->Field->getText('td_name_del', $this->getParameterForModal('td_name_del', $showModal)), true);
+        $fieldSet->addField(Trans::getWord('percentage') . ' (%)', $this->Field->getNumber('td_percent_del', $this->getParameterForModal('td_percent_del', $showModal)), true);
+        $fieldSet->addHiddenField($this->Field->getHidden('td_id_del', $this->getParameterForModal('td_id_del', $showModal)));
+        $p = new Paragraph(Trans::getMessageWord('deleteConfirmation'));
+        $p->setAsLabelLarge()->setAlignCenter();
+        $modal->addText($p);
+        $modal->setBtnOkName(Trans::getWord('yesDelete'));
+
         $modal->addFieldSet($fieldSet);
 
         return $modal;

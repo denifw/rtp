@@ -94,7 +94,7 @@ class Page extends AbstractFormModel
             ];
             $prDao = new PageRightDao();
             if ($this->isValidParameter('pr_id') === true) {
-                $prDao->doUpdateTransaction($this->getIntParameter('pr_id'), $prColVal);
+                $prDao->doUpdateTransaction($this->getStringParameter('pr_id'), $prColVal);
             } else {
                 $prDao->doInsertTransaction($prColVal);
             }
@@ -152,7 +152,7 @@ class Page extends AbstractFormModel
             $this->Validation->checkRequire('pr_name', 3, 125);
             $this->Validation->checkRequire('pr_description', 3, 255);
             $this->Validation->checkUnique('pr_name', 'page_right', [
-                'pr_id' => $this->getStringParameter('pr_id', 0)
+                'pr_id' => $this->getStringParameter('pr_id')
             ], [
                 'pr_pg_id' => $this->getDetailReferenceValue()
             ]);

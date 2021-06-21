@@ -16,7 +16,6 @@ use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
 use App\Frame\Mvc\AbstractFormModel;
 use App\Model\Dao\Master\Finance\PaymentMethodDao;
-use App\Model\Dao\Master\Finance\PaymentTermsDao;
 
 /**
  * Class to handle the creation of detail CostCode page
@@ -33,18 +32,18 @@ class PaymentMethod extends AbstractFormModel
      *
      * @param array $parameters To store the parameter from http.
      */
-    public function __construct($parameters)
+    public function __construct(array $parameters)
     {
-        parent::__construct(get_class($this), 'paymentMethod', 'pm_id');
+        parent::__construct(get_class($this), 'pm', 'pm_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
             'pm_ss_id' => $this->User->getSsId(),
@@ -111,7 +110,7 @@ class PaymentMethod extends AbstractFormModel
     /**
      * Function to get the general Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getGeneralFieldSet(): Portlet
     {

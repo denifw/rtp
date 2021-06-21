@@ -32,25 +32,25 @@ class CostCode extends AbstractFormModel
      *
      * @param array $parameters To store the parameter from http.
      */
-    public function __construct($parameters)
+    public function __construct(array $parameters)
     {
-        parent::__construct(get_class($this), 'costCode', 'cc_id');
+        parent::__construct(get_class($this), 'cc', 'cc_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
             'cc_ss_id' => $this->User->getSsId(),
-            'cc_ccg_id' => $this->getIntParameter('cc_ccg_id'),
+            'cc_ccg_id' => $this->getStringParameter('cc_ccg_id'),
             'cc_code' => $this->getStringParameter('cc_code'),
             'cc_name' => $this->getStringParameter('cc_name'),
-            'cc_active' => $this->getStringParameter('cc_active', 'Y')
+            'cc_active' => 'Y'
         ];
         $costCodeDao = new CostCodeDao();
         $costCodeDao->doInsertTransaction($colVal);
@@ -66,10 +66,10 @@ class CostCode extends AbstractFormModel
     protected function doUpdate(): void
     {
         $colVal = [
-            'cc_ccg_id' => $this->getIntParameter('cc_ccg_id'),
+            'cc_ccg_id' => $this->getStringParameter('cc_ccg_id'),
             'cc_code' => $this->getStringParameter('cc_code'),
             'cc_name' => $this->getStringParameter('cc_name'),
-            'cc_active' => $this->getStringParameter('cc_active', 'Y')
+            'cc_active' => $this->getStringParameter('cc_active')
         ];
         $costCodeDao = new CostCodeDao();
         $costCodeDao->doUpdateTransaction($this->getDetailReferenceValue(), $colVal);
@@ -109,7 +109,7 @@ class CostCode extends AbstractFormModel
             'cc_id' => $this->getDetailReferenceValue()
         ], [
             'cc_ss_id' => $this->User->getSsId(),
-            'cc_ccg_id' => $this->getIntParameter('cc_ccg_id')
+            'cc_ccg_id' => $this->getStringParameter('cc_ccg_id')
         ]);
     }
 
@@ -117,7 +117,7 @@ class CostCode extends AbstractFormModel
     /**
      * Function to get the general Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getGeneralFieldSet(): Portlet
     {
@@ -125,8 +125,8 @@ class CostCode extends AbstractFormModel
         $fieldSet = new FieldSet($this->Validation);
         $fieldSet->setGridDimension(12, 12, 12);
         # Add field to field set
-        $ccgField = $this->Field->getSingleSelect('costCodeGroup', 'cc_group_name', $this->getStringParameter('cc_group_name'));
-        $ccgField->setHiddenField('cc_ccg_id', $this->getIntParameter('cc_ccg_id'));
+        $ccgField = $this->Field->getSingleSelect('ccg', 'cc_group_name', $this->getStringParameter('cc_group_name'));
+        $ccgField->setHiddenField('cc_ccg_id', $this->getStringParameter('cc_ccg_id'));
         $ccgField->addParameter('ccg_ss_id', $this->User->getSsId());
         $ccgField->setDetailReferenceCode('ccg_id');
 

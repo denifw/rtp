@@ -30,7 +30,7 @@ class TaxDetail extends AbstractBaseAjaxModel
      *
      * @return array
      */
-    public function getByReference(): array
+    public function getById(): array
     {
         $results = [];
         if ($this->isValidParameter('td_id') === true) {
@@ -38,6 +38,29 @@ class TaxDetail extends AbstractBaseAjaxModel
             if (empty($results) === false) {
                 $number = new NumberFormatter();
                 $results['td_percent_number'] = $number->doFormatFloat((float)$results['td_percent']);
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Function to get data for delete
+     *
+     * @return array
+     */
+    public function getByIdForDelete(): array
+    {
+        $results = [];
+        if ($this->isValidParameter('td_id') === true) {
+            $data = TaxDetailDao::getByReference($this->getStringParameter('td_id'));
+            if (empty($data) === false) {
+                $keys = array_keys($data);
+                foreach ($keys as $key) {
+                    $results[$key . '_del'] = $data[$key];
+                }
+                $number = new NumberFormatter();
+                $results['td_percent_del_number'] = $number->doFormatFloat((float)$results['td_percent_del']);
             }
         }
 

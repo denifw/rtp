@@ -34,26 +34,25 @@ class CostCodeGroup extends AbstractFormModel
      *
      * @param array $parameters To store the parameter from http.
      */
-    public function __construct($parameters)
+    public function __construct(array $parameters)
     {
-        parent::__construct(get_class($this), 'costCodeGroup', 'ccg_id');
+        parent::__construct(get_class($this), 'ccg', 'ccg_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $colVal = [
             'ccg_ss_id' => $this->User->getSsId(),
             'ccg_code' => $this->getStringParameter('ccg_code'),
             'ccg_name' => $this->getStringParameter('ccg_name'),
-            'ccg_srv_id' => $this->getIntParameter('ccg_srv_id'),
             'ccg_type' => $this->getStringParameter('ccg_type'),
-            'ccg_active' => $this->getStringParameter('ccg_active', 'Y'),
+            'ccg_active' => 'Y',
         ];
         $ccgDao = new CostCodeGroupDao();
         $ccgDao->doInsertTransaction($colVal);
@@ -71,9 +70,8 @@ class CostCodeGroup extends AbstractFormModel
         $colVal = [
             'ccg_code' => $this->getStringParameter('ccg_code'),
             'ccg_name' => $this->getStringParameter('ccg_name'),
-            'ccg_srv_id' => $this->getIntParameter('ccg_srv_id'),
             'ccg_type' => $this->getStringParameter('ccg_type'),
-            'ccg_active' => $this->getStringParameter('ccg_active', 'Y'),
+            'ccg_active' => $this->getStringParameter('ccg_active'),
         ];
         $ccgDao = new CostCodeGroupDao();
         $ccgDao->doUpdateTransaction($this->getDetailReferenceValue(), $colVal);
@@ -116,7 +114,6 @@ class CostCodeGroup extends AbstractFormModel
             'ccg_id' => $this->getDetailReferenceValue()
         ], [
             'ccg_ss_id' => $this->User->getSsId(),
-            'ccg_srv_id' => $this->getIntParameter('ccg_srv_id'),
         ]);
     }
 
@@ -131,24 +128,17 @@ class CostCodeGroup extends AbstractFormModel
         # Create a form.
         $fieldSet = new FieldSet($this->Validation);
         $fieldSet->setGridDimension(6, 6, 12);
-        # Add field to field set
-        $srvField = $this->Field->getSingleSelect('service', 'ccg_service', $this->getStringParameter('ccg_service'));
-        $srvField->setHiddenField('ccg_srv_id', $this->getIntParameter('ccg_srv_id'));
-        $srvField->addParameter('ssr_ss_id', $this->User->getSsId());
-        $srvField->setEnableDetailButton(false);
-        $srvField->setEnableNewButton(false);
         #Type
         $typeField = $this->Field->getSelect('ccg_type', $this->getStringParameter('ccg_type'));
-        $typeField->addOption(Trans::getFinanceWord('sales'), 'S');
-        $typeField->addOption(Trans::getFinanceWord('purchase'), 'P');
-        $typeField->addOption(Trans::getFinanceWord('reimburse'), 'R');
-        $typeField->addOption(Trans::getFinanceWord('deposit'), 'D');
+        $typeField->addOption(Trans::getWord('sales'), 'S');
+        $typeField->addOption(Trans::getWord('purchase'), 'P');
+        $typeField->addOption(Trans::getWord('reimburse'), 'R');
+        $typeField->addOption(Trans::getWord('deposit'), 'D');
 
 
         $fieldSet->addField(Trans::getWord('code'), $this->Field->getText('ccg_code', $this->getStringParameter('ccg_code')), true);
         $fieldSet->addField(Trans::getWord('name'), $this->Field->getText('ccg_name', $this->getStringParameter('ccg_name')), true);
         $fieldSet->addField(Trans::getWord('type'), $typeField, true);
-        $fieldSet->addField(Trans::getWord('service'), $srvField);
         if ($this->isUpdate() === true) {
             $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('ccg_active', $this->getStringParameter('ccg_active')));
         }
@@ -181,7 +171,7 @@ class CostCodeGroup extends AbstractFormModel
         $table->setColumnType('cc_active', 'yesno');
         $table->addColumnAttribute('cc_code', 'style', 'text-align: center;');
         # Create a portlet box.
-        $portlet = new Portlet('CcPtl', Trans::getFinanceWord('costCode'));
+        $portlet = new Portlet('CcPtl', Trans::getWord('costCode'));
         $portlet->addTable($table);
         return $portlet;
     }

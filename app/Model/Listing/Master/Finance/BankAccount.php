@@ -51,7 +51,7 @@ class BankAccount extends AbstractListingModel
     public function loadSearchForm(): void
     {
         # User
-        $usField = $this->Field->getSingleSelect('us', 'ba_user', $this->getStringParameter('ba_user'), 'loadBankAccountManager');
+        $usField = $this->Field->getSingleSelect('us', 'ba_user', $this->getStringParameter('ba_user'));
         $usField->setHiddenField('ba_us_id', $this->getStringParameter('ba_us_id'));
         $usField->addParameter('ba_ss_id', $this->User->getSsId());
         $usField->setEnableDetailButton(false);
@@ -97,7 +97,6 @@ class BankAccount extends AbstractListingModel
         $this->ListingTable->setColumnType('ba_payable', 'YesNo');
         $this->ListingTable->addColumnAttribute('ba_balance', 'style', 'text-align: right;');
         $this->ListingTable->addColumnAttribute('ba_status', 'style', 'text-align: center;');
-        $this->ListingTable->setViewActionByHyperlink($this->getViewRoute(), ['ba_id']);
         if ($this->isAllowUpdate() === true) {
             $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['ba_id']);
         }
@@ -140,11 +139,7 @@ class BankAccount extends AbstractListingModel
                 $row['ba_account_number'],
                 $row['ba_account_name'],
             ]);
-            if ($row['ba_main'] === 'Y') {
-                $row['ba_balance'] = '';
-            } else {
-                $row['ba_balance'] = $row['ba_currency'] . ' ' . $number->doFormatFloat($row['ba_balance']);
-            }
+            $row['ba_balance'] = $row['ba_currency'] . ' ' . $number->doFormatFloat($row['ba_balance']);
             if (empty($row['ba_deleted_on']) === false) {
                 $status = new LabelDanger(Trans::getWord('deleted'));
             } elseif (empty($row['ba_block_on']) === false) {

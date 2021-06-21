@@ -78,8 +78,8 @@ class BankAccountDao extends AbstractBaseDao
     public static function getByUser(UserSession $user): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateNumericCondition('ba.ba_ss_id', $user->getSsId());
-        $wheres[] = SqlHelper::generateNumericCondition('ba.ba_us_id', $user->getId());
+        $wheres[] = SqlHelper::generateStringCondition('ba.ba_ss_id', $user->getSsId());
+        $wheres[] = SqlHelper::generateStringCondition('ba.ba_us_id', $user->getId());
         $wheres[] = SqlHelper::generateNullCondition('ba.ba_deleted_on');
         $wheres[] = SqlHelper::generateNullCondition('ba.ba_block_on');
         $data = self::loadData($wheres);
@@ -92,16 +92,16 @@ class BankAccountDao extends AbstractBaseDao
     /**
      * Function to get data by reference value
      *
-     * @param int $referenceValue To store the reference value of the table.
-     * @param int $ssId To store the system setting value.
+     * @param string $referenceValue To store the reference value of the table.
+     * @param string $ssId To store the system setting value.
      *
      * @return array
      */
-    public static function getByReferenceAndSystem(int $referenceValue, int $ssId): array
+    public static function getByReferenceAndSystem(string $referenceValue, string $ssId): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateNumericCondition('ba.ba_id', $referenceValue);
-        $wheres[] = SqlHelper::generateNumericCondition('ba.ba_ss_id', $ssId);
+        $wheres[] = SqlHelper::generateStringCondition('ba.ba_id', $referenceValue);
+        $wheres[] = SqlHelper::generateStringCondition('ba.ba_ss_id', $ssId);
         $data = self::loadData($wheres);
         if (count($data) === 1) {
             return $data[0];

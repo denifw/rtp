@@ -8,7 +8,7 @@
  * @copyright  2021 PT Makmur Berkat Teknologi.
  */
 
-namespace App\Model\Detail\Finance\CashAndBank;
+namespace App\Model\Detail\Master\Finance;
 
 use App\Frame\Formatter\DateTimeParser;
 use App\Frame\Formatter\Trans;
@@ -17,10 +17,10 @@ use App\Frame\Gui\Html\Labels\Paragraph;
 use App\Frame\Gui\Icon;
 use App\Frame\Gui\Modal;
 use App\Frame\Mvc\AbstractFormModel;
-use App\Model\Dao\Finance\CashAndBank\BankAccountBalanceDao;
-use App\Model\Dao\Finance\CashAndBank\BankAccountDao;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
+use App\Model\Dao\Master\Finance\BankAccountBalanceDao;
+use App\Model\Dao\Master\Finance\BankAccountDao;
 
 /**
  * Class to handle the creation of detail BankAccount page
@@ -56,9 +56,9 @@ class BankAccount extends AbstractFormModel
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
         $usId = null;
         $limit = 0.0;
@@ -67,15 +67,15 @@ class BankAccount extends AbstractFormModel
         if ($this->getStringParameter('ba_main', 'N') === 'N') {
             $receivable = 'Y';
             $payable = 'Y';
-            $usId = $this->getIntParameter('ba_us_id');
+            $usId = $this->getStringParameter('ba_us_id');
             $limit = $this->getFloatParameter('ba_limit');
         }
         $colVal = [
             'ba_ss_id' => $this->User->getSsId(),
             'ba_code' => $this->getStringParameter('ba_code'),
             'ba_description' => $this->getStringParameter('ba_description'),
-            'ba_bn_id' => $this->getIntParameter('ba_bn_id'),
-            'ba_cur_id' => $this->getIntParameter('ba_cur_id'),
+            'ba_bn_id' => $this->getStringParameter('ba_bn_id'),
+            'ba_cur_id' => $this->getStringParameter('ba_cur_id'),
             'ba_account_number' => $this->getStringParameter('ba_account_number'),
             'ba_account_name' => $this->getStringParameter('ba_account_name'),
             'ba_bank_branch' => $this->getStringParameter('ba_bank_branch'),
@@ -85,6 +85,8 @@ class BankAccount extends AbstractFormModel
             'ba_us_id' => $usId,
             'ba_limit' => $limit,
         ];
+        var_dump($colVal);
+        exit;
         $baDao = new BankAccountDao();
         $baDao->doInsertTransaction($colVal);
         return $baDao->getLastInsertId();
@@ -105,15 +107,15 @@ class BankAccount extends AbstractFormModel
             if ($this->getStringParameter('ba_main', 'N') === 'N') {
                 $receivable = 'Y';
                 $payable = 'Y';
-                $usId = $this->getIntParameter('ba_us_id');
+                $usId = $this->getStringParameter('ba_us_id');
                 $limit = $this->getFloatParameter('ba_limit');
             }
             $colVal = [
                 'ba_ss_id' => $this->User->getSsId(),
                 'ba_code' => $this->getStringParameter('ba_code'),
                 'ba_description' => $this->getStringParameter('ba_description'),
-                'ba_bn_id' => $this->getIntParameter('ba_bn_id'),
-                'ba_cur_id' => $this->getIntParameter('ba_cur_id'),
+                'ba_bn_id' => $this->getStringParameter('ba_bn_id'),
+                'ba_cur_id' => $this->getStringParameter('ba_cur_id'),
                 'ba_account_number' => $this->getStringParameter('ba_account_number'),
                 'ba_account_name' => $this->getStringParameter('ba_account_name'),
                 'ba_bank_branch' => $this->getStringParameter('ba_bank_branch'),
@@ -238,22 +240,22 @@ class BankAccount extends AbstractFormModel
         $fieldSet->setGridDimension(6, 6);
 
         # User Field
-        $usField = $this->Field->getSingleSelect('user', 'ba_user', $this->getStringParameter('ba_user'));
-        $usField->setHiddenField('ba_us_id', $this->getIntParameter('ba_us_id'));
+        $usField = $this->Field->getSingleSelect('us', 'ba_user', $this->getStringParameter('ba_user'));
+        $usField->setHiddenField('ba_us_id', $this->getStringParameter('ba_us_id'));
         $usField->addParameter('ss_id', $this->User->getSsId());
         $usField->addParameter('rel_id', $this->User->getRelId());
         $usField->setEnableDetailButton(false);
         $usField->setEnableNewButton(false);
 
         # Bank Field
-        $bankField = $this->Field->getSingleSelect('bank', 'ba_bank_name', $this->getStringParameter('ba_bank_name'));
-        $bankField->setHiddenField('ba_bn_id', $this->getIntParameter('ba_bn_id'));
+        $bankField = $this->Field->getSingleSelect('bn', 'ba_bank_name', $this->getStringParameter('ba_bank_name'));
+        $bankField->setHiddenField('ba_bn_id', $this->getStringParameter('ba_bn_id'));
         $bankField->setEnableNewButton(false);
         $bankField->setEnableDetailButton(false);
 
         # Currency Field
-        $curField = $this->Field->getSingleSelect('currency', 'ba_currency', $this->getStringParameter('ba_currency'));
-        $curField->setHiddenField('ba_cur_id', $this->getIntParameter('ba_cur_id'));
+        $curField = $this->Field->getSingleSelect('cur', 'ba_currency', $this->getStringParameter('ba_currency'));
+        $curField->setHiddenField('ba_cur_id', $this->getStringParameter('ba_cur_id'));
         $curField->setEnableDetailButton(false);
         $curField->setEnableNewButton(false);
 
@@ -265,18 +267,18 @@ class BankAccount extends AbstractFormModel
         }
 
         # Add field to field set
-        $fieldSet->addField(Trans::getFinanceWord('code'), $this->Field->getText('ba_code', $this->getStringParameter('ba_code')), true);
-        $fieldSet->addField(Trans::getFinanceWord('description'), $this->Field->getText('ba_description', $this->getStringParameter('ba_description')), true);
-        $fieldSet->addField(Trans::getFinanceWord('accountNumber'), $this->Field->getText('ba_account_number', $this->getStringParameter('ba_account_number')), true);
-        $fieldSet->addField(Trans::getFinanceWord('bankName'), $bankField, true);
-        $fieldSet->addField(Trans::getFinanceWord('accountName'), $this->Field->getText('ba_account_name', $this->getStringParameter('ba_account_name')), true);
-        $fieldSet->addField(Trans::getFinanceWord('bankBranch'), $this->Field->getText('ba_bank_branch', $this->getStringParameter('ba_bank_branch')));
-        $fieldSet->addField(Trans::getFinanceWord('mainAccount'), $mainField, true);
-        $fieldSet->addField(Trans::getFinanceWord('currency'), $curField, true);
-        $fieldSet->addField(Trans::getFinanceWord('receivable'), $this->Field->getYesNo('ba_receivable', $this->getStringParameter('ba_receivable')));
-        $fieldSet->addField(Trans::getFinanceWord('payable'), $this->Field->getYesNo('ba_payable', $this->getStringParameter('ba_payable')));
-        $fieldSet->addField(Trans::getFinanceWord('ceiling'), $this->Field->getNumber('ba_limit', $this->getFloatParameter('ba_limit')));
-        $fieldSet->addField(Trans::getFinanceWord('accountManager'), $usField);
+        $fieldSet->addField(Trans::getWord('code'), $this->Field->getText('ba_code', $this->getStringParameter('ba_code')), true);
+        $fieldSet->addField(Trans::getWord('description'), $this->Field->getText('ba_description', $this->getStringParameter('ba_description')), true);
+        $fieldSet->addField(Trans::getWord('accountNumber'), $this->Field->getText('ba_account_number', $this->getStringParameter('ba_account_number')), true);
+        $fieldSet->addField(Trans::getWord('bankName'), $bankField, true);
+        $fieldSet->addField(Trans::getWord('accountName'), $this->Field->getText('ba_account_name', $this->getStringParameter('ba_account_name')), true);
+        $fieldSet->addField(Trans::getWord('bankBranch'), $this->Field->getText('ba_bank_branch', $this->getStringParameter('ba_bank_branch')));
+        $fieldSet->addField(Trans::getWord('mainAccount'), $mainField, true);
+        $fieldSet->addField(Trans::getWord('currency'), $curField, true);
+        $fieldSet->addField(Trans::getWord('ar'), $this->Field->getYesNo('ba_receivable', $this->getStringParameter('ba_receivable')));
+        $fieldSet->addField(Trans::getWord('ap'), $this->Field->getYesNo('ba_payable', $this->getStringParameter('ba_payable')));
+        $fieldSet->addField(Trans::getWord('ceiling'), $this->Field->getNumber('ba_limit', $this->getFloatParameter('ba_limit')));
+        $fieldSet->addField(Trans::getWord('accountManager'), $usField);
 
         $portlet->addFieldSet($fieldSet);
         return $portlet;
@@ -300,7 +302,7 @@ class BankAccount extends AbstractFormModel
             if ($this->TransactionExist === true && $this->getFloatParameter('ba_balance') === 0.0) {
                 $blockModal = $this->getBlockModal();
                 $this->View->addModal($blockModal);
-                $blockBtn = new ModalButton('BaBlockBtn', Trans::getFinanceWord('block'), $blockModal->getModalId());
+                $blockBtn = new ModalButton('BaBlockBtn', Trans::getWord('block'), $blockModal->getModalId());
                 $blockBtn->btnDark()->pullRight()->setIcon(Icon::Lock);
                 $this->View->addButton($blockBtn);
             }
@@ -316,7 +318,7 @@ class BankAccount extends AbstractFormModel
     private function getBlockModal(): Modal
     {
         # Create Fields.
-        $modal = new Modal('BaBlockMdl', Trans::getFinanceWord('blockAccount'));
+        $modal = new Modal('BaBlockMdl', Trans::getWord('blockAccount'));
         $modal->setFormSubmit($this->getMainFormId(), 'doBlockAccount');
         $showModal = false;
         if ($this->getFormAction() === 'doBlockAccount' && $this->isValidPostValues() === false) {
@@ -331,7 +333,7 @@ class BankAccount extends AbstractFormModel
         $p = new Paragraph(Trans::getMessageWord('blockAccountConfirmation'));
         $p->setAsLabelLarge()->setAlignCenter();
         $modal->addText($p);
-        $modal->setBtnOkName(Trans::getFinanceWord('yesBlock'));
+        $modal->setBtnOkName(Trans::getWord('yesBlock'));
         $modal->addFieldSet($fieldSet);
 
         return $modal;

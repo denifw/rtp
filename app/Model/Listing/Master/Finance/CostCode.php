@@ -111,7 +111,7 @@ class CostCode extends AbstractListingModel
         );
         $results = [];
         foreach ($data as $row) {
-            $row['cc_group'] = $row['ccg_code'] . ' - ' . $row['ccg_name'];
+            $row['cc_group'] = $row['cc_group_code'] . ' - ' . $row['cc_group_name'];
             $results[] = $row;
         }
         return $results;
