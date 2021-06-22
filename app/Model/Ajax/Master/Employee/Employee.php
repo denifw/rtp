@@ -12,33 +12,36 @@ namespace App\Model\Ajax\Master\Employee;
 
 use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractBaseAjaxModel;
-use App\Model\Dao\Master\Employee\JobTitleDao;
+use App\Model\Dao\Master\Employee\EmployeeDao;
 
 /**
- * Class to handle the ajax request fo JobTitle.
+ * Class to handle the ajax request fo Employee.
  *
  * @package    app
  * @subpackage Model\Ajax\Master\Employee
  * @author     Deni Firdaus Waruwu <deni.firdaus.w@gmail.com>
  * @copyright  2021 Deni Firdaus Waruwu.
  */
-class JobTitle extends AbstractBaseAjaxModel
+class Employee extends AbstractBaseAjaxModel
 {
 
     /**
-     * Function to load the data for single select for JobTitle
+     * Function to load the data for single select for Employee
      *
      * @return array
      */
     public function loadSingleSelectData(): array
     {
-        if ($this->isValidParameter('jt_ss_id') === true) {
+        if ($this->isValidParameter('em_ss_id') === true) {
             $wheres = [];
+            $wheres[] = SqlHelper::generateStringCondition('em.em_ss_id', $this->getStringParameter('em_ss_id'));
             if ($this->isValidParameter('search_key') === true) {
-                $wheres[] = SqlHelper::generateLikeCondition('jt_description', $this->getStringParameter('search_key'));
+                $wheres[] = SqlHelper::generateOrLikeCondition(['em.em_number', 'em.em_name'], $this->getStringParameter('search_key'));
             }
+            $wheres[] = SqlHelper::generateNullCondition('em.em_deleted_on');
+            $wheres[] = SqlHelper::generateStringCondition('em.em_active', 'Y');
 
-            return JobTitleDao::loadSingleSelectData('jt_description', $wheres);
+            return EmployeeDao::loadSingleSelectData(['em_number', 'em_name'], $wheres);
         }
         return [];
     }
@@ -50,8 +53,8 @@ class JobTitle extends AbstractBaseAjaxModel
      */
     public function getById(): array
     {
-        if ($this->isValidParameter('jt_id') === true) {
-            return JobTitleDao::getByReference($this->getIntParameter('jt_id'));
+        if ($this->isValidParameter('em_id') === true) {
+            return EmployeeDao::getByReference($this->getIntParameter('em_id'));
         }
         return [];
     }
@@ -64,10 +67,10 @@ class JobTitle extends AbstractBaseAjaxModel
     public function getByIdForCopy(): array
     {
         $data = [];
-        if ($this->isValidParameter('jt_id') === true) {
-            $data = JobTitleDao::getByReference($this->getIntParameter('jt_id'));
+        if ($this->isValidParameter('em_id') === true) {
+            $data = EmployeeDao::getByReference($this->getIntParameter('em_id'));
             if (empty($data) === false) {
-                $data['jt_id'] = '';
+                $data['em_id'] = '';
             }
         }
 
@@ -82,8 +85,8 @@ class JobTitle extends AbstractBaseAjaxModel
     public function getByIdForDelete(): array
     {
         $result = [];
-        if ($this->isValidParameter('jt_id') === true) {
-            $data = JobTitleDao::getByReference($this->getIntParameter('jt_id'));
+        if ($this->isValidParameter('em_id') === true) {
+            $data = EmployeeDao::getByReference($this->getIntParameter('em_id'));
             if (empty($data) === false) {
                 $keys = array_keys($data);
                 foreach ($keys as $key) {

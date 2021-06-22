@@ -215,4 +215,9 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'Master/Employee/JobTitle');
     });
+    # Master - Employee - Employee
+    Route::match(['get', 'post'], '/em/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Master/Employee/Employee');
+    });
 });

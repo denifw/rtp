@@ -37,5 +37,6 @@ class SystemTableSeeder extends Seeder
         DB::table('system_table')->insert(['st_id' => '553d229d-edbc-32da-911f-0af805de9382', 'st_name' => 'Service', 'st_prefix' => 'srv', 'st_path' => 'System\Master', 'st_active' => 'Y', 'st_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'st_created_on' => date('Y-m-d H:i:s')]);
         DB::table('system_table')->insert(['st_id' => 'a81c6d06-615a-3a49-ae67-1a4e849114ce', 'st_name' => 'Bank', 'st_prefix' => 'bn', 'st_path' => 'System\Master', 'st_active' => 'Y', 'st_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'st_created_on' => date('Y-m-d H:i:s')]);
         DB::table('system_table')->insert(['st_id' => '48dad3bf-d8eb-3614-94e6-9126954a3fd2', 'st_name' => 'Job Title', 'st_prefix' => 'jt', 'st_path' => 'Master\Employee', 'st_active' => 'Y', 'st_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'st_created_on' => date('Y-m-d H:i:s')]);
+        DB::table('system_table')->insert(['st_id' => 'e66ed541-0af0-3ee8-8efc-891de41d5bd9', 'st_name' => 'Employee', 'st_prefix' => 'em', 'st_path' => 'Master\Employee', 'st_active' => 'Y', 'st_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'st_created_on' => date('Y-m-d H:i:s')]);
     }
 }

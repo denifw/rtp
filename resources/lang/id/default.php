@@ -155,4 +155,11 @@ return [
     'accountName' => 'Nama Akun',
     'bankBranch' => 'Cabang Bank',
     'ceiling' => 'Plafon',
+    'identityNumber' => 'Nomor Identitas',
+    'jobTitle' => 'Jabatan',
+    'birthday' => 'Tanggal Lahir',
+    'joinDate' => 'Tanggal Bergabung',
+    'man' => 'Laki-laki',
+    'woman' => 'Perempuan',
+    'gender' => 'Jenis Kelamin',
 ];
