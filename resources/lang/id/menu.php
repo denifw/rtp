@@ -12,4 +12,5 @@ return [
     'document' => 'Dokumen',
     'page' => 'Halaman',
     'finance' => 'Financial',
+    'employee' => 'Karyawan',
 ];

@@ -117,7 +117,7 @@ return [
 //    'invalidSnInbound' => 'Invalid SN :sn.',
 //    'invalidPrefixSnInbound' => 'Invalid prefix :prefix for SN :sn.',
 //    'duplicateSnInbound' => 'SN :sn has already been scaned.',
-//    'deletedData' => 'This data has been deleted by <strong>:user</strong>,on <strong>:time</strong>,<br />because : <strong>:reason</strong>',
+    'deletedData' => 'Data ini sudah di hapus oleh <strong>:user</strong>, pada tanggal <strong>:time</strong>,<br />karena : <strong>:reason</strong>',
 //    'rejectRequest' => 'This request has been rejected by <strong>:user</strong>,on <strong>:time</strong>,<br />because : <strong>:reason</strong>',
 //    'createBundleConfirmation' => 'Are you sure to start creating new bundle?',
 //    'validationOutstandingBundle' => 'Please complete your outstanding bundle before creating new bundle.',

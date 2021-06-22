@@ -169,4 +169,8 @@ return [
         'title' => 'Pengguna',
         'description' => 'Pengguna'
     ],
+    'jt' => [
+        'title' => 'Jabatan',
+        'description' => 'Jabatan'
+    ],
 ];
