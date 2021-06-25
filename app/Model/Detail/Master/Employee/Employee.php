@@ -112,7 +112,7 @@ class Employee extends AbstractFormModel
             ];
             $emDao = new EmployeeDao();
             $emDao->doUpdateTransaction($this->getDetailReferenceValue(), $colVal);
-        } elseif ($this->isUploadDocumentAction()) {
+        } elseif ($this->isUploadDocumentAction() === true) {
             $file = $this->getFileParameter('doc_file');
             if ($file !== null) {
                 $colVal = [
@@ -129,7 +129,7 @@ class Employee extends AbstractFormModel
                 $docDao = new DocumentDao();
                 $docDao->doUploadDocument($colVal, $file);
             }
-        } elseif ($this->isDeleteDocumentAction()) {
+        } elseif ($this->isDeleteDocumentAction() === true) {
             $docDao = new DocumentDao();
             $docDao->doDeleteTransaction($this->getStringParameter('doc_id_del'));
         }

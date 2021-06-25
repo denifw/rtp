@@ -20,11 +20,13 @@ use App\Frame\Gui\Modal;
 use App\Frame\Gui\Table;
 use App\Frame\Mvc\AbstractFormModel;
 use App\Frame\System\SerialNumber\SerialNumber;
+use App\Model\Dao\Operation\Job\JobArchiveDao;
 use App\Model\Dao\Operation\Job\JobEmployeeDao;
 use App\Model\Dao\Operation\Job\jobOrderDao;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
 use App\Model\Dao\Operation\Job\JobOrderTaskDao;
+use App\Model\Dao\System\Document\DocumentDao;
 
 /**
  * Class to handle the creation of detail jobOrder page
@@ -36,6 +38,13 @@ use App\Model\Dao\Operation\Job\JobOrderTaskDao;
  */
 class JobOrder extends AbstractFormModel
 {
+    /**
+     * Property to store the tasks of the job.
+     *
+     * @var array $Tasks
+     */
+    protected $Tasks = [];
+
     /**
      * Constructor to load when there is a new instance created.
      *
@@ -156,6 +165,48 @@ class JobOrder extends AbstractFormModel
         } elseif ($this->getFormAction() === 'doDeleteWorker') {
             $jemDao = new JobEmployeeDao();
             $jemDao->doDeleteTransaction($this->getStringParameter('jem_id_del'));
+        } elseif ($this->getFormAction() === 'doPublishJob') {
+            $joDao = new jobOrderDao();
+            $joDao->doUpdateTransaction($this->getDetailReferenceValue(), [
+                'jo_publish_by' => $this->User->getId(),
+                'jo_publish_on' => date('Y-m-d H:i:s')
+            ]);
+        } elseif ($this->isUploadDocumentAction() === true) {
+            $file = $this->getFileParameter('doc_file');
+            if ($file !== null) {
+                $colVal = [
+                    'doc_ss_id' => $this->User->getSsId(),
+                    'doc_dct_id' => $this->getStringParameter('doc_dct_id'),
+                    'doc_group_reference' => $this->getDetailReferenceValue(),
+                    'doc_type_reference' => null,
+                    'doc_file_name' => time() . '.' . $file->getClientOriginalExtension(),
+                    'doc_description' => $this->getStringParameter('doc_description'),
+                    'doc_file_size' => $file->getSize(),
+                    'doc_file_type' => $file->getClientOriginalExtension(),
+                    'doc_public' => $this->getStringParameter('doc_public', 'Y'),
+                ];
+                $docDao = new DocumentDao();
+                $docDao->doUploadDocument($colVal, $file);
+            }
+        } elseif ($this->isDeleteDocumentAction() === true) {
+            $docDao = new DocumentDao();
+            $docDao->doDeleteTransaction($this->getStringParameter('doc_id_del'));
+        } elseif ($this->getFormAction() === 'doArchiveJob') {
+            $joaDao = new JobArchiveDao();
+            $joaDao->doInsertTransaction([
+                'joa_jo_id' => $this->getDetailReferenceValue()
+            ]);
+            $joDao = new jobOrderDao();
+            $joDao->doUpdateTransaction($this->getDetailReferenceValue(), [
+                'jo_joa_id' => $joaDao->getLastInsertId()
+            ]);
+        } elseif ($this->getFormAction() === 'doUndoArchive') {
+            $joaDao = new JobArchiveDao();
+            $joaDao->doDeleteTransaction($this->getStringParameter('jo_joa_id'), $this->getStringParameter('joa_deleted_reason'));
+            $joDao = new jobOrderDao();
+            $joDao->doUpdateTransaction($this->getDetailReferenceValue(), [
+                'jo_joa_id' => null
+            ]);
         }
     }
 
@@ -179,9 +230,10 @@ class JobOrder extends AbstractFormModel
         $this->Tab->addPortlet('general', $this->getGeneralPortlet());
         if ($this->isUpdate() === true) {
             $this->overrideTitle();
+            $this->Tasks = JobOrderTaskDao::getByJobId($this->getDetailReferenceValue());
             $this->Tab->addPortlet('general', $this->getTaskPortlet());
             $this->Tab->addPortlet('workers', $this->getWorkersPortlet());
-
+            $this->Tab->addPortlet('document', $this->getBaseDocumentPortlet('jo', $this->getDetailReferenceValue()));
         }
     }
 
@@ -239,6 +291,9 @@ class JobOrder extends AbstractFormModel
             ]);
         } elseif ($this->getFormAction() === 'doDeleteWorker') {
             $this->Validation->checkRequire('jem_id_del');
+        } elseif ($this->getFormAction() === 'doUndoArchive') {
+            $this->Validation->checkRequire('jo_joa_id');
+            $this->Validation->checkRequire('joa_deleted_reason', 2, 256);
         } else {
             parent::loadValidationRole();
         }
@@ -361,16 +416,34 @@ class JobOrder extends AbstractFormModel
     {
         if ($this->isUpdate() === true) {
             if ($this->isAllowUpdate() === true) {
+                if ($this->isPublished() === false) {
+                    $modal = $this->getPublishModal();
+                    $this->View->addModal($modal);
+                    $btnDel = new ModalButton('btnPubJo', Trans::getWord('publish'), $modal->getModalId());
+                    $btnDel->setIcon(Icon::PaperPlane)->btnPrimary()->pullRight()->btnMedium();
+                    $this->View->addButton($btnDel);
+                }
                 if ($this->isStarted() === false) {
                     $this->setEnableDeleteButton(true);
                 } else {
                     $this->setEnableDeleteButton(false);
                 }
-                if ($this->isFinished() === true) {
-                    # Show Archive Button
+                if ($this->isFinished() === true && $this->isArchived() === false) {
+                    $modal = $this->getArchiveModal();
+                    $this->View->addModal($modal);
+                    $btnDel = new ModalButton('btnJoaJo', Trans::getWord('archive'), $modal->getModalId());
+                    $btnDel->setIcon(Icon::Folder)->btnPrimary()->pullRight()->btnMedium();
+                    $this->View->addButton($btnDel);
                 }
             } else {
                 $this->setDisableUpdate(true);
+                if ($this->isArchived() === true) {
+                    $modal = $this->getUndoArchiveModal();
+                    $this->View->addModal($modal);
+                    $btnDel = new ModalButton('btnJoaUnJo', Trans::getWord('reOpen'), $modal->getModalId());
+                    $btnDel->setIcon(Icon::FolderOpen)->btnPrimary()->pullRight()->btnMedium();
+                    $this->View->addButton($btnDel);
+                }
             }
         }
         parent::loadDefaultButton();
@@ -456,7 +529,7 @@ class JobOrder extends AbstractFormModel
             'jot_portion' => Trans::getWord('portion') . ' (%)',
             'jot_progress' => Trans::getWord('progress') . ' (%)',
         ]);
-        $tbl->addRows(JobOrderTaskDao::getByJobId($this->getDetailReferenceValue()));
+        $tbl->addRows($this->Tasks);
         $tbl->setColumnType('jot_portion', 'float');
         $tbl->setColumnType('jot_progress', 'float');
 
@@ -655,6 +728,104 @@ class JobOrder extends AbstractFormModel
         $mdl->addFieldSet($fieldSet);
 
         return $mdl;
+    }
+
+    /**
+     * Function to get publish confirmation modal.
+     *
+     * @return Modal
+     */
+    private function getPublishModal(): Modal
+    {
+        # Create Fields.
+        $modal = new Modal('JoPubMdl', Trans::getWord('publishConfirmation'));
+        if (empty($this->Tasks) === true || $this->isValidParameter('jo_us_id') === false) {
+            $p = new Paragraph(Trans::getMessageWord('unablePublishJobOrder'));
+            $p->setAsLabelLarge()->setAlignCenter();
+            $modal->addText($p);
+            $modal->setTitle(Trans::getWord('warning'));
+            $modal->setDisableBtnOk();
+            $modal->addHeaderAttribute('class', 'modal-header alert-warning');
+        } else {
+            $text = Trans::getMessageWord('publishJobConfirmation');
+            $modal->setFormSubmit($this->getMainFormId(), 'doPublishJob');
+            $modal->setBtnOkName(Trans::getWord('yesPublish'));
+            $p = new Paragraph($text);
+            $p->setAsLabelLarge()->setAlignCenter();
+            $modal->addText($p);
+        }
+
+        return $modal;
+    }
+
+    /**
+     * Function to get publish confirmation modal.
+     *
+     * @return Modal
+     */
+    private function getArchiveModal(): Modal
+    {
+        # Create Fields.
+        $modal = new Modal('JoJoaMdl', Trans::getWord('archiveConfirmation'));
+        if ($this->isAllowArchiveData() === false) {
+            $p = new Paragraph(Trans::getMessageWord('unableArchiveJobOrder'));
+            $p->setAsLabelLarge()->setAlignCenter();
+            $modal->addText($p);
+            $modal->setTitle(Trans::getWord('warning'));
+            $modal->setDisableBtnOk();
+            $modal->addHeaderAttribute('class', 'modal-header alert-warning');
+        } else {
+            $text = Trans::getMessageWord('archiveConfirmation');
+            $modal->setFormSubmit($this->getMainFormId(), 'doArchiveJob');
+            $modal->setBtnOkName(Trans::getWord('yesArchive'));
+            $p = new Paragraph($text);
+
+            $p->setAsLabelLarge()->setAlignCenter();
+            $modal->addText($p);
+        }
+
+        return $modal;
+    }
+
+    /**
+     * Function to get storage delete modal.
+     *
+     * @return bool
+     */
+    private function isAllowArchiveData(): bool
+    {
+        return true;
+    }
+
+
+    /**
+     * Function to get storage delete modal.
+     *
+     * @return Modal
+     */
+    private function getUndoArchiveModal(): Modal
+    {
+        # Create Fields.
+        $modal = new Modal('JoUnJoaMdl', Trans::getWord('reOpenArchiveConfirmation'));
+        $modal->setFormSubmit($this->getMainFormId(), 'doUndoArchive');
+        $showModal = false;
+        if ($this->getFormAction() === 'doUndoArchive' && $this->isValidPostValues() === false) {
+            $modal->setShowOnLoad();
+            $showModal = true;
+        }
+        $fieldSet = new FieldSet($this->Validation);
+        $fieldSet->setGridDimension(12);
+
+        # Add field into field set.
+        $fieldSet->addField(Trans::getWord('reason'), $this->Field->getTextArea('joa_deleted_reason', $this->getParameterForModal('joa_deleted_reason', $showModal)), true);
+        $fieldSet->addHiddenField($this->Field->getHidden('jo_joa_id', $this->getParameterForModal('jo_joa_id', true)));
+        $p = new Paragraph(Trans::getMessageWord('reOpenArchiveConfirmation'));
+        $p->setAsLabelLarge()->setAlignCenter();
+        $modal->addText($p);
+        $modal->setBtnOkName(Trans::getWord('yesOpen'));
+        $modal->addFieldSet($fieldSet);
+
+        return $modal;
     }
 
 }
