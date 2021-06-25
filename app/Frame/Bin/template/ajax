@@ -48,7 +48,7 @@ class ${Class_Name} extends AbstractBaseAjaxModel
     public function getById(): array
     {
         if (${DS}this->isValidParameter('${Reference_Code}') === true) {
-            return ${Class_Name}Dao::getByReference(${DS}this->getIntParameter('${Reference_Code}'));
+            return ${Class_Name}Dao::getByReference(${DS}this->getStringParameter('${Reference_Code}'));
         }
         return [];
     }
@@ -62,7 +62,7 @@ class ${Class_Name} extends AbstractBaseAjaxModel
     {
         ${DS}data = [];
         if (${DS}this->isValidParameter('${Reference_Code}') === true) {
-            ${DS}data = ${Class_Name}Dao::getByReference(${DS}this->getIntParameter('${Reference_Code}'));
+            ${DS}data = ${Class_Name}Dao::getByReference(${DS}this->getStringParameter('${Reference_Code}'));
             if (empty(${DS}data) === false) {
                 ${DS}data['${Reference_Code}'] = '';
             }
@@ -80,7 +80,7 @@ class ${Class_Name} extends AbstractBaseAjaxModel
     {
         ${DS}result = [];
         if (${DS}this->isValidParameter('${Reference_Code}') === true) {
-            ${DS}data = ${Class_Name}Dao::getByReference(${DS}this->getIntParameter('${Reference_Code}'));
+            ${DS}data = ${Class_Name}Dao::getByReference(${DS}this->getStringParameter('${Reference_Code}'));
             if (empty(${DS}data) === false) {
                 ${DS}keys = array_keys(${DS}data);
                 foreach (${DS}keys as ${DS}key) {

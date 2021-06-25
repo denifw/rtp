@@ -220,4 +220,19 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'Master/Employee/Employee');
     });
+    # Operation - Job
+    Route::match(['get', 'post'], '/jo/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Operation/Job/JobOrder');
+    });
+    # Operation - Job Order Task
+    Route::match(['get', 'post'], '/jot/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Operation/Job/JobOrderTask');
+    });
+    # Operation - Job Employee
+    Route::match(['get', 'post'], '/jem/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Operation/Job/JobEmployee');
+    });
 });

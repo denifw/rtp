@@ -94,12 +94,8 @@ class JobTitle extends AbstractFormModel
     {
         if ($this->isUpdate() === true) {
             $status = new LabelSuccess(Trans::getWord('active'));
+            $this->addDeletedMessage('jt');
             if ($this->isValidParameter('jt_deleted_on') === true) {
-                $this->View->addErrorMessage(Trans::getWord('deletedData', 'message', '', [
-                    'user' => $this->getStringParameter('jt_deleted_by'),
-                    'time' => DateTimeParser::format($this->getStringParameter('jt_deleted_on'), 'Y-m-d H:i:s', 'd M Y - H:i'),
-                    'reason' => $this->getStringParameter('jt_deleted_reason')
-                ]));
                 $status = new LabelDanger(Trans::getWord('deleted'));
             }
             $this->View->setDescription($this->PageSetting->getPageDescription() . ' - ' . $status);

@@ -276,11 +276,11 @@ class SerialNumber
     /**
      * Function to get relation short name.
      *
-     * @param int $relId To store the id of relation.
+     * @param string $relId To store the id of relation.
      *
      * @return string
      */
-    private function loadRelationShortName(int $relId): string
+    private function loadRelationShortName(string $relId): string
     {
         $result = '';
         $query = 'SELECT rel_id, rel_short_name FROM relation where ' . SqlHelper::generateStringCondition('rel_id', $relId);
