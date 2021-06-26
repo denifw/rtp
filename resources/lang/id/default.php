@@ -143,7 +143,7 @@ return [
     'status' => 'Status',
     'sales' => 'Penjualan',
     'purchase' => 'Pembelian',
-    'deposit' => 'Titipan',
+    'deposit' => 'Setoran',
     'reimburse' => 'Reimburse',
     'costCode' => 'Kode Akun',
     'taxDetail' => 'Detail Pajak',
@@ -196,4 +196,8 @@ return [
     'yesArchive' => 'Ya, Arsip',
     'reOpenArchiveConfirmation' => 'Konfirmasi Buka Arsip',
     'yesOpen' => 'Ya, Buka',
+    'withdrawal' => 'Penarikan',
+    'date' => 'Tanggal',
+    'amount' => 'Jumlah',
+    'time' => 'Time',
 ];

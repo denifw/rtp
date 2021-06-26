@@ -45,5 +45,6 @@ class SystemTableSeeder extends Seeder
         DB::table('system_table')->insert(['st_id' => '95e3366e-2a1b-3a8d-bcb6-1704d11f1fd7', 'st_name' => 'Page Right', 'st_prefix' => 'pr', 'st_path' => 'System/Page', 'st_active' => 'Y', 'st_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'st_created_on' => date('Y-m-d H:i:s')]);
         DB::table('system_table')->insert(['st_id' => 'df883e83-62f4-3ca1-9f98-3859b6bbe14c', 'st_name' => 'Document Template Type', 'st_prefix' => 'dtt', 'st_path' => 'System/Document', 'st_active' => 'Y', 'st_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'st_created_on' => date('Y-m-d H:i:s')]);
         DB::table('system_table')->insert(['st_id' => 'f58192d1-42b5-3f0f-bdfa-db9f3b147089', 'st_name' => 'System Table', 'st_prefix' => 'st', 'st_path' => 'System/Page', 'st_active' => 'Y', 'st_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'st_created_on' => date('Y-m-d H:i:s')]);
+        DB::table('system_table')->insert(['st_id' => 'b1c4bd0b-ec6b-3551-9c6e-a86d1cc4523d', 'st_name' => 'Working Capital', 'st_prefix' => 'wc', 'st_path' => 'Administration', 'st_active' => 'Y', 'st_created_by' => '47e71f7c-548c-36ad-8ba7-52652a4698bc', 'st_created_on' => date('Y-m-d H:i:s')]);
     }
 }

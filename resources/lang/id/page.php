@@ -105,9 +105,9 @@ return [
         'title' => 'Penggajian',
         'description' => 'Penggajian'
     ],
-    'pi' => [
-        'title' => 'Faktur Pembelian',
-        'description' => 'Faktur Pembelian'
+    'wc' => [
+        'title' => 'Modal Kerja',
+        'description' => 'Modal Kerja'
     ],
     'rel' => [
         'title' => 'Relasi',

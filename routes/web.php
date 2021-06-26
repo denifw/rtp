@@ -235,4 +235,9 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'Operation/Job/JobEmployee');
     });
+    # Administration - Working Capital
+    Route::match(['get', 'post'], '/wc/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Administration/WorkingCapital');
+    });
 });
