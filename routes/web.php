@@ -240,4 +240,9 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'Administration/WorkingCapital');
     });
+    # Administration - Cash Transfer
+    Route::match(['get', 'post'], '/ct/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Administration/CashTransfer');
+    });
 });

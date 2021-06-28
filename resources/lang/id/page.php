@@ -21,9 +21,9 @@ return [
         'title' => 'Pembayaran Tunai',
         'description' => 'Pembayaran Tunai'
     ],
-    'crc' => [
-        'title' => 'Penerimaan Tunai',
-        'description' => 'Penerimaan Tunai'
+    'ct' => [
+        'title' => 'Transfer Tunai',
+        'description' => 'Transfer Tunai'
     ],
     'cty' => [
         'title' => 'Kab/Kota',

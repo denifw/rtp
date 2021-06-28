@@ -1,11 +1,11 @@
 <?php
 /**
- * Contains code written by the Deni Firdaus Waruwu.
+ * Contains code written by the PT Makmur Berkat Teknologi.
  * Any other use of this code is in violation of copy rights.
  *
- * @package    Project
- * @author     Deni Firdaus Waruwu <deni.firdaus.w@gmail.com>
- * @copyright  2021 Deni Firdaus Waruwu.
+ * @package   Matalogix
+ * @author     Deni Firdaus Waruwu <deni.fw@mbteknologi.com>
+ * @copyright  2021 PT Makmur Berkat Teknologi.
  */
 
 namespace App\Model\Dao\Administration;
@@ -16,14 +16,14 @@ use Illuminate\Support\Facades\DB;
 use App\Frame\Formatter\SqlHelper;
 
 /**
- * Class to handle data access object for table working_capital.
+ * Class to handle data access object for table cash_transfer.
  *
  * @package    app
  * @subpackage Model\Dao\Administration
- * @author     Deni Firdaus Waruwu <deni.firdaus.w@gmail.com>
- * @copyright  2021 Deni Firdaus Waruwu.
+ * @author     Deni Firdaus Waruwu <deni.fw@mbteknologi.com>
+ * @copyright  2021 PT Makmur Berkat Teknologi.
  */
-class WorkingCapitalDao extends AbstractBaseDao
+class CashTransferDao extends AbstractBaseDao
 {
     /**
      * The field for the table.
@@ -31,14 +31,17 @@ class WorkingCapitalDao extends AbstractBaseDao
      * @var array
      */
     private static $Fields = [
-        'wc_id',
-        'wc_ss_id',
-        'wc_ba_id',
-        'wc_bab_id',
-        'wc_type',
-        'wc_date',
-        'wc_amount',
-        'wc_reference',
+        'ct_id',
+        'ct_ss_id',
+        'ct_number',
+        'ct_payer_ba_id',
+        'ct_payer_bab_id',
+        'ct_receiver_ba_id',
+        'ct_receiver_bab_id',
+        'ct_amount',
+        'ct_currency_exchange',
+        'ct_notes',
+        'ct_doc_id',
     ];
     /**
      * Property to store the numeric fields.
@@ -46,16 +49,17 @@ class WorkingCapitalDao extends AbstractBaseDao
      * @var array
      */
     protected $NumericFields = [
-        'wc_amount',
+        'ct_amount',
+        'ct_currency_exchange',
     ];
 
     /**
-     * Base dao constructor for working_capital.
+     * Base dao constructor for cash_transfer.
      *
      */
     public function __construct()
     {
-        parent::__construct('working_capital', 'wc', self::$Fields);
+        parent::__construct('cash_transfer', 'ct', self::$Fields);
     }
 
     /**
@@ -68,7 +72,7 @@ class WorkingCapitalDao extends AbstractBaseDao
     public static function getByReference(string $referenceValue): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('wc_id', $referenceValue);
+        $wheres[] = SqlHelper::generateStringCondition('ct.ct_id', $referenceValue);
         $data = self::loadData($wheres);
         if (count($data) === 1) {
             return $data[0];
@@ -87,8 +91,8 @@ class WorkingCapitalDao extends AbstractBaseDao
     public static function getByReferenceAndSystem(string $referenceValue, string $ssId): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('wc_id', $referenceValue);
-        $wheres[] = SqlHelper::generateStringCondition('wc_ss_id', $ssId);
+        $wheres[] = SqlHelper::generateStringCondition('ct.ct_id', $referenceValue);
+        $wheres[] = SqlHelper::generateStringCondition('ct.ct_ss_id', $ssId);
         $data = self::loadData($wheres);
         if (count($data) === 1) {
             return $data[0];
@@ -112,17 +116,21 @@ class WorkingCapitalDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT wc.wc_id, wc.wc_ss_id, wc.wc_ba_id, ba.ba_description as wc_bank_account,
-                        cur.cur_iso as wc_currency, wc.wc_bab_id, wc.wc_type, wc.wc_date, wc.wc_amount,
-                        wc.wc_created_on, uc.us_name as wc_created_by, wc.wc_deleted_on, wc.wc_deleted_reason,
-                        ud.us_name as wc_deleted_by, wc.wc_reference
-                    FROM working_capital as wc
-                    INNER JOIN bank_account as ba ON ba.ba_id = wc.wc_ba_id
-                    INNER JOIN currency as cur ON ba.ba_cur_id = cur.cur_id
-                    LEFT OUTER JOIN users as uc ON wc.wc_created_by = uc.us_id
-                    LEFT OUTER JOIN users as ud ON wc.wc_deleted_by = ud.us_id ' . $strWhere;
+        $query = 'SELECT ct.ct_id, ct.ct_number, ct.ct_ss_id, ct.ct_payer_ba_id, bap.ba_description as ct_payer, ct.ct_payer_bab_id,
+                        ct.ct_receiver_ba_id, bar.ba_description as ct_receiver, ct.ct_receiver_bab_id,
+                        ct.ct_date, ct.ct_amount, ct.ct_currency_exchange, ct.ct_notes, ct.ct_doc_id,
+                        ct.ct_created_on, uc.us_name as ct_created_by, ct.ct_updated_on, uu.us_name as ct_updated_by,
+                        ct.ct_deleted_on, ct.ct_deleted_reason, ud.us_name as ct_deleted_by
+                    FROM cash_transfer as ct
+                    INNER JOIN bank_account as bap ON ct.ct_payer_ba_id = bap.ba_id
+                    INNER JOIN bank_account as bar ON ct.ct_receiver_ba_id = bar.ba_id
+                    INNER JOIN users as uc ON ct.ct_created_by = uc.us_id
+                    LEFT OUTER JOIN users as uu ON ct.ct_updated_by = uu.us_id
+                    LEFT OUTER JOIN users as ud ON ct.ct_deleted_by = ud.us_id' . $strWhere;
         if (empty($orders) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orders);
+        } else {
+            $query .= ' ORDER BY ct.ct_number DESC, ct.ct_id';
         }
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
@@ -147,12 +155,13 @@ class WorkingCapitalDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT count(DISTINCT (wc.wc_id)) AS total_rows
-                        FROM working_capital as wc
-                    INNER JOIN bank_account as ba ON ba.ba_id = wc.wc_ba_id
-                    INNER JOIN currency as cur ON ba.ba_cur_id = cur.cur_id
-                    LEFT OUTER JOIN users as uc ON wc.wc_created_by = uc.us_id
-                    LEFT OUTER JOIN users as ud ON wc.wc_deleted_by = ud.us_id' . $strWhere;
+        $query = 'SELECT count(DISTINCT (ct.ct_id)) AS total_rows
+                        FROM cash_transfer as ct
+                    INNER JOIN bank_account as bap ON ct.ct_payer_ba_id = bap.ba_id
+                    INNER JOIN bank_account as bar ON ct.ct_receiver_ba_id = bar.ba_id
+                    INNER JOIN users as uc ON ct.ct_created_by = uc.us_id
+                    LEFT OUTER JOIN users as uu ON ct.ct_updated_by = uu.us_id
+                    LEFT OUTER JOIN users as ud ON ct.ct_deleted_by = ud.us_id' . $strWhere;
 
         $sqlResults = DB::select($query);
         if (count($sqlResults) === 1) {
@@ -174,7 +183,7 @@ class WorkingCapitalDao extends AbstractBaseDao
     {
         $data = self::loadData($wheres, $orders, 20);
 
-        return parent::doPrepareSingleSelectData($data, $textColumn, 'wc_id');
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'ct_id');
     }
 
 

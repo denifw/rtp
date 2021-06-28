@@ -23,8 +23,6 @@ class CreateWorkingCapitalTable extends Migration
             $table->foreign('wc_bab_id', 'tbl_wc_bab_id_fkey')->references('bab_id')->on('bank_account_balance');
             $table->char('wc_type', 1);
             $table->date('wc_date');
-            $table->time('wc_time');
-            $table->dateTime('wc_transaction_on');
             $table->float('wc_amount');
             $table->string('wc_reference', 256)->nullable();
             $table->uuid('wc_created_by');

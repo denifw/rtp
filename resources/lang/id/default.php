@@ -200,4 +200,8 @@ return [
     'date' => 'Tanggal',
     'amount' => 'Jumlah',
     'time' => 'Time',
+    'sendReminder' => 'Kirim Pengingat',
+    'sender' => 'Pengirim',
+    'receiver' => 'Penerima',
+    'receipt' => 'Resi',
 ];

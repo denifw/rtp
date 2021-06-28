@@ -725,13 +725,25 @@ abstract class AbstractDetailModel extends AbstractBaseLayout
      */
     protected function addDeletedMessage(string $prefix): void
     {
-        if ($this->isValidParameter($prefix . '_deleted_on') === true) {
+        if ($this->isDeleted($prefix) === true) {
             $this->View->addErrorMessage(Trans::getWord('deletedData', 'message', '', [
                 'user' => $this->getStringParameter($prefix . '_deleted_by'),
                 'time' => DateTimeParser::format($this->getStringParameter($prefix . '_deleted_on'), 'Y-m-d H:i:s', 'd M Y - H:i'),
                 'reason' => $this->getStringParameter($prefix . '_deleted_reason')
             ]));
+            $this->setDisableUpdate();
         }
+    }
+
+    /**
+     * Function to add deleted message into the page.
+     *
+     * @param string $prefix to store the prefix data.
+     * @return bool
+     */
+    protected function isDeleted(string $prefix): bool
+    {
+        return $this->isValidParameter($prefix . '_deleted_on');
     }
 
 

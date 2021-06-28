@@ -11,6 +11,7 @@
 namespace App\Model\Detail\System\Access;
 
 use App\Frame\Formatter\DataParser;
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Formatter\Trans;
 use App\Frame\Gui\Html\Buttons\HyperLink;
 use App\Frame\Gui\Html\Buttons\SubmitButton;
@@ -189,7 +190,9 @@ class User extends AbstractFormModel
         if ($this->isInsert() === true) {
             $this->Tab->addPortlet('general', $this->getInsertMappingPortlet());
         } elseif ($this->getStringParameter('us_confirm') === 'N') {
-            $ump = UserMappingDao::loadData(['(ump_us_id = ' . $this->getDetailReferenceValue() . ')']);
+            $wheres = [];
+            $wheres[] = SqlHelper::generateStringCondition('ump_us_id', $this->getDetailReferenceValue());
+            $ump = UserMappingDao::loadData($wheres);
             if (count($ump) === 1) {
                 $this->setParameters($ump[0]);
             }

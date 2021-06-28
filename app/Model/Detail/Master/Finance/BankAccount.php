@@ -60,14 +60,12 @@ class BankAccount extends AbstractFormModel
      */
     protected function doInsert(): string
     {
-        $usId = null;
         $limit = 0.0;
         $receivable = $this->getStringParameter('ba_receivable');
         $payable = $this->getStringParameter('ba_payable');
         if ($this->getStringParameter('ba_main', 'N') === 'N') {
             $receivable = 'Y';
             $payable = 'Y';
-            $usId = $this->getStringParameter('ba_us_id');
             $limit = $this->getFloatParameter('ba_limit');
         }
         $colVal = [
@@ -82,11 +80,9 @@ class BankAccount extends AbstractFormModel
             'ba_main' => $this->getStringParameter('ba_main'),
             'ba_receivable' => $receivable,
             'ba_payable' => $payable,
-            'ba_us_id' => $usId,
+            'ba_us_id' => $this->getStringParameter('ba_us_id'),
             'ba_limit' => $limit,
         ];
-        var_dump($colVal);
-        exit;
         $baDao = new BankAccountDao();
         $baDao->doInsertTransaction($colVal);
         return $baDao->getLastInsertId();
@@ -100,14 +96,12 @@ class BankAccount extends AbstractFormModel
     protected function doUpdate(): void
     {
         if ($this->getFormAction() === null) {
-            $usId = null;
             $limit = 0.0;
             $receivable = $this->getStringParameter('ba_receivable');
             $payable = $this->getStringParameter('ba_payable');
             if ($this->getStringParameter('ba_main', 'N') === 'N') {
                 $receivable = 'Y';
                 $payable = 'Y';
-                $usId = $this->getStringParameter('ba_us_id');
                 $limit = $this->getFloatParameter('ba_limit');
             }
             $colVal = [
@@ -122,7 +116,7 @@ class BankAccount extends AbstractFormModel
                 'ba_main' => $this->getStringParameter('ba_main'),
                 'ba_receivable' => $receivable,
                 'ba_payable' => $payable,
-                'ba_us_id' => $usId,
+                'ba_us_id' => $this->getStringParameter('ba_us_id'),
                 'ba_limit' => $limit,
             ];
             $baDao = new BankAccountDao();
@@ -201,15 +195,16 @@ class BankAccount extends AbstractFormModel
             $this->Validation->checkRequire('ba_account_number', 2, 256);
             $this->Validation->checkRequire('ba_account_name', 2, 256);
             $this->Validation->checkMaxLength('ba_bank_branch', 256);
+            $this->Validation->checkRequire('ba_us_id');
+            $this->Validation->checkUnique('ba_us_id', 'bank_account', [
+                'ba_id' => $this->getDetailReferenceValue()
+            ], [
+                'ba_ss_id' => $this->User->getSsId(),
+                'ba_block_on' => null
+            ]);
             $this->Validation->checkRequire('ba_main');
             if ($this->isValidParameter('ba_main') === true) {
                 if ($this->getStringParameter('ba_main', 'Y') === 'N') {
-                    $this->Validation->checkRequire('ba_us_id');
-                    $this->Validation->checkUnique('ba_us_id', 'bank_account', [
-                        'ba_id' => $this->getDetailReferenceValue()
-                    ], [
-                        'ba_ss_id' => $this->User->getSsId()
-                    ]);
                     $this->Validation->checkRequire('ba_limit');
                     $this->Validation->checkFloat('ba_limit');
                 } else {
@@ -261,7 +256,7 @@ class BankAccount extends AbstractFormModel
 
         $mainField = $this->Field->getYesNo('ba_main', $this->getStringParameter('ba_main'));
         if ($this->TransactionExist === true) {
-            $usField->setReadOnly();
+//            $usField->setReadOnly();
             $curField->setReadOnly();
             $mainField->setReadOnly();
         }
@@ -278,7 +273,7 @@ class BankAccount extends AbstractFormModel
         $fieldSet->addField(Trans::getWord('ar'), $this->Field->getYesNo('ba_receivable', $this->getStringParameter('ba_receivable')));
         $fieldSet->addField(Trans::getWord('ap'), $this->Field->getYesNo('ba_payable', $this->getStringParameter('ba_payable')));
         $fieldSet->addField(Trans::getWord('ceiling'), $this->Field->getNumber('ba_limit', $this->getFloatParameter('ba_limit')));
-        $fieldSet->addField(Trans::getWord('accountManager'), $usField);
+        $fieldSet->addField(Trans::getWord('accountManager'), $usField, true);
 
         $portlet->addFieldSet($fieldSet);
         return $portlet;
