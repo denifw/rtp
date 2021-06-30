@@ -17,9 +17,9 @@ return [
         'title' => 'Akun Kas',
         'description' => 'Akun Kas'
     ],
-    'cpy' => [
-        'title' => 'Pembayaran Tunai',
-        'description' => 'Pembayaran Tunai'
+    'pi' => [
+        'title' => 'Pengeluaran',
+        'description' => 'Pengeluaran'
     ],
     'ct' => [
         'title' => 'Transfer Tunai',

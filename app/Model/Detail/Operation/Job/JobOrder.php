@@ -456,17 +456,7 @@ class JobOrder extends AbstractFormModel
      */
     private function isAllowUpdate(): bool
     {
-        return $this->isDeleted() === false && $this->isArchived() === false;
-    }
-
-    /**
-     * Function to check is deleted
-     *
-     * @return bool
-     */
-    private function isDeleted(): bool
-    {
-        return $this->isValidParameter('jo_deleted_on');
+        return $this->isDeleted('jo') === false && $this->isArchived() === false;
     }
 
     /**

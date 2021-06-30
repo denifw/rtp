@@ -288,7 +288,7 @@ class BankAccount extends AbstractFormModel
     protected function loadDefaultButton(): void
     {
         if ($this->isUpdate() === true) {
-            if ($this->isDeleted() === true || $this->isBlocked() === true) {
+            if ($this->isDeleted('ba') === true || $this->isBlocked() === true) {
                 $this->setDisableUpdate();
             }
             if ($this->TransactionExist === false) {
@@ -333,17 +333,6 @@ class BankAccount extends AbstractFormModel
 
         return $modal;
     }
-
-    /**
-     * Function to check is data deleted
-     *
-     * @return bool
-     */
-    private function isDeleted(): bool
-    {
-        return $this->isValidParameter('ba_deleted_on');
-    }
-
     /**
      * Function to check is data block
      *

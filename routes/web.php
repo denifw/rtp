@@ -245,4 +245,14 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'Administration/CashTransfer');
     });
+    # Administration - Purchase Invoice
+    Route::match(['get', 'post'], '/pi/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Administration/PurchaseInvoice');
+    });
+    # Administration - Purchase Invoice Detail
+    Route::match(['get', 'post'], '/pid/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Administration/PurchaseInvoiceDetail');
+    });
 });
