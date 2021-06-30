@@ -20,6 +20,8 @@ use App\Frame\Gui\Modal;
 use App\Frame\Gui\Portlet;
 use App\Frame\Gui\Table;
 use App\Frame\System\SerialNumber\SerialNumber;
+use App\Model\Dao\Crm\OfficeDao;
+use App\Model\Dao\Crm\RelationDao;
 
 /**
  * Class to handle the creation of detail Office page
@@ -39,39 +41,39 @@ class Office extends AbstractFormModel
     public function __construct(array $parameters)
     {
         # Call parent construct.
-        parent::__construct(get_class($this), 'office', 'of_id');
+        parent::__construct(get_class($this), 'of', 'of_id');
         $this->setParameters($parameters);
     }
 
     /**
      * Function to do the insert of the transaction.;
      *
-     * @return int
+     * @return string
      */
-    protected function doInsert(): int
+    protected function doInsert(): string
     {
-        $mainOffice = 'N';
-        if (OfficeDao::isRelationHasMainOffice($this->getIntParameter('of_rel_id')) === false) {
-            $mainOffice = 'Y';
-        }
-        $districtData = DistrictDao::getByReference($this->getIntParameter('of_dtc_id'));
-        $colVal = [
-            'of_rel_id' => $this->getIntParameter('of_rel_id'),
-            'of_name' => $this->getStringParameter('of_name'),
-            'of_main' => $mainOffice,
-            'of_invoice' => $this->getStringParameter('of_invoice', 'N'),
-            'of_address' => $this->getStringParameter('of_address'),
-            'of_cnt_id' => $districtData['dtc_cnt_id'],
-            'of_stt_id' => $districtData['dtc_stt_id'],
-            'of_cty_id' => $districtData['dtc_cty_id'],
-            'of_dtc_id' => $this->getIntParameter('of_dtc_id'),
-            'of_postal_code' => $this->getStringParameter('of_postal_code'),
-            'of_longitude' => $this->getFloatParameter('of_longitude'),
-            'of_latitude' => $this->getFloatParameter('of_latitude'),
-            'of_active' => $this->getStringParameter('of_active', 'Y'),
-        ];
+//        $mainOffice = 'N';
+//        if (OfficeDao::isRelationHasMainOffice($this->getIntParameter('of_rel_id')) === false) {
+//            $mainOffice = 'Y';
+//        }
+//        $districtData = DistrictDao::getByReference($this->getIntParameter('of_dtc_id'));
+//        $colVal = [
+//            'of_rel_id' => $this->getIntParameter('of_rel_id'),
+//            'of_name' => $this->getStringParameter('of_name'),
+//            'of_main' => $mainOffice,
+//            'of_invoice' => $this->getStringParameter('of_invoice', 'N'),
+//            'of_address' => $this->getStringParameter('of_address'),
+//            'of_cnt_id' => $districtData['dtc_cnt_id'],
+//            'of_stt_id' => $districtData['dtc_stt_id'],
+//            'of_cty_id' => $districtData['dtc_cty_id'],
+//            'of_dtc_id' => $this->getIntParameter('of_dtc_id'),
+//            'of_postal_code' => $this->getStringParameter('of_postal_code'),
+//            'of_longitude' => $this->getFloatParameter('of_longitude'),
+//            'of_latitude' => $this->getFloatParameter('of_latitude'),
+//            'of_active' => $this->getStringParameter('of_active', 'Y'),
+//        ];
         $ofDao = new OfficeDao();
-        $ofDao->doInsertTransaction($colVal);
+//        $ofDao->doInsertTransaction($colVal);
 
         return $ofDao->getLastInsertId();
     }
@@ -137,18 +139,11 @@ class Office extends AbstractFormModel
     {
         if ($this->isInsert() === true) {
             if ($this->isValidParameter('of_rel_id') === true) {
-                $relation = RelationDao::getByReference($this->getIntParameter('of_rel_id'));
+                $relation = RelationDao::getByReference($this->getStringParameter('of_rel_id'));
                 if (empty($relation) === false) {
                     $this->setParameter('of_relation', $relation['rel_name']);
                 } else {
                     $this->setParameter('of_rel_id', '');
-                }
-            }
-            if ($this->isValidParameter('of_ss_id') === true) {
-                $relation = RelationDao::getRelationOwnerBySystemId($this->getIntParameter('of_ss_id'));
-                if (empty($relation) === false) {
-                    $this->setParameter('of_relation', $relation['rel_name']);
-                    $this->setParameter('of_rel_id', $relation['rel_id']);
                 }
             }
         }

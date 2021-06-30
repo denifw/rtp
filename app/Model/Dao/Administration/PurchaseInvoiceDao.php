@@ -52,6 +52,7 @@ class PurchaseInvoiceDao extends AbstractBaseDao
         'pi_paid_by',
         'pi_verified_on',
         'pi_verified_by',
+        'pi_pm_id',
     ];
 
     /**
@@ -121,7 +122,7 @@ class PurchaseInvoiceDao extends AbstractBaseDao
                         pi.pi_cp_id, cp.cp_name as pi_pic_vendor, pi.pi_date, pi.pi_due_date, pi.pi_ba_id, ba.ba_description as pi_bank_account,
                         pi.pi_bab_id, pi.pi_notes, pi.pi_paid_on, up.us_name as pi_paid_by, pi.pi_verified_on, uv.us_name as pi_verified_by,
                         pi.pi_created_on, uc.us_name as pi_created_by, pi.pi_deleted_on, pi.pi_deleted_reason, ud.us_name as pi_deleted_by,
-                        pid.total as pi_total, pi.pi_pay_date
+                        pid.total as pi_total, pi.pi_pay_date, pi.pi_pm_id, pm.pm_name as pi_payment_method
                     FROM purchase_invoice as pi
                     INNER JOIN users as uc ON pi.pi_created_by = uc.us_id
                     LEFT OUTER JOIN relation as rel ON pi.pi_rel_id = rel.rel_id
@@ -130,6 +131,7 @@ class PurchaseInvoiceDao extends AbstractBaseDao
                     LEFT OUTER JOIN users as up ON pi.pi_paid_by = up.us_id
                     LEFT OUTER JOIN users as uv ON pi.pi_verified_by = uv.us_id
                     LEFT OUTER JOIN users as ud ON pi.pi_deleted_by = ud.us_id
+                    LEFT OUTER JOIN payment_method as pm ON pi.pi_pm_id = pm.pm_id
                     LEFT OUTER JOIN (SELECT pid_pi_id, SUM(pid_total) as total
                         FROM purchase_invoice_detail
                         WHERE (pid_deleted_on IS NULL)
@@ -171,6 +173,7 @@ class PurchaseInvoiceDao extends AbstractBaseDao
                     LEFT OUTER JOIN users as up ON pi.pi_paid_by = up.us_id
                     LEFT OUTER JOIN users as uv ON pi.pi_verified_by = uv.us_id
                     LEFT OUTER JOIN users as ud ON pi.pi_deleted_by = ud.us_id
+                    LEFT OUTER JOIN payment_method as pm ON pi.pi_pm_id = pm.pm_id
                     LEFT OUTER JOIN (SELECT pid_pi_id, SUM(pid_total) as total
                         FROM purchase_invoice_detail
                         WHERE (pid_deleted_on IS NULL)
@@ -211,7 +214,7 @@ class PurchaseInvoiceDao extends AbstractBaseDao
     {
         if (empty($data['pi_deleted_on']) === false) {
             $result = new LabelDanger(Trans::getWord('deleted'));
-        } elseif (empty($data['pi_verified_id']) === false) {
+        } elseif (empty($data['pi_verified_on']) === false) {
             $result = new LabelSuccess(Trans::getWord('verified'));
         } elseif (empty($data['pi_paid_on']) === false) {
             $result = new LabelPrimary(Trans::getWord('unVerified'));

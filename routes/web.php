@@ -255,4 +255,14 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'Administration/PurchaseInvoiceDetail');
     });
+    # Administration - Sales Invoice
+    Route::match(['get', 'post'], '/si/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Administration/SalesInvoice');
+    });
+    # Administration - Sales Invoice Detail
+    Route::match(['get', 'post'], '/sid/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Administration/SalesInvoiceDetail');
+    });
 });

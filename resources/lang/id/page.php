@@ -114,8 +114,8 @@ return [
         'description' => 'Relasi'
     ],
     'si' => [
-        'title' => 'Faktur Penjualan',
-        'description' => 'Faktur Penjualan'
+        'title' => 'Pendapatan',
+        'description' => 'Pendapatan'
     ],
     'sc' => [
         'title' => 'Kode Serial',

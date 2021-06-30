@@ -176,6 +176,7 @@ class PurchaseInvoice extends AbstractFormModel
                 'pi_pay_date' => $this->getStringParameter('pi_pay_date'),
                 'pi_paid_on' => date('Y-m-d H:i:s'),
                 'pi_paid_by' => $this->User->getId(),
+                'pi_pm_id' => $this->getStringParameter('pi_pm_id'),
                 'pi_ba_id' => $this->getStringParameter('pi_ba_id'),
                 'pi_bab_id' => $babDao->getLastInsertId()
             ]);
@@ -239,6 +240,7 @@ class PurchaseInvoice extends AbstractFormModel
         } elseif ($this->getFormAction() === 'doPaid') {
             $this->Validation->checkRequire('pi_ba_id');
             $this->Validation->checkRequire('pi_pay_date');
+            $this->Validation->checkRequire('pi_pm_id');
             $this->Validation->checkDate('pi_pay_date');
             $this->Validation->checkRequire('pi_total');
             $this->Validation->checkFloat('pi_total');
@@ -270,6 +272,8 @@ class PurchaseInvoice extends AbstractFormModel
         $relField->setHiddenField('pi_rel_id', $this->getStringParameter('pi_rel_id'));
         $relField->addParameter('rel_ss_id', $this->User->getSsId());
         $relField->setDetailReferenceCode('rel_id');
+        $relField->addClearField('pi_pic_vendor');
+        $relField->addClearField('pi_cp_id');
         # Contact Person
         $cpField = $this->Field->getSingleSelect('cp', 'pi_pic_vendor', $this->getStringParameter('pi_pic_vendor'));
         $cpField->setHiddenField('pi_cp_id', $this->getStringParameter('pi_cp_id'));
@@ -406,6 +410,7 @@ class PurchaseInvoice extends AbstractFormModel
         $joField = $this->Field->getSingleSelect('jo', 'pid_jo_number', $this->getParameterForModal('pid_jo_number', $showModal));
         $joField->setHiddenField('pid_jo_id', $this->getParameterForModal('pid_jo_id', $showModal));
         $joField->addParameter('jo_ss_id', $this->User->getSsId());
+        $joField->addParameter('jo_active', 'Y');
         $joField->setDetailReferenceCode('jo_id');
         $joField->setEnableNewButton(false);
         $joField->setEnableDetailButton(false);
@@ -578,14 +583,22 @@ class PurchaseInvoice extends AbstractFormModel
             $fieldSet = new FieldSet($this->Validation);
             $fieldSet->setGridDimension(6, 6);
 
-            # Cost Code Field
+            # Bank Account Field
             $baField = $this->Field->getSingleSelect('ba', 'pi_bank_account', $this->getParameterForModal('pi_bank_account', $showModal));
             $baField->setHiddenField('pi_ba_id', $this->getParameterForModal('pi_ba_id', $showModal));
             $baField->addParameter('ba_ss_id', $this->User->getSsId());
             $baField->addParameter('ba_us_id', $this->User->getId());
+            $baField->addParameter('ba_payable', 'Y');
             $baField->setEnableNewButton(false);
+            # Payment Method Field
+            $pmField = $this->Field->getSingleSelect('pm', 'pi_payment_method', $this->getParameterForModal('pi_payment_method', $showModal));
+            $pmField->setHiddenField('pi_pm_id', $this->getParameterForModal('pi_pm_id', $showModal));
+            $pmField->addParameter('pm_ss_id', $this->User->getSsId());
+            $pmField->setEnableNewButton(false);
+
             $fieldSet->addField(Trans::getWord('cashAccount'), $baField, true);
             $fieldSet->addField(Trans::getWord('date'), $this->Field->getCalendar('pi_pay_date', $this->getParameterForModal('pi_pay_date', $showModal)), true);
+            $fieldSet->addField(Trans::getWord('paymentMethod'), $pmField, true);
 
             $modal->addFieldSet($fieldSet);
         }
@@ -655,6 +668,10 @@ class PurchaseInvoice extends AbstractFormModel
             [
                 'label' => Trans::getWord('cashAccount'),
                 'value' => $this->getStringParameter('pi_bank_account'),
+            ],
+            [
+                'label' => Trans::getWord('paymentMethod'),
+                'value' => $this->getStringParameter('pi_payment_method'),
             ],
             [
                 'label' => Trans::getWord('paidBy'),

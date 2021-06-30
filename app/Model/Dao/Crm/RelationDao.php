@@ -59,6 +59,27 @@ class RelationDao extends AbstractBaseDao
      * Function to get data by reference value
      *
      * @param string $relId To store the reference value of the table.
+     *
+     * @return array
+     */
+    public static function getByReference(string $relId): array
+    {
+        $wheres = [];
+        $wheres[] = SqlHelper::generateStringCondition('rel.rel_id', $relId);
+        $results = self::loadData($wheres);
+        $result = [];
+        if (count($results) === 1) {
+            $result = $results[0];
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * Function to get data by reference value
+     *
+     * @param string $relId To store the reference value of the table.
      * @param string $ssId To store the system setting value.
      *
      * @return array

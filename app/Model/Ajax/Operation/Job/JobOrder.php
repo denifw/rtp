@@ -38,6 +38,14 @@ class JobOrder extends AbstractBaseAjaxModel
             if ($this->isValidParameter('search_key') === true) {
                 $wheres[] = SqlHelper::generateOrLikeCondition(['jo.jo_number', 'jo.jo_name'], $this->getStringParameter('search_key'));
             }
+            if ($this->isValidParameter('jo_active') === true && $this->getStringParameter('jo_active', 'N') === 'Y') {
+                $wheres[] = SqlHelper::generateNullCondition('jo.jo_deleted_on');
+                $wheres[] = SqlHelper::generateNullCondition('jo.jo_publish_on', false);
+                $wheres[] = SqlHelper::generateNullCondition('jo.jo_joa_id');
+            }
+            if ($this->isValidParameter('jo_rel_id') === true) {
+                $wheres[] = SqlHelper::generateStringCondition('jo.jo_rel_id', $this->getStringParameter('jo_rel_id'));
+            }
             return JobOrderDao::loadSingleSelectData(['jo_number', 'jo_name'], $wheres);
         }
         return [];

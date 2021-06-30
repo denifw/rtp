@@ -226,4 +226,9 @@ return [
     'paidOn' => 'Dibayar Tanggal',
     'paidBy' => 'Dibayar Oleh',
     'paymentDetail' => 'Detail Pembayaran',
+    'paymentMethod' => 'Metode Pembayaran',
+    'overDue' => 'Lewat Jatuh Tempo',
+    'customerOffice' => 'Kantor Pelanggan',
+    'picCustomer' => 'PIC Pelanggan',
+    'paymentTerms' => 'Ketentuan Pembayaran',
 ];

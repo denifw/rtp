@@ -31,6 +31,8 @@ class CreatePurchaseInvoiceTable extends Migration
             $table->uuid('pi_bab_id')->unsigned()->nullable();
             $table->foreign('pi_bab_id', 'tbl_pi_bab_id_foreign')->references('bab_id')->on('bank_account_balance');
             $table->date('pi_pay_date')->nullable();
+            $table->uuid('pi_pm_id')->unsigned()->nullable();
+            $table->foreign('pi_pm_id', 'tbl_pi_pm_id_foreign')->references('pm_id')->on('payment_method');
             $table->dateTime('pi_paid_on')->nullable();
             $table->uuid('pi_paid_by')->unsigned()->nullable();
             $table->foreign('pi_paid_by', 'tbl_pi_paid_by_foreign')->references('us_id')->on('users');
