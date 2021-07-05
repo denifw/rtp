@@ -22,7 +22,7 @@ use App\Frame\Mvc\AbstractFormModel;
 use App\Frame\System\SerialNumber\SerialNumber;
 use App\Model\Dao\Operation\Job\JobArchiveDao;
 use App\Model\Dao\Operation\Job\JobEmployeeDao;
-use App\Model\Dao\Operation\Job\jobOrderDao;
+use App\Model\Dao\Operation\Job\JobOrderDao;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
 use App\Model\Dao\Operation\Job\JobOrderTaskDao;
@@ -166,7 +166,7 @@ class JobOrder extends AbstractFormModel
             $jemDao = new JobEmployeeDao();
             $jemDao->doDeleteTransaction($this->getStringParameter('jem_id_del'));
         } elseif ($this->getFormAction() === 'doPublishJob') {
-            $joDao = new jobOrderDao();
+            $joDao = new JobOrderDao();
             $joDao->doUpdateTransaction($this->getDetailReferenceValue(), [
                 'jo_publish_by' => $this->User->getId(),
                 'jo_publish_on' => date('Y-m-d H:i:s')
@@ -196,14 +196,14 @@ class JobOrder extends AbstractFormModel
             $joaDao->doInsertTransaction([
                 'joa_jo_id' => $this->getDetailReferenceValue()
             ]);
-            $joDao = new jobOrderDao();
+            $joDao = new JobOrderDao();
             $joDao->doUpdateTransaction($this->getDetailReferenceValue(), [
                 'jo_joa_id' => $joaDao->getLastInsertId()
             ]);
         } elseif ($this->getFormAction() === 'doUndoArchive') {
             $joaDao = new JobArchiveDao();
             $joaDao->doDeleteTransaction($this->getStringParameter('jo_joa_id'), $this->getStringParameter('joa_deleted_reason'));
-            $joDao = new jobOrderDao();
+            $joDao = new JobOrderDao();
             $joDao->doUpdateTransaction($this->getDetailReferenceValue(), [
                 'jo_joa_id' => null
             ]);
@@ -217,7 +217,7 @@ class JobOrder extends AbstractFormModel
      */
     public function loadData(): array
     {
-        return jobOrderDao::getByReferenceAndSystem($this->getDetailReferenceValue(), $this->User->getSsId());
+        return JobOrderDao::getByReferenceAndSystem($this->getDetailReferenceValue(), $this->User->getSsId());
     }
 
     /**

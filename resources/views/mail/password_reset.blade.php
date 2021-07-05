@@ -6,8 +6,7 @@
         <tr>
             <td class="content-cell">
                 <h1>Dear {{$receiver}},</h1>
-                <p>Welcome to {{$app_name}}!</p>
-                <p>Your account has been successfully created.</p>
+                <p>Your request has been successfully created.</p>
                 <p>{{$pre_header}}</p>
                 <!-- Action -->
                 <table class="body-action" align="center" width="100%" cellpadding="0"

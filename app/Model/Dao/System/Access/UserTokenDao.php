@@ -152,7 +152,7 @@ class UserTokenDao extends AbstractBaseDao
     {
         $date = DateTimeParser::createDateTime();
         if ($tokenType === 'FORGET_PASSWORD') {
-            $date->modify('+2 hours');
+            $date->modify('+15 minutes');
         } elseif ($tokenType === 'EMAIL_CONFIRMATION') {
             $date->modify('+1 month');
         } elseif ($tokenType === 'MAPPING_USER') {

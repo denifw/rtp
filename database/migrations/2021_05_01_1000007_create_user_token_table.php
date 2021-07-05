@@ -19,7 +19,7 @@ class CreateUserTokenTable extends Migration
             $table->string('ut_type', 128);
             $table->uuid('ut_us_id')->unsigned();
             $table->foreign('ut_us_id', 'tbl_ut_us_id_fkey')->references('us_id')->on('users');
-            $table->uuid('ut_ss_id')->unsigned();
+            $table->uuid('ut_ss_id')->unsigned()->nullable();
             $table->foreign('ut_ss_id', 'tbl_ut_ss_id_fkey')->references('ss_id')->on('system_setting');
             $table->dateTime('ut_expired_on');
             $table->dateTime('ut_deleted_on')->nullable();

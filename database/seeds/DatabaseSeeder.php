@@ -51,6 +51,8 @@ class DatabaseSeeder extends Seeder
             DocumentTemplateSeeder::class,
             DocumentTemplateTypeSeeder::class,
             DocumentSeeder::class,
+
+            SerialNumberSeeder::class,
         ]);
     }
 }

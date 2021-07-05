@@ -15,5 +15,6 @@ return [
 
     'failed' => 'Kredential ini tidak cocok dengan data kami.',
     'throttle' => 'Terlalu banyak upaya login, silahkan coba lagi setelah :seconds detik.',
+    'throttleForgotPassword' => 'Permintaan pembaharuan kata sandi sudah dilakukan, silahkan melakuan permintaan lagi setelah pukul :time.',
 
 ];

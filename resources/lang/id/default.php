@@ -231,4 +231,5 @@ return [
     'customerOffice' => 'Kantor Pelanggan',
     'picCustomer' => 'PIC Pelanggan',
     'paymentTerms' => 'Ketentuan Pembayaran',
+    'passwordReset' => 'Reset Kata Sandi',
 ];

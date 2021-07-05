@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Frame\Formatter\DateTimeParser;
 use App\Frame\Formatter\Trans;
 use App\Frame\System\Validation;
 use App\Http\Controllers\AbstractBaseAuthController;
@@ -45,15 +46,16 @@ class ForgotPasswordController extends AbstractBaseAuthController
         if (empty($user) === false) {
             # Generate the token.
             $userTokenDao = new UserTokenDao();
-            $userToken = $userTokenDao->getUserTokenByType($user['us_id'], null, 'FORGET_PASSWORD');
+            $userToken = $userTokenDao->getUserTokenByType($user['us_id'], '', 'FORGET_PASSWORD');
             if (empty($userToken) === false) {
-                $userTokenDao->doDeleteTransaction($userToken['ut_id']);
+                $dt = new DateTimeParser();
+                return view('auth.forget')->withErrors([Trans::getWord('throttleForgotPassword', 'auth', '', ['time' => $dt->formatDateTime($userToken['ut_expired_on'])])]);
             }
             $token = $userTokenDao->generateTokenByUser($user['us_id'], 'FORGET_PASSWORD');
             $userToken = [
                 'ut_us_id' => $user['us_id'],
                 'ut_token' => $token,
-                'ut_type' => 'EMAIL_CONFIRMATION',
+                'ut_type' => 'FORGET_PASSWORD',
                 'ut_expired_on' => $userTokenDao->getExpiredDate('FORGET_PASSWORD')
             ];
             $userTokenDao->doInsertTransaction($userToken);
@@ -122,7 +124,6 @@ class ForgotPasswordController extends AbstractBaseAuthController
         if (empty($userToken) === true) {
             return view('errors.404');
         }
-        $userTokenDao->doDeleteTransaction($userTokenDao['ut_id']);
         $colVal = [
             'us_password' => bcrypt(request('us_password'))
         ];
