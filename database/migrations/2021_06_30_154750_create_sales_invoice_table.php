@@ -17,7 +17,7 @@ class CreateSalesInvoiceTable extends Migration
             $table->uuid('si_id')->primary();
             $table->uuid('si_ss_id')->unsigned();
             $table->foreign('si_ss_id', 'tbl_si_ss_id_foreign')->references('ss_id')->on('system_setting');
-            $table->string('si_number', 128);
+            $table->string('si_number', 128)->nullable();
             $table->uuid('si_rel_id')->unsigned();
             $table->foreign('si_rel_id', 'tbl_si_rel_id_foreign')->references('rel_id')->on('relation');
             $table->uuid('si_of_id')->unsigned();
@@ -28,7 +28,7 @@ class CreateSalesInvoiceTable extends Migration
             $table->foreign('si_jo_id', 'tbl_si_jo_id_foreign')->references('jo_id')->on('job_order');
             $table->uuid('si_pt_id')->unsigned();
             $table->foreign('si_pt_id', 'tbl_si_pt_id_foreign')->references('pt_id')->on('payment_terms');
-            $table->uuid('si_pm_id')->unsigned();
+            $table->uuid('si_pm_id')->unsigned()->nullable();
             $table->foreign('si_pm_id', 'tbl_si_pm_id_foreign')->references('pm_id')->on('payment_method');
             $table->uuid('si_ba_id')->unsigned();
             $table->foreign('si_ba_id', 'tbl_si_ba_id_foreign')->references('ba_id')->on('bank_account');

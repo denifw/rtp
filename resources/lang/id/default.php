@@ -232,4 +232,10 @@ return [
     'picCustomer' => 'PIC Pelanggan',
     'paymentTerms' => 'Ketentuan Pembayaran',
     'passwordReset' => 'Reset Kata Sandi',
+    'mainPic' => 'PIC Utama',
+    'purchaseDetail' => 'Detail Pembelian',
+    'salesDetail' => 'Detail Penjualan',
+    'submitConfirmation' => 'Konfirmasi Pengiriman',
+    'submitInvoice' => 'Kirim Faktur',
+    'submitted' => 'Dikirim',
 ];

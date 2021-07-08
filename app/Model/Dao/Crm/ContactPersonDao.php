@@ -113,11 +113,12 @@ class ContactPersonDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT cp.cp_id, cp.cp_number, cp.cp_name, cp.cp_email, cp.cp_phone, cp.cp_active, cp.cp_of_id, o.of_name as cp_office,
-                         o.of_rel_id as cp_rel_id, rel.rel_name as cp_relation, cp.cp_deleted_on, cp.cp_deleted_reason
+        $query = "SELECT cp.cp_id, cp.cp_number, cp.cp_name, cp.cp_email, cp.cp_phone, cp.cp_active, cp.cp_of_id, o.of_name as cp_office,
+                         o.of_rel_id as cp_rel_id, rel.rel_name as cp_relation, cp.cp_deleted_on, cp.cp_deleted_reason,
+                        (CASE WHEN cp.cp_id = o.of_cp_id THEN 'Y' ELSE 'N' END) as cp_of_manager
                         FROM contact_person as cp
                              INNER JOIN office as o ON cp.cp_of_id = o.of_id
-                             INNER JOIN relation as rel ON o.of_rel_id = rel.rel_id ' . $strWhere;
+                             INNER JOIN relation as rel ON o.of_rel_id = rel.rel_id " . $strWhere;
         if (empty($orders) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orders);
         } else {

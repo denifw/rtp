@@ -233,6 +233,7 @@ class SerialNumber
             $shDao->doInsertTransaction($colVal);
             $this->Number = $lasNumber;
         } catch (Exception $e) {
+//            Message::throwMessage($e->getMessage(), 'ERROR');
             $this->storeSerialHistory($config, $lasNumber);
         }
     }

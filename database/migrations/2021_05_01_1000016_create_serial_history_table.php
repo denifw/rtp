@@ -29,7 +29,7 @@ class CreateSerialHistoryTable extends Migration
             $table->dateTime('sh_deleted_on')->nullable();
             $table->uuid('sh_deleted_by')->nullable();
             $table->string('sh_deleted_reason', 256)->nullable();
-            $table->unique(['sh_sn_id', 'sh_rel_id', 'sh_year', 'sh_month'], 'tbl_sh_sn_sh_year_month_unique');
+            $table->unique(['sh_sn_id', 'sh_number', 'sh_rel_id', 'sh_year', 'sh_month'], 'tbl_sh_sn_number_year_month_unique');
         });
     }
 

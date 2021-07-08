@@ -106,18 +106,18 @@ class OfficeDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT ofc.of_id, ofc.of_rel_id, ofc.of_name, ofc.of_invoice, ofc.of_address,
+        $query = "SELECT ofc.of_id, ofc.of_rel_id, ofc.of_name, ofc.of_invoice, ofc.of_address,
                         ofc.of_cnt_id, ofc.of_stt_id, ofc.of_cty_id, ofc.of_dtc_id, ofc.of_postal_code, ofc.of_longitude,
                         ofc.of_latitude, ofc.of_active, rel.rel_name as of_relation, cnt.cnt_name as of_country,
                         stt.stt_name as of_state, cty.cty_name as of_city, dtc.dtc_name as of_district,
-                        ofc.of_cp_id, cp.cp_name as of_manager
+                        ofc.of_cp_id, cp.cp_name as of_manager, (CASE WHEN ofc.of_id = rel.rel_of_id THEN 'Y' ELSE 'N' END) as of_rel_main
                     FROM office as ofc
                         INNER JOIN relation as rel ON ofc.of_rel_id = rel.rel_id
                         LEFT OUTER JOIN contact_person as cp ON ofc.of_cp_id = cp.cp_id
                         LEFT OUTER JOIN country as cnt ON ofc.of_cnt_id = cnt.cnt_id
                         LEFT OUTER JOIN state as stt ON ofc.of_stt_id = stt.stt_id
                         LEFT OUTER JOIN city as cty ON ofc.of_cty_id = cty.cty_id
-                        LEFT OUTER JOIN district as dtc ON ofc.of_dtc_id = dtc.dtc_id ' . $strWhere;
+                        LEFT OUTER JOIN district as dtc ON ofc.of_dtc_id = dtc.dtc_id" . $strWhere;
         if (empty($orderBy) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orderBy);
         } else {

@@ -45,7 +45,7 @@ class DocumentType extends AbstractListingModel
      */
     public function loadSearchForm(): void
     {
-        $documentGroupField = $this->Field->getSingleSelect('documentGroup', 'dct_group', $this->getStringParameter('dct_group'));
+        $documentGroupField = $this->Field->getSingleSelect('dcg', 'dct_group', $this->getStringParameter('dct_group'));
         $documentGroupField->setHiddenField('dct_dcg_id', $this->getStringParameter('dct_dcg_id'));
         $documentGroupField->setEnableDetailButton(false);
         $documentGroupField->setEnableNewButton(false);
@@ -115,7 +115,7 @@ class DocumentType extends AbstractListingModel
         $wheres = [];
 
         if ($this->isValidParameter('dct_dcg_id') === true) {
-            $wheres[] = SqlHelper::generateLikeCondition('dct.dct_dcg_id', $this->getStringParameter('dct_dcg_id'));
+            $wheres[] = SqlHelper::generateStringCondition('dct.dct_dcg_id', $this->getStringParameter('dct_dcg_id'));
         }
         if ($this->isValidParameter('dct_code') === true) {
             $wheres[] = SqlHelper::generateLikeCondition('dct.dct_code', $this->getStringParameter('dct_code'));

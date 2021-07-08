@@ -20,8 +20,10 @@ use App\Frame\Gui\Modal;
 use App\Frame\Gui\Portlet;
 use App\Frame\Gui\Table;
 use App\Frame\System\SerialNumber\SerialNumber;
+use App\Model\Dao\Crm\ContactPersonDao;
 use App\Model\Dao\Crm\OfficeDao;
 use App\Model\Dao\Crm\RelationDao;
+use App\Model\Dao\System\Master\DistrictDao;
 
 /**
  * Class to handle the creation of detail Office page
@@ -52,28 +54,29 @@ class Office extends AbstractFormModel
      */
     protected function doInsert(): string
     {
-//        $mainOffice = 'N';
-//        if (OfficeDao::isRelationHasMainOffice($this->getIntParameter('of_rel_id')) === false) {
-//            $mainOffice = 'Y';
-//        }
-//        $districtData = DistrictDao::getByReference($this->getIntParameter('of_dtc_id'));
-//        $colVal = [
-//            'of_rel_id' => $this->getIntParameter('of_rel_id'),
-//            'of_name' => $this->getStringParameter('of_name'),
-//            'of_main' => $mainOffice,
-//            'of_invoice' => $this->getStringParameter('of_invoice', 'N'),
-//            'of_address' => $this->getStringParameter('of_address'),
-//            'of_cnt_id' => $districtData['dtc_cnt_id'],
-//            'of_stt_id' => $districtData['dtc_stt_id'],
-//            'of_cty_id' => $districtData['dtc_cty_id'],
-//            'of_dtc_id' => $this->getIntParameter('of_dtc_id'),
-//            'of_postal_code' => $this->getStringParameter('of_postal_code'),
-//            'of_longitude' => $this->getFloatParameter('of_longitude'),
-//            'of_latitude' => $this->getFloatParameter('of_latitude'),
-//            'of_active' => $this->getStringParameter('of_active', 'Y'),
-//        ];
+        $districtData = DistrictDao::getByReference($this->getStringParameter('of_dtc_id'));
+        $colVal = [
+            'of_rel_id' => $this->getStringParameter('of_rel_id'),
+            'of_name' => $this->getStringParameter('of_name'),
+            'of_invoice' => $this->getStringParameter('of_invoice', 'N'),
+            'of_address' => $this->getStringParameter('of_address'),
+            'of_cnt_id' => $districtData['dtc_cnt_id'],
+            'of_stt_id' => $districtData['dtc_stt_id'],
+            'of_cty_id' => $districtData['dtc_cty_id'],
+            'of_dtc_id' => $this->getStringParameter('of_dtc_id'),
+            'of_postal_code' => $this->getStringParameter('of_postal_code'),
+            'of_longitude' => $this->getFloatParameter('of_longitude'),
+            'of_latitude' => $this->getFloatParameter('of_latitude'),
+            'of_active' => $this->getStringParameter('of_active', 'Y'),
+        ];
         $ofDao = new OfficeDao();
-//        $ofDao->doInsertTransaction($colVal);
+        $ofDao->doInsertTransaction($colVal);
+        if ($this->getStringParameter('of_rel_main', 'N') === 'Y') {
+            $relDao = new RelationDao();
+            $relDao->doUpdateTransaction($this->getStringParameter('of_rel_id'), [
+                'rel_of_id' => $ofDao->getLastInsertId()
+            ]);
+        }
 
         return $ofDao->getLastInsertId();
     }
@@ -87,29 +90,28 @@ class Office extends AbstractFormModel
     {
         if ($this->getFormAction() === 'doUpdateContact') {
             $sn = new SerialNumber($this->User->getSsId());
-            $cpNumber = $sn->loadNumber('ContactPerson', $this->getDetailReferenceValue(), $this->getIntParameter('of_rel_id'));
+            $cpNumber = $sn->loadNumber('CP', $this->getDetailReferenceValue(), $this->getStringParameter('of_rel_id', ''));
             $cpColVal = [
                 'cp_number' => $cpNumber,
                 'cp_of_id' => $this->getDetailReferenceValue(),
                 'cp_name' => $this->getStringParameter('cp_name'),
                 'cp_email' => $this->getStringParameter('cp_email'),
                 'cp_phone' => $this->getStringParameter('cp_phone'),
-                'cp_office_manager' => $this->getStringParameter('cp_office_manager', 'N'),
                 'cp_active' => $this->getStringParameter('cp_active', 'Y'),
             ];
             $cpDao = new ContactPersonDao();
             $cpDao->doInsertTransaction($cpColVal);
         } else {
-            $districtData = DistrictDao::getByReference($this->getIntParameter('of_dtc_id'));
+            $districtData = DistrictDao::getByReference($this->getStringParameter('of_dtc_id'));
             $colVal = [
-                'of_rel_id' => $this->getIntParameter('of_rel_id'),
+                'of_rel_id' => $this->getStringParameter('of_rel_id'),
                 'of_name' => $this->getStringParameter('of_name'),
                 'of_invoice' => $this->getStringParameter('of_invoice'),
                 'of_address' => $this->getStringParameter('of_address'),
                 'of_cnt_id' => $districtData['dtc_cnt_id'],
                 'of_stt_id' => $districtData['dtc_stt_id'],
                 'of_cty_id' => $districtData['dtc_cty_id'],
-                'of_dtc_id' => $this->getIntParameter('of_dtc_id'),
+                'of_dtc_id' => $this->getStringParameter('of_dtc_id'),
                 'of_postal_code' => $this->getStringParameter('of_postal_code'),
                 'of_longitude' => $this->getFloatParameter('of_longitude'),
                 'of_latitude' => $this->getFloatParameter('of_latitude'),
@@ -117,6 +119,13 @@ class Office extends AbstractFormModel
             ];
             $ofDao = new OfficeDao();
             $ofDao->doUpdateTransaction($this->getDetailReferenceValue(), $colVal);
+            if ($this->getStringParameter('of_rel_main', 'N') === 'Y') {
+                $relDao = new RelationDao();
+                $relDao->doUpdateTransaction($this->getStringParameter('of_rel_id'), [
+                    'rel_of_id' => $this->getDetailReferenceValue()
+                ]);
+            }
+
         }
     }
 
@@ -185,25 +194,23 @@ class Office extends AbstractFormModel
     /**
      * Function to get the general Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getGeneralFieldSet(): Portlet
     {
         # Create Fields.
 
         # Create Relation Field
-        $relField = $this->Field->getSingleSelect('relation', 'of_relation', $this->getStringParameter('of_relation'));
-        $relField->setHiddenField('of_rel_id', $this->getIntParameter('of_rel_id'));
+        $relField = $this->Field->getSingleSelect('rel', 'of_relation', $this->getStringParameter('of_relation'));
+        $relField->setHiddenField('of_rel_id', $this->getStringParameter('of_rel_id'));
         $relField->setDetailReferenceCode('rel_id');
         $relField->addParameter('rel_ss_id', $this->User->getSsId());
         if ($this->isInsert() === true && $this->isValidParameter('of_rel_id') === true) {
             $relField->setReadOnly();
         }
         # Create custom field.
-        $districtField = $this->Field->getSingleSelect('district', 'of_full_district', $this->getStringParameter('of_full_district'), 'loadCompleteSingleSelectData');
-        $districtField->setHiddenField('of_dtc_id', $this->getIntParameter('of_dtc_id'));
-        $districtField->setDetailReferenceCode('dtc_id');
-        $districtField->setEnableDetailButton(false);
+        $districtField = $this->Field->getSingleSelect('dtc', 'of_full_district', $this->getStringParameter('of_full_district'), 'loadCompleteSingleSelectData');
+        $districtField->setHiddenField('of_dtc_id', $this->getStringParameter('of_dtc_id'));
         $districtField->setEnableNewButton(false);
         # Add field to field set
         $fieldSet = new FieldSet($this->Validation);
@@ -216,6 +223,7 @@ class Office extends AbstractFormModel
         $fieldSet->addField(Trans::getWord('longitude'), $this->Field->getText('of_longitude', $this->getFloatParameter('of_longitude')));
         $fieldSet->addField(Trans::getWord('longitude'), $this->Field->getText('of_latitude', $this->getFloatParameter('of_latitude')));
         $fieldSet->addField(Trans::getWord('invoiceOffice'), $this->Field->getYesNo('of_invoice', $this->getStringParameter('of_invoice')));
+        $fieldSet->addField(Trans::getWord('mainOffice'), $this->Field->getYesNo('of_rel_main', $this->getStringParameter('of_rel_main')));
         if ($this->isUpdate() === true) {
             $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('of_active', $this->getStringParameter('of_active')));
         }
@@ -230,7 +238,7 @@ class Office extends AbstractFormModel
     /**
      * Function to get the contact Field Set.
      *
-     * @return \App\Frame\Gui\Portlet
+     * @return Portlet
      */
     private function getContactFieldSet(): Portlet
     {
@@ -241,14 +249,14 @@ class Office extends AbstractFormModel
             'cp_name' => Trans::getWord('name'),
             'cp_email' => Trans::getWord('email'),
             'cp_phone' => Trans::getWord('phone'),
-            'cp_office_manager' => Trans::getWord('mainPic'),
+            'cp_of_manager' => Trans::getWord('mainPic'),
             'cp_active' => Trans::getWord('active'),
         ]);
         $data = ContactPersonDao::getDataByOffice($this->getDetailReferenceValue());
         $table->addRows($data);
         $table->setColumnType('cp_active', 'yesno');
-        $table->setColumnType('cp_office_manager', 'yesno');
-        $table->setUpdateActionByHyperlink('contactPerson/detail', ['cp_id'], true);
+        $table->setColumnType('cp_of_manager', 'yesno');
+        $table->setUpdateActionByHyperlink('cp/detail', ['cp_id'], true);
         # Create a portlet box.
         $portlet = new Portlet('RelCPPtl', Trans::getWord('contactPerson'));
         $btnCpMdl = new ModalButton('btnCpMdl', Trans::getWord('addContact'), $modal->getModalId());
@@ -263,7 +271,7 @@ class Office extends AbstractFormModel
     /**
      * Function to get operator modal.
      *
-     * @return \App\Frame\Gui\Modal
+     * @return Modal
      */
     private function getContactModal(): Modal
     {
@@ -282,7 +290,6 @@ class Office extends AbstractFormModel
         $fieldSet->addField(Trans::getWord('name'), $this->Field->getText('cp_name', $this->getParameterForModal('cp_name', $showModal)), true);
         $fieldSet->addField(Trans::getWord('email'), $this->Field->getText('cp_email', $this->getParameterForModal('cp_email', $showModal)));
         $fieldSet->addField(Trans::getWord('phone'), $this->Field->getText('cp_phone', $this->getParameterForModal('cp_phone', $showModal)));
-        $fieldSet->addField(Trans::getWord('mainPic'), $this->Field->getYesNo('cp_office_manager', $this->getParameterForModal('cp_office_manager', $showModal)));
         if ($this->isUpdate() === true) {
             $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('cp_active', $this->getParameterForModal('cp_active', $showModal)));
         }

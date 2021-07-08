@@ -213,6 +213,7 @@ class PurchaseInvoice extends AbstractFormModel
             $this->Tab->addContent('general', $this->getWidget());
             $this->Tab->addPortlet('general', $this->getPaymentPortlet());
             $this->Tab->addPortlet('general', $this->getDetailPortlet());
+            $this->Tab->addPortlet('document', $this->getBaseDocumentPortlet('pi', $this->getDetailReferenceValue()));
         }
     }
 
@@ -323,7 +324,12 @@ class PurchaseInvoice extends AbstractFormModel
     private function overrideTitle(): void
     {
         $status = PurchaseInvoiceDao::generateStatus($this->getAllParameters());
-        $this->View->setDescription($this->getStringParameter('pi_number') . ' - ' . $status);
+        $title = $this->PageSetting->getPageDescription();
+        if ($this->isValidParameter('pi_number') === true) {
+            $title .= ' #' . $this->getStringParameter('pi_number');
+        }
+        $title .= ' - ' . $status;
+        $this->View->setDescription($title);
 
         $this->addDeletedMessage('pi');
 
@@ -363,7 +369,7 @@ class PurchaseInvoice extends AbstractFormModel
         $tbl->addColumnAttribute('pid_total', 'style', 'text-align: right;');
 
         # Instantiate Portlet Object
-        $portlet = new Portlet('PiPidPtl', Trans::getWord('jobDetail'));
+        $portlet = new Portlet('PiPidPtl', Trans::getWord('purchaseDetail'));
         $portlet->setGridDimension(12, 12, 12);
         # Set Action
         if ($this->isAllowUpdate() === true) {
@@ -479,6 +485,7 @@ class PurchaseInvoice extends AbstractFormModel
         $fieldSet->addField(Trans::getWord('unitPrice'), $this->Field->getNumber('pid_rate_del', $this->getParameterForModal('pid_rate_del', $showModal)), true);
         $fieldSet->addField(Trans::getWord('uom'), $this->Field->getText('pid_uom_code_del', $this->getParameterForModal('pid_uom_code_del', $showModal)), true);
         $fieldSet->addField(Trans::getWord('tax'), $this->Field->getText('pid_tax_name_del', $this->getParameterForModal('pid_tax_name_del', $showModal)), true);
+        $fieldSet->addHiddenField($this->Field->getHidden('pid_id_del', $this->getParameterForModal('pid_id_del', $showModal)));
 
         $p = new Paragraph(Trans::getMessageWord('deleteConfirmation'));
         $p->setAsLabelLarge()->setAlignCenter();

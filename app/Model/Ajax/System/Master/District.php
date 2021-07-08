@@ -98,7 +98,7 @@ class District extends AbstractBaseAjaxModel
         if ($this->isValidParameter('dtc_cty_id') === true) {
             $wheres[] = SqlHelper::generateStringCondition('dtc.dtc_cty_id', $this->getStringParameter('dtc_cty_id'));
         }
-        return DistrictDao::loadSingleSelectData(['dtc_name', 'cty_name', 'stt_name', 'cnt_name'], $wheres);
+        return DistrictDao::loadSingleSelectData(['dtc_name', 'dtc_city', 'dtc_state', 'dtc_country'], $wheres);
     }
 
     /**

@@ -95,11 +95,7 @@ class SalesInvoiceDetailDao extends AbstractBaseDao
         $wheres = [];
         $wheres[] = SqlHelper::generateStringCondition('sid.sid_si_id', $siId);
         $wheres[] = SqlHelper::generateNullCondition('sid.sid_deleted_on');
-        $data = self::loadData($wheres);
-        if (count($data) === 1) {
-            return $data[0];
-        }
-        return [];
+        return self::loadData($wheres);
     }
 
     /**
@@ -118,7 +114,7 @@ class SalesInvoiceDetailDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT sid.sid_id, sid.sid_si_id, si.si_number as sid_si_number, sid.sid_cc_id, cc.cc_name as sid_cost_code, sid.sid_description,
+        $query = 'SELECT sid.sid_id, sid.sid_si_id, si.si_number as sid_si_number, sid.sid_cc_id, cc.cc_code as sid_cc_code, cc.cc_name as sid_cc_name, sid.sid_description,
                         sid.sid_quantity, sid.sid_uom_id, uom.uom_code as sid_uom_code, sid.sid_rate, sid.sid_cur_id,
                         cur.cur_iso as sid_currency, sid.sid_exchange_rate, sid.sid_tax_id, tax.tax_name as sid_tax_name,
                         tax.tax_percent as sid_tax_percent, sid.sid_total
@@ -126,8 +122,8 @@ class SalesInvoiceDetailDao extends AbstractBaseDao
                         INNER JOIN sales_invoice as si ON sid.sid_si_id = si.si_id
                         INNER JOIN cost_code as cc ON sid.sid_cc_id = cc.cc_id
                         INNER JOIN currency as cur ON sid.sid_cur_id = cur.cur_id
-                        INNER JOIN unit as uom ON sid.sid_uon_id = uom.uom_id
-                        INNER JOIN tax as tax ON sid.sid_tax_id = tax.tax_id ' . $strWhere;
+                        INNER JOIN unit as uom ON sid.sid_uom_id = uom.uom_id
+                        INNER JOIN tax as tax ON sid.sid_tax_id = tax.tax_id' . $strWhere;
         if (empty($orders) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orders);
         }
@@ -143,28 +139,23 @@ class SalesInvoiceDetailDao extends AbstractBaseDao
     /**
      * Function to get total record.
      *
-     * @param array $wheres To store the list condition query.
+     * @param string $siId To store the list condition query.
      *
-     * @return int
+     * @return float
      */
-    public static function loadTotalData(array $wheres = []): int
+    public static function loadTotalAmountBySoid(string $siId): float
     {
-        $result = 0;
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
-        $query = 'SELECT count(DISTINCT (sid.sid_id)) AS total_rows
-                        FROM sales_invoice_detail as sid
-                        INNER JOIN sales_invoice as si ON sid.sid_si_id = si.si_id
-                        INNER JOIN cost_code as cc ON sid.sid_cc_id = cc.cc_id
-                        INNER JOIN currency as cur ON sid.sid_cur_id = cur.cur_id
-                        INNER JOIN unit as uom ON sid.sid_uon_id = uom.uom_id
-                        INNER JOIN tax as tax ON sid.sid_tax_id = tax.tax_id ' . $strWhere;
+        $result = 0.0;
+        $wheres = [];
+        $wheres[] = SqlHelper::generateStringCondition('sid_si_id', $siId);
+        $wheres[] = SqlHelper::generateNullCondition('sid_deleted_on');
+        $strWhere = ' WHERE ' . implode(' AND ', $wheres);
+        $query = 'SELECT sum(sid_total) AS total
+                        FROM sales_invoice_detail ' . $strWhere;
 
         $sqlResults = DB::select($query);
         if (count($sqlResults) === 1) {
-            $result = (int)DataParser::objectToArray($sqlResults[0])['total_rows'];
+            $result = (float)DataParser::objectToArray($sqlResults[0])['total'];
         }
         return $result;
     }

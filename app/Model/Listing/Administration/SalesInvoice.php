@@ -70,14 +70,19 @@ class SalesInvoice extends AbstractListingModel
         # set header column table
         $this->ListingTable->setHeaderRow([
             'si_number' => Trans::getWord('number'),
-            'si_vendor' => Trans::getWord('customer'),
+            'si_customer' => Trans::getWord('customer'),
             'si_job_order' => Trans::getWord('jobNumber'),
             'si_total' => Trans::getWord('amount'),
-            'pi_due_date' => Trans::getWord('due'),
-            'pi_status' => Trans::getWord('status'),
+            'si_date' => Trans::getWord('date'),
+            'si_due_date' => Trans::getWord('due'),
+            'si_status' => Trans::getWord('status'),
         ]);
         # Load the data for SalesInvoice.
         $this->ListingTable->addRows($this->loadData());
+        $this->ListingTable->setColumnType('si_date', 'date');
+        $this->ListingTable->setColumnType('si_due_date', 'date');
+        $this->ListingTable->addColumnAttribute('si_total', 'style', 'text-align: center;');
+        $this->ListingTable->addColumnAttribute('si_status', 'style', 'text-align: center;');
         if ($this->PageSetting->checkPageRight('AllowUpdate') === true) {
             $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['si_id']);
         }
