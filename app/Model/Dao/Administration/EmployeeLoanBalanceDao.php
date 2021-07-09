@@ -8,22 +8,23 @@
  * @copyright  2021 Deni Firdaus Waruwu.
  */
 
-namespace App\Model\Dao\Master\Employee;
+namespace App\Model\Dao\Administration;
 
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
 use Illuminate\Support\Facades\DB;
 use App\Frame\Formatter\SqlHelper;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
- * Class to handle data access object for table employee.
+ * Class to handle data access object for table employee_loan_balance.
  *
  * @package    app
- * @subpackage Model\Dao\Master\Employee
+ * @subpackage Model\Dao\Administration
  * @author     Deni Firdaus Waruwu <deni.firdaus.w@gmail.com>
  * @copyright  2021 Deni Firdaus Waruwu.
  */
-class EmployeeDao extends AbstractBaseDao
+class EmployeeLoanBalanceDao extends AbstractBaseDao
 {
     /**
      * The field for the table.
@@ -31,28 +32,27 @@ class EmployeeDao extends AbstractBaseDao
      * @var array
      */
     private static $Fields = [
-        'em_id',
-        'em_ss_id',
-        'em_cp_id',
-        'em_jt_id',
-        'em_number',
-        'em_name',
-        'em_identity_number',
-        'em_gender',
-        'em_birthday',
-        'em_join_date',
-        'em_phone',
-        'em_email',
-        'em_active',
+        'elb_id',
+        'elb_em_id',
+        'elb_amount',
     ];
 
     /**
-     * Base dao constructor for employee.
+     * Property to store the numeric fields.
+     *
+     * @var array
+     */
+    protected $NumericFields = [
+        'elb_amount',
+    ];
+
+    /**
+     * Base dao constructor for employee_loan_balance.
      *
      */
     public function __construct()
     {
-        parent::__construct('employee', 'em', self::$Fields);
+        parent::__construct('employee_loan_balance', 'elb', self::$Fields);
     }
 
     /**
@@ -65,7 +65,7 @@ class EmployeeDao extends AbstractBaseDao
     public static function getByReference(string $referenceValue): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('em.em_id', $referenceValue);
+        $wheres[] = SqlHelper::generateStringCondition('elb_id', $referenceValue);
         $data = self::loadData($wheres);
         if (count($data) === 1) {
             return $data[0];
@@ -76,21 +76,25 @@ class EmployeeDao extends AbstractBaseDao
     /**
      * Function to get data by reference value
      *
-     * @param string $referenceValue To store the reference value of the table.
-     * @param string $ssId To store the system setting value.
+     * @param string $emId To store the system setting value.
      *
-     * @return array
+     * @return float
      */
-    public static function getByReferenceAndSystem(string $referenceValue, string $ssId): array
+    public static function getBalaceByEmployee(string $emId): float
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('em.em_id', $referenceValue);
-        $wheres[] = SqlHelper::generateStringCondition('em.em_ss_id', $ssId);
-        $data = self::loadData($wheres);
-        if (count($data) === 1) {
-            return $data[0];
+        $wheres[] = SqlHelper::generateStringCondition('elb_em_id', $emId);
+        $wheres[] = SqlHelper::generateNullCondition('el_deleted_on');
+        $strWheres = ' WHERE ' . implode(' AND ', $wheres);
+        $query = 'SELECT elb_em_id, SUM(el_amount) as total
+                FROM employee_loan_balance ' . $strWheres . '
+                GROUP BY elb_em_id';
+        $sqlResults = DB::select($query);
+        $results = 0.0;
+        if (count($sqlResults) === 1) {
+            $results = (float)DataParser::objectToArray($sqlResults[0])['total'];
         }
-        return [];
+        return $results;
     }
 
     /**
@@ -109,22 +113,12 @@ class EmployeeDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT em.em_id, em.em_ss_id, em.em_cp_id, em.em_jt_id, jt.jt_description as em_job_title,
-                        em.em_number, em.em_identity_number, em.em_name, em.em_gender, em.em_birthday, em.em_join_date,
-                        em.em_active, em.em_created_on, uc.us_name as em_created_by, em.em_deleted_on, em.em_deleted_reason,
-                        ud.us_name as em_deleted_by, em.em_phone, em.em_email, elb.totas as em_total_loan
-                    FROM employee as em
-                        INNER JOIN job_title as jt ON jt.jt_id = em.em_jt_id
-                        INNER JOIN users as uc ON uc.us_id = em.em_created_by
-                        LEFT OUTER JOIN users as ud ON ud.us_id = em.em_deleted_by
-                        LEFT OUTER JOIN (SELECT elb_em_id, SUM(elb_amount) as total
-                                FROM employee_loan_balance
-                                WHERE elb_deleted_on IS NULL
-                                GROUP BY elb_em_id) as elb ON em.em_id = elb.elb_em_id ' . $strWhere;
+        $query = 'SELECT elb_id, elb_em_id, elb_amount
+                        FROM employee_loan_balance ' . $strWhere;
         if (empty($orders) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orders);
         } else {
-            $query .= ' ORDER BY em.em_number, em.em_id';
+            $query .= ' ORDER BY elb_id';
         }
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
@@ -149,11 +143,8 @@ class EmployeeDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT count(DISTINCT (em.em_id)) AS total_rows
-                        FROM employee as em
-                        INNER JOIN job_title as jt ON jt.jt_id = em.em_jt_id
-                        INNER JOIN users as uc ON uc.us_id = em.em_created_by
-                        LEFT OUTER JOIN users as ud ON ud.us_id = em.em_deleted_by' . $strWhere;
+        $query = 'SELECT count(DISTINCT (elb_id)) AS total_rows
+                        FROM employee_loan_balance' . $strWhere;
 
         $sqlResults = DB::select($query);
         if (count($sqlResults) === 1) {
@@ -175,7 +166,7 @@ class EmployeeDao extends AbstractBaseDao
     {
         $data = self::loadData($wheres, $orders, 20);
 
-        return parent::doPrepareSingleSelectData($data, $textColumn, 'em_id');
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'elb_id');
     }
 
 

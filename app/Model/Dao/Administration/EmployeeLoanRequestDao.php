@@ -8,7 +8,7 @@
  * @copyright  2021 Deni Firdaus Waruwu.
  */
 
-namespace App\Model\Dao\Master\Employee;
+namespace App\Model\Dao\Administration;
 
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
@@ -16,14 +16,14 @@ use Illuminate\Support\Facades\DB;
 use App\Frame\Formatter\SqlHelper;
 
 /**
- * Class to handle data access object for table employee.
+ * Class to handle data access object for table employee_loan_request.
  *
  * @package    app
- * @subpackage Model\Dao\Master\Employee
+ * @subpackage Model\Dao\Administration
  * @author     Deni Firdaus Waruwu <deni.firdaus.w@gmail.com>
  * @copyright  2021 Deni Firdaus Waruwu.
  */
-class EmployeeDao extends AbstractBaseDao
+class EmployeeLoanRequestDao extends AbstractBaseDao
 {
     /**
      * The field for the table.
@@ -31,28 +31,17 @@ class EmployeeDao extends AbstractBaseDao
      * @var array
      */
     private static $Fields = [
-        'em_id',
-        'em_ss_id',
-        'em_cp_id',
-        'em_jt_id',
-        'em_number',
-        'em_name',
-        'em_identity_number',
-        'em_gender',
-        'em_birthday',
-        'em_join_date',
-        'em_phone',
-        'em_email',
-        'em_active',
+        'elr_id',
+        'elr_el_id',
     ];
 
     /**
-     * Base dao constructor for employee.
+     * Base dao constructor for employee_loan_request.
      *
      */
     public function __construct()
     {
-        parent::__construct('employee', 'em', self::$Fields);
+        parent::__construct('employee_loan_request', 'elr', self::$Fields);
     }
 
     /**
@@ -65,7 +54,7 @@ class EmployeeDao extends AbstractBaseDao
     public static function getByReference(string $referenceValue): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('em.em_id', $referenceValue);
+        $wheres[] = SqlHelper::generateStringCondition('elr.elr_id', $referenceValue);
         $data = self::loadData($wheres);
         if (count($data) === 1) {
             return $data[0];
@@ -76,21 +65,16 @@ class EmployeeDao extends AbstractBaseDao
     /**
      * Function to get data by reference value
      *
-     * @param string $referenceValue To store the reference value of the table.
-     * @param string $ssId To store the system setting value.
+     * @param string $elId To store the system setting value.
      *
      * @return array
      */
-    public static function getByReferenceAndSystem(string $referenceValue, string $ssId): array
+    public static function getByElId(string $elId): array
     {
         $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('em.em_id', $referenceValue);
-        $wheres[] = SqlHelper::generateStringCondition('em.em_ss_id', $ssId);
-        $data = self::loadData($wheres);
-        if (count($data) === 1) {
-            return $data[0];
-        }
-        return [];
+        $wheres[] = SqlHelper::generateStringCondition('elr.elr_el_id', $elId);
+        $wheres[] = SqlHelper::generateNullCondition('elr.elr_deleted_on');
+        return self::loadData($wheres);
     }
 
     /**
@@ -109,22 +93,15 @@ class EmployeeDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT em.em_id, em.em_ss_id, em.em_cp_id, em.em_jt_id, jt.jt_description as em_job_title,
-                        em.em_number, em.em_identity_number, em.em_name, em.em_gender, em.em_birthday, em.em_join_date,
-                        em.em_active, em.em_created_on, uc.us_name as em_created_by, em.em_deleted_on, em.em_deleted_reason,
-                        ud.us_name as em_deleted_by, em.em_phone, em.em_email, elb.totas as em_total_loan
-                    FROM employee as em
-                        INNER JOIN job_title as jt ON jt.jt_id = em.em_jt_id
-                        INNER JOIN users as uc ON uc.us_id = em.em_created_by
-                        LEFT OUTER JOIN users as ud ON ud.us_id = em.em_deleted_by
-                        LEFT OUTER JOIN (SELECT elb_em_id, SUM(elb_amount) as total
-                                FROM employee_loan_balance
-                                WHERE elb_deleted_on IS NULL
-                                GROUP BY elb_em_id) as elb ON em.em_id = elb.elb_em_id ' . $strWhere;
+        $query = 'SELECT elr.elr_id, elr.elr_el_id, elr.elr_created_on, uc.us_name as elr_created_by, elr.elr_deleted_on, elr.elr_deleted_reason,
+                        ud.us_name as elr_deleted_by
+                    FROM employee_loan_request as elr
+                        INNER JOIN users as uc ON elr.elr_created_by = uc.us_id
+                        LEFT OUTER JOIN users ud ON elr.elr_deleted_by = ud.us_id' . $strWhere;
         if (empty($orders) === false) {
             $query .= ' ORDER BY ' . implode(', ', $orders);
         } else {
-            $query .= ' ORDER BY em.em_number, em.em_id';
+            $query .= ' ORDER BY elr.elr_deleted_on DESC, elr.elr_created_on DESC, elr.elr_id';
         }
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
@@ -149,11 +126,8 @@ class EmployeeDao extends AbstractBaseDao
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT count(DISTINCT (em.em_id)) AS total_rows
-                        FROM employee as em
-                        INNER JOIN job_title as jt ON jt.jt_id = em.em_jt_id
-                        INNER JOIN users as uc ON uc.us_id = em.em_created_by
-                        LEFT OUTER JOIN users as ud ON ud.us_id = em.em_deleted_by' . $strWhere;
+        $query = 'SELECT count(DISTINCT (elr_id)) AS total_rows
+                        FROM employee_loan_request' . $strWhere;
 
         $sqlResults = DB::select($query);
         if (count($sqlResults) === 1) {
@@ -175,7 +149,7 @@ class EmployeeDao extends AbstractBaseDao
     {
         $data = self::loadData($wheres, $orders, 20);
 
-        return parent::doPrepareSingleSelectData($data, $textColumn, 'em_id');
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'elr_id');
     }
 
 
