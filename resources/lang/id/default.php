@@ -120,7 +120,7 @@ return [
     'addContact' => 'Tambah Kontak',
     'deleteDocument' => 'Hapus Dokumen',
     'documentType' => 'Tipe Dokumen',
-    'type' => 'Type',
+    'type' => 'Tipe',
     'uploader' => 'Pengunggah',
     'uploadedOn' => 'Tanggal Unggah',
     'download' => 'Unduh',
@@ -238,4 +238,6 @@ return [
     'submitConfirmation' => 'Konfirmasi Pengiriman',
     'submitInvoice' => 'Kirim Faktur',
     'submitted' => 'Dikirim',
+    'itemSalary' => 'Item Gaji',
+    'deleteItemSalary' => 'Hapus Item Gaji',
 ];

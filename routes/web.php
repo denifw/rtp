@@ -270,4 +270,19 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'Administration/SalesInvoiceDetail');
     });
+    # Master - Employee - Item Salary
+    Route::match(['get', 'post'], '/isl/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Master/Employee/ItemSalary');
+    });
+    # System - Master - System Type
+    Route::match(['get', 'post'], '/sty/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'System/Master/SystemType');
+    });
+    # Master - Employee - Employee Item Salary
+    Route::match(['get', 'post'], '/eis/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'Master/Employee/EmployeeItemSalary');
+    });
 });

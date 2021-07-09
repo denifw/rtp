@@ -11,12 +11,18 @@
 namespace App\Model\Detail\Master\Employee;
 
 use App\Frame\Formatter\Trans;
+use App\Frame\Gui\Html\Buttons\ModalButton;
+use App\Frame\Gui\Html\Labels\Paragraph;
+use App\Frame\Gui\Icon;
+use App\Frame\Gui\Modal;
+use App\Frame\Gui\Table;
 use App\Frame\Mvc\AbstractFormModel;
 use App\Frame\System\SerialNumber\SerialNumber;
 use App\Model\Dao\Crm\ContactPersonDao;
 use App\Model\Dao\Master\Employee\EmployeeDao;
 use App\Frame\Gui\FieldSet;
 use App\Frame\Gui\Portlet;
+use App\Model\Dao\Master\Employee\EmployeeItemSalaryDao;
 use App\Model\Dao\System\Document\DocumentDao;
 
 /**
@@ -132,6 +138,23 @@ class Employee extends AbstractFormModel
         } elseif ($this->isDeleteDocumentAction() === true) {
             $docDao = new DocumentDao();
             $docDao->doDeleteTransaction($this->getStringParameter('doc_id_del'));
+        } elseif ($this->getFormAction() === 'doUpdateItemSalary') {
+            $colVal = [
+                'eis_em_id' => $this->getDetailReferenceValue(),
+                'eis_isl_id' => $this->getStringParameter('eis_isl_id'),
+                'eis_sty_id' => $this->getStringParameter('eis_sty_id'),
+                'eis_amount' => $this->getFloatParameter('eis_amount'),
+            ];
+            $eisDao = new EmployeeItemSalaryDao();
+            if ($this->isValidParameter('eis_id') === false) {
+                $eisDao->doInsertTransaction($colVal);
+            } else {
+                $eisDao->doUpdateTransaction($this->getStringParameter('eis_id'), $colVal);
+            }
+
+        } elseif ($this->getFormAction() === 'doDeleteItemSalary') {
+            $eisDao = new EmployeeItemSalaryDao();
+            $eisDao->doDeleteTransaction($this->getStringParameter('eis_id_del'));
         }
     }
 
@@ -155,6 +178,7 @@ class Employee extends AbstractFormModel
         $this->Tab->addPortlet('general', $this->getGeneralPortlet());
         if ($this->isUpdate() === true) {
             $this->View->setDescription($this->getStringParameter('em_number'));
+            $this->Tab->addPortlet('general', $this->getSalaryPortlet());
             $this->Tab->addPortlet('document', $this->getBaseDocumentPortlet('em', $this->getDetailReferenceValue()));
         }
     }
@@ -174,6 +198,19 @@ class Employee extends AbstractFormModel
             if ($this->isUpdate() === true) {
                 $this->Validation->checkRequire('em_cp_id');
             }
+        } elseif ($this->getFormAction() === 'doUpdateItemSalary') {
+            $this->Validation->checkRequire('eis_isl_id');
+            $this->Validation->checkRequire('eis_sty_id');
+            $this->Validation->checkRequire('eis_amount');
+            $this->Validation->checkFloat('eis_amount');
+            $this->Validation->checkUnique('eis_isl_id', 'employee_item_salary', [
+                'eis_id' => $this->getStringParameter('eis_id')
+            ], [
+                'eis_em_id' => $this->getDetailReferenceValue(),
+                'eis_deleted_on' => null
+            ]);
+        } elseif ($this->getFormAction() === 'doDeleteItemSalary') {
+            $this->Validation->checkRequire('eis_id_del');
         } else {
             parent::loadValidationRole();
         }
@@ -223,4 +260,108 @@ class Employee extends AbstractFormModel
         $portlet->addFieldSet($fieldSet);
         return $portlet;
     }
+
+
+    /**
+     * Function to get salary portlet
+     *
+     * @return Portlet
+     */
+    private function getSalaryPortlet(): Portlet
+    {
+        $modal = $this->getSalaryModal();
+        $modalDelete = $this->getSalaryDeleteModal();
+        $this->View->addModal($modal);
+        $this->View->addModal($modalDelete);
+
+        $table = new Table('EmEisTbl');
+        $table->setHeaderRow([
+            'eis_item_salary' => Trans::getWord('description'),
+            'eis_salary_type' => Trans::getWord('type'),
+            'eis_amount' => Trans::getWord('amount'),
+        ]);
+        $table->addRows(EmployeeItemSalaryDao::getByEmId($this->getDetailReferenceValue()));
+        $table->setColumnType('eis_amount', 'float');
+        $table->setUpdateActionByModal($modal, 'eis', 'getById', ['eis_id']);
+        $table->setDeleteActionByModal($modalDelete, 'eis', 'getByIdForDelete', ['eis_id']);
+        # Instantiate Portlet Object
+        $portlet = new Portlet('EmEisPtl', Trans::getWord('itemSalary'));
+        $btn = new ModalButton('EmeEisBtn', Trans::getWord('add'), $modal->getModalId());
+        $btn->btnPrimary()->pullRight()->btnMedium()->setIcon(Icon::Plus);
+        $portlet->addButton($btn);
+        $portlet->addTable($table);
+
+        return $portlet;
+    }
+
+    /**
+     * Function to get the Task Modal.
+     *
+     * @return Modal
+     */
+    private function getSalaryModal(): Modal
+    {
+        $mdl = new Modal('EmEisMdl', Trans::getWord('itemSalary'));
+        $mdl->setFormSubmit($this->getMainFormId(), 'doUpdateItemSalary');
+        $showModal = false;
+        if ($this->getFormAction() === 'doUpdateItemSalary' && $this->isValidPostValues() === false) {
+            $mdl->setShowOnLoad();
+            $showModal = true;
+        }
+        $fieldSet = new FieldSet($this->Validation);
+        $fieldSet->setGridDimension(6, 6);
+
+        # Description
+        $islField = $this->Field->getSingleSelect('isl', 'eis_item_salary', $this->getParameterForModal('isl_item_salary', $showModal));
+        $islField->setHiddenField('eis_isl_id', $this->getParameterForModal('eis_isl_id', $showModal));
+        $islField->addParameter('isl_ss_id', $this->User->getSsId());
+        $islField->setDetailReferenceCode('isl_id');
+
+        # Salary Type
+        $styField = $this->Field->getSingleSelect('sty', 'eis_salary_type', $this->getParameterForModal('eis_salary_type', $showModal));
+        $styField->setHiddenField('eis_sty_id', $this->getParameterForModal('eis_sty_id', $showModal));
+        $styField->addParameter('sty_group', 'salarytype');
+        $styField->setEnableNewButton(false);
+
+        $fieldSet->addField(Trans::getWord('description'), $islField, true);
+        $fieldSet->addField(Trans::getWord('type'), $styField);
+        $fieldSet->addField(Trans::getWord('amount'), $this->Field->getNumber('eis_amount', $this->getParameterForModal('eis_amount', $showModal)));
+        $fieldSet->addHiddenField($this->Field->getHidden('eis_id', $this->getParameterForModal('eis_id', $showModal)));
+
+        $mdl->addFieldSet($fieldSet);
+        return $mdl;
+    }
+
+    /**
+     * Function to get the Task Delete Modal.
+     *
+     * @return Modal
+     */
+    private function getSalaryDeleteModal(): Modal
+    {
+        $mdl = new Modal('EisDelMdl', Trans::getWord('deleteItemSalary'));
+        $mdl->setFormSubmit($this->getMainFormId(), 'doDeleteItemSalary');
+        $showModal = false;
+        if ($this->getFormAction() === 'doDeleteItemSalary' && $this->isValidPostValues() === false) {
+            $mdl->setShowOnLoad();
+            $showModal = true;
+        }
+        $fieldSet = new FieldSet($this->Validation);
+        $fieldSet->setGridDimension(6, 6);
+
+        $fieldSet->addField(Trans::getWord('description'), $this->Field->getText('eis_item_salary_del', $this->getParameterForModal('eis_item_salary_del', $showModal)));
+        $fieldSet->addField(Trans::getWord('notes'), $this->Field->getText('eis_salary_type_del', $this->getParameterForModal('eis_salary_type_del', $showModal)));
+        $fieldSet->addField(Trans::getWord('amount'), $this->Field->getNumber('eis_amount_del', $this->getParameterForModal('eis_amount_del', $showModal)));
+        $fieldSet->addHiddenField($this->Field->getHidden('eis_id_del', $this->getParameterForModal('eis_id_del', $showModal)));
+
+        $p = new Paragraph(Trans::getMessageWord('deleteConfirmation'));
+        $p->setAsLabelLarge()->setAlignCenter();
+        $mdl->addText($p);
+        $mdl->setBtnOkName(Trans::getWord('yesDelete'));
+        $mdl->addFieldSet($fieldSet);
+
+        return $mdl;
+    }
+
+
 }
