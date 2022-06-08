@@ -39,6 +39,9 @@ class CreateSystemSettingTable extends Migration
             $table->string('ss_deleted_reason', 256)->nullable();
             $table->unique('ss_name_space', 'tbl_ss_name_space_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => SystemSettingSeeder::class,
+        ]);
     }
 
     /**

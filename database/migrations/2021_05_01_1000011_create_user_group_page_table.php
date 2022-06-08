@@ -28,6 +28,9 @@ class CreateUserGroupPageTable extends Migration
             $table->string('ugp_deleted_reason', 256)->nullable();
             $table->unique(['ugp_usg_id', 'ugp_pg_id'], 'tbl_ugp_usg_id_pg_id_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => UserGroupPageSeeder::class,
+        ]);
     }
 
     /**

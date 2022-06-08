@@ -34,6 +34,9 @@ class CreateDocumentTable extends Migration
             $table->dateTime('doc_deleted_on')->nullable();
             $table->string('doc_deleted_reason', 256)->nullable();
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => DocumentSeeder::class,
+        ]);
     }
 
     /**

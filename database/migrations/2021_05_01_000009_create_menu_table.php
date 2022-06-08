@@ -30,7 +30,9 @@ class CreateMenuTable extends Migration
             $table->string('mn_deleted_reason', 256)->nullable();
             $table->unique(['mn_code', 'mn_parent'], 'tbl_mn_code_parent_unique');
         });
-
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => MenuSeeder::class,
+        ]);
     }
 
     /**

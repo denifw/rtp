@@ -31,6 +31,9 @@ class CreateSerialHistoryTable extends Migration
             $table->string('sh_deleted_reason', 256)->nullable();
             $table->unique(['sh_sn_id', 'sh_number', 'sh_rel_id', 'sh_year', 'sh_month'], 'tbl_sh_sn_number_year_month_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => SerialHistorySeeder::class,
+        ]);
     }
 
     /**

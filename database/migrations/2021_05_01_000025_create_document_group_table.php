@@ -30,6 +30,9 @@ class CreateDocumentGroupTable extends Migration
             $table->string('dcg_deleted_reason', 256)->nullable();
             $table->unique('dcg_code', 'tbl_dcg_code_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => DocumentGroupSeeder::class,
+        ]);
     }
 
     /**

@@ -29,6 +29,9 @@ class CreateCurrencyTable extends Migration
             $table->string('cur_deleted_reason', 256)->nullable();
             $table->unique('cur_iso', 'tbl_cur_iso_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => CurrencySeeder::class,
+        ]);
     }
 
     /**

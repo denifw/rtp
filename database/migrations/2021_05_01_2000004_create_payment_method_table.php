@@ -28,6 +28,9 @@ class CreatePaymentMethodTable extends Migration
             $table->string('pm_deleted_reason', 256)->nullable();
             $table->unique(['pm_name','pm_ss_id'], 'tbl_pm_ss_name_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => PaymentMethodSeeder::class,
+        ]);
     }
 
     /**

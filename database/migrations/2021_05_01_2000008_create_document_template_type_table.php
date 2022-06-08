@@ -26,6 +26,9 @@ class CreateDocumentTemplateTypeTable extends Migration
             $table->dateTime('dtt_deleted_on')->nullable();
             $table->unique('dtt_code', 'tbl_dtt_code_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => DocumentTemplateTypeSeeder::class,
+        ]);
     }
 
     /**

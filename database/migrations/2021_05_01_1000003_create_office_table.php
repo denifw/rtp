@@ -41,7 +41,9 @@ class CreateOfficeTable extends Migration
             $table->dateTime('of_deleted_on')->nullable();
             $table->string('of_deleted_reason', 256)->nullable();
         });
-
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => OfficeSeeder::class,
+        ]);
     }
 
     /**

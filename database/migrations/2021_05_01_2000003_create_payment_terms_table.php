@@ -29,6 +29,9 @@ class CreatePaymentTermsTable extends Migration
             $table->string('pt_deleted_reason', 256)->nullable();
             $table->unique(['pt_ss_id', 'pt_name'], 'tbl_pt_ss_name_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => PaymentTermsSeeder::class,
+        ]);
     }
 
     /**

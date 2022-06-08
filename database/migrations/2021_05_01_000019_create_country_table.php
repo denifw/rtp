@@ -27,6 +27,9 @@ class CreateCountryTable extends Migration
             $table->string('cnt_deleted_reason', 256)->nullable();
             $table->unique('cnt_iso', 'tbl_cnt_iso_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => CountrySeeder::class,
+        ]);
     }
 
     /**

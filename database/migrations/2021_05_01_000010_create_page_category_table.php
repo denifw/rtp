@@ -28,6 +28,9 @@ class CreatePageCategoryTable extends Migration
             $table->unique('pc_code', 'tbl_pc_code_unique');
             $table->string('pc_deleted_reason', 256)->nullable();
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => PageCategorySeeder::class,
+        ]);
     }
 
     /**

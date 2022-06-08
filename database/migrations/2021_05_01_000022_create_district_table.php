@@ -32,6 +32,9 @@ class CreateDistrictTable extends Migration
             $table->dateTime('dtc_deleted_on')->nullable();
             $table->string('dtc_deleted_reason', 256)->nullable();
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => DistrictSeeder::class,
+        ]);
     }
 
     /**

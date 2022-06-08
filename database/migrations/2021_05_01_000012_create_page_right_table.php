@@ -30,6 +30,9 @@ class CreatePageRightTable extends Migration
             $table->string('pr_deleted_reason', 256)->nullable();
             $table->unique(['pr_pg_id', 'pr_name'], 'tbl_pr_pg_id_name_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => PageRightSeeder::class,
+        ]);
     }
 
     /**

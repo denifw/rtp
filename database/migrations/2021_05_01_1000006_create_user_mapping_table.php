@@ -36,6 +36,9 @@ class CreateUserMappingTable extends Migration
             $table->unique(['ump_ss_id', 'ump_us_id'], 'tbl_ump_ss_id_us_id_unique');
             $table->unique(['ump_ss_id', 'ump_cp_id'], 'tbl_ump_ss_id_cp_id_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => UserMappingSeeder::class,
+        ]);
     }
 
     /**

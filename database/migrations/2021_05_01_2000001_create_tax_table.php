@@ -18,6 +18,7 @@ class CreateTaxTable extends Migration
             $table->uuid('tax_ss_id')->unsigned();
             $table->foreign('tax_ss_id', 'tbl_tax_ss_id_fkey')->references('ss_id')->on('system_setting');
             $table->string('tax_name', 128);
+            $table->char('tax_group', 1)->default('Y');
             $table->float('tax_percent')->nullable();
             $table->char('tax_active', 1)->default('Y');
             $table->uuid('tax_created_by');
@@ -29,6 +30,9 @@ class CreateTaxTable extends Migration
             $table->string('tax_deleted_reason', 256)->nullable();
             $table->unique(['tax_ss_id', 'tax_name'], 'tbl_tax_ss_name_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => TaxSeeder::class,
+        ]);
     }
 
     /**

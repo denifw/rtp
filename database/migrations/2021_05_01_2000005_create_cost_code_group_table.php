@@ -30,6 +30,9 @@ class CreateCostCodeGroupTable extends Migration
             $table->string('ccg_deleted_reason', 256)->nullable();
             $table->unique(['ccg_ss_id', 'ccg_code'], 'tbl_ccg_ss_code_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => CostCodeGroupSeeder::class,
+        ]);
     }
 
     /**

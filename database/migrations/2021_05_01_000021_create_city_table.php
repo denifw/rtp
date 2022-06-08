@@ -30,6 +30,9 @@ class CreateCityTable extends Migration
             $table->dateTime('cty_deleted_on')->nullable();
             $table->string('cty_deleted_reason', 256)->nullable();
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => CitySeeder::class,
+        ]);
     }
 
     /**

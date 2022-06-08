@@ -29,6 +29,9 @@ class CreateDocumentTemplateTable extends Migration
             $table->dateTime('dt_deleted_on')->nullable();
             $table->unique(['dt_dtt_id', 'dt_path'], 'tbl_dtt_id_path_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => DocumentTemplateSeeder::class,
+        ]);
     }
 
     /**

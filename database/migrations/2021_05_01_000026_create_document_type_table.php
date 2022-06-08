@@ -32,7 +32,9 @@ class CreateDocumentTypeTable extends Migration
             $table->string('dct_deleted_reason', 256)->nullable();
             $table->unique(['dct_dcg_id', 'dct_code'], 'tbl_dct_code_dcg_id_unique');
         });
-
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => DocumentTypeSeeder::class,
+        ]);
     }
 
     /**

@@ -27,6 +27,9 @@ class CreateLanguageTable extends Migration
             $table->unique('lg_iso', 'lg_iso_unique');
             $table->string('lg_deleted_reason', 256)->nullable();
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => LanguageSeeder::class,
+        ]);
     }
 
     /**

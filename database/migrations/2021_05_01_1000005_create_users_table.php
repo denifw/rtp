@@ -35,7 +35,9 @@ class CreateUsersTable extends Migration
             $table->string('us_deleted_reason', 256)->nullable();
             $table->unique('us_username', 'tbl_us_username_unique');
         });
-
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => UserSeeder::class,
+        ]);
     }
 
     /**

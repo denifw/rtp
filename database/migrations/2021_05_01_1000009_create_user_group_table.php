@@ -28,6 +28,9 @@ class CreateUserGroupTable extends Migration
             $table->string('usg_deleted_reason', 256)->nullable();
             $table->unique('usg_name', 'tbl_usg_name_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => UserGroupSeeder::class,
+        ]);
     }
 
     /**

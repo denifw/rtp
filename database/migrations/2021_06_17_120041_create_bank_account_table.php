@@ -45,6 +45,9 @@ class CreateBankAccountTable extends Migration
             $table->string('ba_deleted_reason', 256)->nullable();
             $table->unique(['ba_ss_id', 'ba_code'], 'tbl_ba_ss_code_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => BankAccountSeeder::class,
+        ]);
     }
 
     /**

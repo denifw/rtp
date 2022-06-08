@@ -15,8 +15,10 @@ class CreateBankTable extends Migration
     {
         Schema::create('bank', function (Blueprint $table) {
             $table->uuid('bn_id')->primary();
-            $table->string('bn_short_name', 125);
-            $table->string('bn_name', 255);
+            $table->uuid('bn_ss_id')->unsigned();
+            $table->foreign('bn_ss_id', 'tbl_bn_ss_id_fkey')->references('ss_id')->on('system_setting');
+            $table->string('bn_short_name', 128);
+            $table->string('bn_name', 256);
             $table->char('bn_active', 1)->default('Y');
             $table->uuid('bn_created_by');
             $table->dateTime('bn_created_on');
@@ -25,7 +27,11 @@ class CreateBankTable extends Migration
             $table->uuid('bn_deleted_by')->nullable();
             $table->dateTime('bn_deleted_on')->nullable();
             $table->string('bn_deleted_reason', 255)->nullable();
+            $table->unique(['bn_ss_id', 'bn_short_name'], 'tbl_bn_ss_short_name_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => BankSeeder::class,
+        ]);
     }
 
     /**

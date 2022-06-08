@@ -28,6 +28,9 @@ class CreateUserGroupApiAccessTable extends Migration
             $table->string('uga_deleted_reason', 256)->nullable();
             $table->unique(['uga_usg_id', 'uga_aa_id'], 'tbl_uga_usg_id_aa_id_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => UserGroupApiSeeder::class,
+        ]);
     }
 
     /**

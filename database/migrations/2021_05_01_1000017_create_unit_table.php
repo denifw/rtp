@@ -15,6 +15,8 @@ class CreateUnitTable extends Migration
     {
         Schema::create('unit', function (Blueprint $table) {
             $table->uuid('uom_id')->primary();
+            $table->uuid('uom_ss_id')->unsigned();
+            $table->foreign('uom_ss_id', 'tbl_uom_ss_id_fkey')->references('ss_id')->on('system_setting');
             $table->string('uom_name', 125);
             $table->string('uom_code', 50);
             $table->char('uom_active', 1)->default('Y');
@@ -27,6 +29,9 @@ class CreateUnitTable extends Migration
             $table->string('uom_deleted_reason', 256)->nullable();
             $table->unique('uom_code', 'tbl_uom_code_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => UnitSeeder::class,
+        ]);
     }
 
     /**

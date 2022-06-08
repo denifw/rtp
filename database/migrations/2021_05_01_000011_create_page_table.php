@@ -36,7 +36,9 @@ class CreatePageTable extends Migration
             $table->string('pg_deleted_reason', 256)->nullable();
             $table->unique(['pg_route', 'pg_pc_id'], 'tbl_pg_route_pc_id_unique');
         });
-
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => PageSeeder::class,
+        ]);
     }
 
     /**

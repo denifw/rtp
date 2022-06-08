@@ -31,6 +31,9 @@ class CreateCostCodeTable extends Migration
             $table->string('cc_deleted_reason', 256)->nullable();
             $table->unique(['cc_ss_id', 'cc_code'], 'tbl_cc_ss_id_code_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => CostCodeSeeder::class,
+        ]);
     }
 
     /**

@@ -39,6 +39,9 @@ class CreateSerialNumberTable extends Migration
             $table->dateTime('sn_deleted_on')->nullable();
             $table->string('sn_deleted_reason', 256)->nullable();
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => SerialNumberSeeder::class,
+        ]);
     }
 
     /**

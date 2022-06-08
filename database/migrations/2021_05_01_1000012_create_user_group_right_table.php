@@ -28,6 +28,9 @@ class CreateUserGroupRightTable extends Migration
             $table->string('ugr_deleted_reason', 256)->nullable();
             $table->unique(['ugr_usg_id', 'ugr_pr_id'], 'tbl_ugr_usg_id_pr_id_unique');
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => UserGroupRightSeeder::class,
+        ]);
     }
 
     /**

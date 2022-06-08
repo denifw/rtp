@@ -27,6 +27,9 @@ class CreateUserGroupDetailTable extends Migration
             $table->uuid('ugd_deleted_by')->nullable();
             $table->string('ugd_deleted_reason', 256)->nullable();
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => UserGroupDetailSeeder::class,
+        ]);
     }
 
     /**

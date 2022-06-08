@@ -30,6 +30,9 @@ class CreateContactPersonTable extends Migration
             $table->dateTime('cp_deleted_on')->nullable();
             $table->string('cp_deleted_reason', 256)->nullable();
         });
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => ContactPersonSeeder::class,
+        ]);
     }
 
     /**
