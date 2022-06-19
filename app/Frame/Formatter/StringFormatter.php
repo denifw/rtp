@@ -26,54 +26,6 @@ class StringFormatter
 {
 
     /**
-     * Function to add data into the results property
-     *
-     * @param array $data To store the response data.
-     * @param string $prefix To store the prefix data
-     * @return string
-     */
-    public function doFormatAddress(array $data, string $prefix = ''): string
-    {
-        /*
-         $data = [
-            'address' => '',
-            'district' => '',
-            'city' => '',
-            'state' => '',
-            'country' => '',
-            'postal_code' => '',
-        ];
-         * */
-        if (empty($prefix) === false) {
-            $prefix .= '_';
-        }
-        $temp = [];
-        if (array_key_exists($prefix . 'address', $data) === true && empty($data[$prefix . 'address']) === false) {
-            $temp[] = $data[$prefix . 'address'];
-        }
-        if (array_key_exists($prefix . 'district', $data) === true && empty($data[$prefix . 'district']) === false) {
-            $temp[] = $data[$prefix . 'district'];
-        }
-        if (array_key_exists($prefix . 'city', $data) === true && empty($data[$prefix . 'city']) === false) {
-            $temp[] = $data[$prefix . 'city'];
-        }
-        if (array_key_exists($prefix . 'state', $data) === true && empty($data[$prefix . 'state']) === false) {
-            $temp[] = $data[$prefix . 'state'];
-        }
-        if (array_key_exists($prefix . 'country', $data) === true && empty($data[$prefix . 'country']) === false) {
-            $temp[] = $data[$prefix . 'country'];
-        }
-        if (array_key_exists($prefix . 'postal_code', $data) === true && empty($data[$prefix . 'postal_code']) === false) {
-            $temp[] = $data[$prefix . 'postal_code'];
-        }
-        if (empty($temp) === false) {
-            return implode(', ', $temp);
-        }
-
-        return '';
-    }
-
-    /**
      * Function to parse the data from stdClass to array
      *
      * @param string $str to store the string to convert.

@@ -70,7 +70,7 @@ class Relation extends AbstractListingModel
         # Load the data for Relation.
         $listingData = $this->loadData();
         $this->ListingTable->addRows($listingData);
-        $this->ListingTable->setViewActionByHyperlink($this->getViewRoute(), ['rel_id']);
+//        $this->ListingTable->setViewActionByHyperlink($this->getViewRoute(), ['rel_id']);
         if ($this->isAllowUpdate() === true) {
             $this->ListingTable->setUpdateActionByHyperlink($this->getUpdateRoute(), ['rel_id']);
         }
@@ -95,37 +95,27 @@ class Relation extends AbstractListingModel
      */
     private function loadData(): array
     {
-        return RelationDao::loadData(
-            $this->getWhereCondition(),
-            $this->ListingSort->getOrderByFields(),
-            $this->getLimitTable(),
-            $this->getLimitOffsetTable());
+        return RelationDao::loadData($this->getWhereCondition());
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return array
+     * @return SqlHelper
      */
-    private function getWhereCondition(): array
+    private function getWhereCondition(): SqlHelper
     {
+        $helper = new SqlHelper();
+        $helper->setLimit($this->getLimitTable(), $this->getLimitOffsetTable());
+        $helper->addOrderByString($this->ListingSort->getOrderByFieldsString());
         # Set where conditions
-        $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('rel.rel_ss_id', $this->User->getSsId());
-        if ($this->isValidParameter('rel_number') === true) {
-            $wheres[] = SqlHelper::generateLikeCondition('rel.rel_number', $this->getStringParameter('rel_number'));
-        }
-        if ($this->isValidParameter('rel_name') === true) {
-            $wheres[] = SqlHelper::generateLikeCondition('rel.rel_name', $this->getStringParameter('rel_name'));
-        }
-        if ($this->isValidParameter('rel_short_name') === true) {
-            $wheres[] = SqlHelper::generateLikeCondition('rel.rel_short_name', $this->getStringParameter('rel_short_name'));
-        }
-        if ($this->isValidParameter('rel_active') === true) {
-            $wheres[] = SqlHelper::generateStringCondition('rel.rel_active', $this->getStringParameter('rel_active'));
-        }
+        $helper->addStringWhere('rel.rel_ss_id', $this->User->getSsId());
+        $helper->addLikeWhere('rel.rel_number', $this->getStringParameter('rel_number'));
+        $helper->addLikeWhere('rel.rel_name', $this->getStringParameter('rel_name'));
+        $helper->addLikeWhere('rel.rel_short_name', $this->getStringParameter('rel_short_name'));
+        $helper->addStringWhere('rel.rel_active', $this->getStringParameter('rel_active'));
 
         # return the where query.
-        return $wheres;
+        return $helper;
     }
 }

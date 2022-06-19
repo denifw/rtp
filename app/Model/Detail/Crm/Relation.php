@@ -248,6 +248,7 @@ class Relation extends AbstractFormModel
             $this->Tab->addPortlet('general', $this->getPicPortlet());
         } else {
             $this->Tab->addPortlet('general', $this->getOfficePortlet());
+            $this->Tab->addPortlet('general', $this->getRemarkPortlet());
             $this->Tab->addPortlet('contactPerson', $this->getContactPortlet());
 //            $this->Tab->addPortlet('finance', $this->getRelationBankPortlet());
             $this->Tab->addPortlet('document', $this->getBaseDocumentPortlet('rel', $this->getDetailReferenceValue(), '', '', true));
@@ -356,6 +357,7 @@ class Relation extends AbstractFormModel
         $fieldSet->addField(Trans::getWord('website'), $this->Field->getText('rel_website', $this->getStringParameter('rel_website')));
         $fieldSet->addField(Trans::getWord('email'), $this->Field->getText('rel_email', $this->getStringParameter('rel_email')));
         $fieldSet->addField(Trans::getWord('phone'), $this->Field->getText('rel_phone', $this->getStringParameter('rel_phone')));
+        $fieldSet->addField(Trans::getWord('vatNumber'), $this->Field->getText('rel_vat', $this->getStringParameter('rel_vat')));
         if ($this->isUpdate() === true) {
             # Office
             $ofField = $this->Field->getSingleSelect('of', 'rel_office', $this->getStringParameter('rel_office'));
@@ -370,8 +372,10 @@ class Relation extends AbstractFormModel
             $cpField->setEnableNewButton(false);
             $fieldSet->addField(Trans::getWord('mainOffice'), $ofField);
             $fieldSet->addField(Trans::getWord('pic'), $cpField);
-            if ($this->getDetailReferenceValue() === $this->User->getRelId()) {
+            if ($this->isSystemOwner() === true) {
                 $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('rel_active', $this->getStringParameter('rel_active')));
+            } else {
+                $fieldSet->addHiddenField($this->Field->getHidden('rel_active', $this->getStringParameter('rel_active')));
             }
         }
         $portlet->addFieldSet($fieldSet);
@@ -480,7 +484,6 @@ class Relation extends AbstractFormModel
             'of_name' => Trans::getWord('name'),
             'of_full_address' => Trans::getWord('address'),
             'of_invoice' => Trans::getWord('invoiceOffice'),
-            'of_manager' => Trans::getWord('manager'),
             'of_active' => Trans::getWord('active'),
         ]);
         $data = OfficeDao::getDataByRelation($this->getDetailReferenceValue());
@@ -495,6 +498,27 @@ class Relation extends AbstractFormModel
         $btnOfMdl->setIcon(Icon::Plus)->btnPrimary()->pullRight();
         $portlet->addButton($btnOfMdl);
         $portlet->addTable($table);
+
+        return $portlet;
+    }
+
+    /**
+     * Function to get the Office Field Set.
+     *
+     * @return Portlet
+     */
+    private function getRemarkPortlet(): Portlet
+    {
+
+        # Add field to field set
+        $fieldSet = new FieldSet($this->Validation);
+        $fieldSet->setGridDimension(12, 12, 12);
+
+        $fieldSet->addField(Trans::getWord('notes'), $this->Field->getTextArea('rel_remark', $this->getStringParameter('rel_remark')));
+        # Create a portlet box.
+        $portlet = new Portlet('RelRemarkPtl', Trans::getWord('notes'));
+        $portlet->setGridDimension(12, 12, 12);
+        $portlet->addFieldSet($fieldSet);
 
         return $portlet;
     }
@@ -709,5 +733,16 @@ class Relation extends AbstractFormModel
         $modal->addFieldSet($fieldSet);
 
         return $modal;
+    }
+
+
+    /**
+     * Function to get operator modal.
+     *
+     * @return Bool
+     */
+    private function isSystemOwner(): bool
+    {
+        return $this->getDetailReferenceValue() === $this->User->Settings->getOwnerId();
     }
 }

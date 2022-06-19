@@ -40,7 +40,7 @@ class DataParser
     /**
      * Function to parse the data from stdClass to array
      *
-     * @param mixed  $data          To store the data that will be parse.
+     * @param mixed $data To store the data that will be parse.
      * @param string $attributeName To store the attribute name that will be taken.
      *
      * @return null|string
@@ -62,7 +62,7 @@ class DataParser
      * Function to parse the array object data to normal array.
      *
      * @param array $arrayObject To store the data that will be parse.
-     * @param array $attributes  To store the attribute name that will be taken.
+     * @param array $attributes To store the attribute name that will be taken.
      *
      * @return array
      */
@@ -81,8 +81,8 @@ class DataParser
     /**
      * Function to parse the object data to normal array.
      *
-     * @param \stdClass $object     To store the data that will be parse.
-     * @param array     $attributes To store the attribute name that will be taken.
+     * @param \stdClass $object To store the data that will be parse.
+     * @param array $attributes To store the attribute name that will be taken.
      *
      * @return array
      */
@@ -140,8 +140,8 @@ class DataParser
     /**
      * Function to parse the object data to normal array.
      *
-     * @param \stdClass $object     To store the data that will be parse.
-     * @param array     $attributes To store the attribute name that will be taken.
+     * @param \stdClass $object To store the data that will be parse.
+     * @param array $attributes To store the attribute name that will be taken.
      *
      * @return array
      */
@@ -211,33 +211,47 @@ class DataParser
         return $result;
     }
 
+
     /**
      * Function to add data into the results property
      *
      * @param array $data To store the response data.
-     *
+     * @param string $prefix To store the prefix data
      * @return string
      */
-    public static function doFormatAddress(array $data): string
+    public static function doFormatAddress(array $data, string $prefix = ''): string
     {
+        /*
+         $data = [
+            'address' => '',
+            'district' => '',
+            'city' => '',
+            'state' => '',
+            'country' => '',
+            'postal_code' => '',
+        ];
+         * */
+        if (empty($prefix) === false) {
+            $prefix .= '_';
+        }
         $temp = [];
-        if (array_key_exists('address', $data) === true && empty($data['address']) === false) {
-            $temp[] = $data['address'];
+        if (array_key_exists($prefix . 'address', $data) === true && empty($data[$prefix . 'address']) === false) {
+            $temp[] = $data[$prefix . 'address'];
         }
-        if (array_key_exists('district', $data) === true && empty($data['district']) === false) {
-            $temp[] = $data['district'];
+        if (array_key_exists($prefix . 'district', $data) === true && empty($data[$prefix . 'district']) === false) {
+            $temp[] = $data[$prefix . 'district'];
         }
-        if (array_key_exists('city', $data) === true && empty($data['city']) === false) {
-            $temp[] = $data['city'];
+        if (array_key_exists($prefix . 'city', $data) === true && empty($data[$prefix . 'city']) === false) {
+            $temp[] = $data[$prefix . 'city'];
         }
-        if (array_key_exists('state', $data) === true && empty($data['state']) === false) {
-            $temp[] = $data['state'];
+        if (array_key_exists($prefix . 'state', $data) === true && empty($data[$prefix . 'state']) === false) {
+            $temp[] = $data[$prefix . 'state'];
         }
-        if (array_key_exists('country', $data) === true && empty($data['country']) === false) {
-            $temp[] = $data['country'];
+        if (array_key_exists($prefix . 'country', $data) === true && empty($data[$prefix . 'country']) === false) {
+            $temp[] = $data[$prefix . 'country'];
         }
-        if (array_key_exists('postalCode', $data) === true && empty($data['postalCode']) === false) {
-            $temp[] = $data['postalCode'];
+        if (array_key_exists($prefix . 'postal_code', $data) === true && empty($data[$prefix . 'postal_code']) === false) {
+            $temp[] = $data[$prefix . 'postal_code'];
         }
         if (empty($temp) === false) {
             return implode(', ', $temp);

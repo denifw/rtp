@@ -183,8 +183,8 @@ class ContactPerson extends AbstractFormModel
         $fieldSet->addField(Trans::getWord('office'), $officeField, true);
         $fieldSet->addField(Trans::getWord('name'), $this->Field->getText('cp_name', $this->getStringParameter('cp_name')), true);
         $fieldSet->addField(Trans::getWord('email'), $this->Field->getText('cp_email', $this->getStringParameter('cp_email')));
-        $fieldSet->addField(Trans::getWord('phone'), $this->Field->getText('cp_phone', $this->getStringParameter('cp_phone')));
         $fieldSet->addField(Trans::getWord('mainPic'), $this->Field->getYesNo('cp_of_manager', $this->getStringParameter('cp_of_manager')));
+        $fieldSet->addField(Trans::getWord('phone'), $this->Field->getText('cp_phone', $this->getStringParameter('cp_phone')));
         if ($this->isUpdate() === true) {
             $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('cp_active', $this->getStringParameter('cp_active')));
         }

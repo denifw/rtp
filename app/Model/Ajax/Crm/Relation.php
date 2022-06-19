@@ -32,15 +32,13 @@ class Relation extends AbstractBaseAjaxModel
     public function loadSingleSelectData(): array
     {
         if ($this->isValidParameter('rel_ss_id') === true) {
-            $wheres = [];
-            $wheres[] = SqlHelper::generateOrLikeCondition(['rel_short_name', 'rel_name'], $this->getStringParameter('search_key'));
-            $wheres[] = SqlHelper::generateStringCondition('rel_ss_id', $this->getStringParameter('rel_ss_id'));
-            if ($this->isValidParameter('rel_id') === true) {
-                $wheres[] = SqlHelper::generateStringCondition('rel_id', $this->getStringParameter('rel_id'));
-            }
-            $wheres[] = SqlHelper::generateNullCondition('rel_deleted_on');
-            $wheres[] = SqlHelper::generateStringCondition('rel_active', 'Y');
-            return RelationDao::loadSingleSelectData('rel_name', $wheres);
+            $helper = new SqlHelper();
+            $helper->addOrLikeWhere(['rel.rel_short_name', 'rel.rel_name'], $this->getStringParameter('search_key'));
+            $helper->addStringWhere('rel.rel_ss_id', $this->getStringParameter('rel_ss_id'));
+            $helper->addStringWhere('rel.rel_id', $this->getStringParameter('rel_id'));
+            $helper->addStringWhere('rel.rel_active', $this->getStringParameter('rel_active'));
+            $helper->addNullWhere('rel.rel_deleted_on');
+            return RelationDao::loadSingleSelectData('rel_name', $helper);
         }
 
         return [];

@@ -185,4 +185,17 @@ class ListingSort
         return $field;
     }
 
+    /**
+     * Function to set the selected field.
+     *
+     * @return string
+     */
+    public function getOrderByFieldsString(): string
+    {
+        $fields = $this->getOrderByFields();
+        if (empty($fields) === false) {
+            return implode(', ', $fields);
+        }
+        return '';
+    }
 }

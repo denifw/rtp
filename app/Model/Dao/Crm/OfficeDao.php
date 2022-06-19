@@ -65,9 +65,9 @@ class OfficeDao extends AbstractBaseDao
      */
     public static function getByReference(string $referenceValue): array
     {
-        $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('ofc.of_id', $referenceValue);
-        $data = self::loadData($wheres);
+        $helper = new SqlHelper();
+        $helper->addStringWhere('ofc.of_id', $referenceValue);
+        $data = self::loadData($helper);
         if (count($data) === 1) {
             return $data[0];
         }
@@ -84,27 +84,22 @@ class OfficeDao extends AbstractBaseDao
      */
     public static function getDataByRelation(string $relId): array
     {
-        $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('ofc.of_rel_id', $relId);
-        $wheres[] = SqlHelper::generateNullCondition('ofc.of_deleted_on');
-        return self::loadData($wheres);
+        $helper = new SqlHelper();
+        $helper->addStringWhere('ofc.of_rel_id', $relId);
+        return self::loadData($helper);
     }
 
     /**
      * Function to get all record.
      *
-     * @param array $wheres To store the list condition query.
-     * @param array $orderBy To store the list order by query.
-     * @param int $limit To store the limit of the data.
-     * @param int $offset To store the offset of the data to apply limit.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return array
      */
-    public static function loadData(array $wheres = [], array $orderBy = [], int $limit = 0, int $offset = 0): array
+    public static function loadData(SqlHelper $helper): array
     {
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
+        if ($helper->hasOrderBy() === false) {
+            $helper->addOrderByString('ofc.of_name, ofc.of_id');
         }
         $query = "SELECT ofc.of_id, ofc.of_rel_id, ofc.of_name, ofc.of_invoice, ofc.of_address,
                         ofc.of_cnt_id, ofc.of_stt_id, ofc.of_cty_id, ofc.of_dtc_id, ofc.of_postal_code, ofc.of_longitude,
@@ -117,131 +112,49 @@ class OfficeDao extends AbstractBaseDao
                         LEFT OUTER JOIN country as cnt ON ofc.of_cnt_id = cnt.cnt_id
                         LEFT OUTER JOIN state as stt ON ofc.of_stt_id = stt.stt_id
                         LEFT OUTER JOIN city as cty ON ofc.of_cty_id = cty.cty_id
-                        LEFT OUTER JOIN district as dtc ON ofc.of_dtc_id = dtc.dtc_id" . $strWhere;
-        if (empty($orderBy) === false) {
-            $query .= ' ORDER BY ' . implode(', ', $orderBy);
-        } else {
-            $query .= ' ORDER BY ofc.of_name, ofc.of_id';
-        }
-        if ($limit > 0) {
-            $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-        }
-        $result = DB::select($query);
-        return self::doPrepareOfficeData($result);
+                        LEFT OUTER JOIN district as dtc ON ofc.of_dtc_id = dtc.dtc_id " . $helper;
+        $results = DB::select($query);
+        return DataParser::arrayObjectToArray($results);
     }
 
     /**
-     * Function to prepare office data..
+     * Function to get total record.
      *
-     * @param array $sqlResults To store data from sql query.
+     * @param SqlHelper $helper To store the list condition query.
      *
-     * @return array
+     * @return int
      */
-    private static function doPrepareOfficeData(array $sqlResults): array
+    public static function loadTotalData(SqlHelper $helper): int
     {
-        $results = [];
-        foreach ($sqlResults as $row) {
-            $data = DataParser::objectToArray($row);
-            $address = $data['of_address'];
-            $adDtc = $data['of_address'];
-            $adCty = $data['of_address'];
-            if (empty($data['of_district']) === false) {
-                $address .= ', ' . $data['of_district'];
-                $address .= ', ' . $data['of_city'];
-                $address .= ', ' . $data['of_state'];
-                $address .= ', ' . $data['of_country'];
+        $result = 0;
+        $query = 'SELECT count(DISTINCT (ofc.of_id)) AS total_rows
+                  FROM office as ofc
+                        INNER JOIN relation as rel ON ofc.of_rel_id = rel.rel_id
+                        LEFT OUTER JOIN contact_person as cp ON ofc.of_cp_id = cp.cp_id
+                        LEFT OUTER JOIN country as cnt ON ofc.of_cnt_id = cnt.cnt_id
+                        LEFT OUTER JOIN state as stt ON ofc.of_stt_id = stt.stt_id
+                        LEFT OUTER JOIN city as cty ON ofc.of_cty_id = cty.cty_id
+                        LEFT OUTER JOIN district as dtc ON ofc.of_dtc_id = dtc.dtc_id ' . $helper->getConditionForCountData();
 
-                $adDtc .= ', ' . $data['of_district'];
-
-                $adCty .= ', ' . $data['of_district'];
-                $adCty .= ', ' . $data['of_city'];
-            }
-            if (empty($data['of_postal_code']) === false) {
-                $address .= ', ' . $data['of_postal_code'];
-            }
-            $data['of_full_address'] = $address;
-            $data['of_address_district'] = $adDtc;
-            $data['of_address_city'] = $adCty;
-            $results[] = $data;
+        $sqlResults = DB::select($query);
+        if (count($sqlResults) === 1) {
+            $result = (int)DataParser::objectToArray($sqlResults[0])['total_rows'];
         }
-        return $results;
+
+        return $result;
     }
-
-    /**
-     * Function to get all record.
-     *
-     * @param array $wheres To store the list condition query.
-     * @param array $orderBy To store the list order by query.
-     * @param int $limit To store the limit of the data.
-     * @param int $offset To store the offset of the data to apply limit.
-     *
-     * @return array
-     */
-    public static function loadSimpleData(array $wheres = [], array $orderBy = [], int $limit = 0, int $offset = 0): array
-    {
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
-        $query = 'SELECT of_id, of_name
-                    FROM office ' . $strWhere;
-        if (empty($orderBy) === false) {
-            $query .= ' ORDER BY ' . implode(', ', $orderBy);
-        } else {
-            $query .= ' ORDER BY of_name, of_id';
-        }
-        if ($limit > 0) {
-            $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-        }
-        $result = DB::select($query);
-
-        return DataParser::arrayObjectToArray($result);
-
-    }
-
-    /**
-     * Function to get all record.
-     *
-     * @param int $relId To store the relation id.
-     * @return array
-     */
-    public static function loadInvoiceOffice($relId): array
-    {
-        $wheres = [];
-        $wheres[] = '(of_rel_id = ' . $relId . ')';
-        $wheres[] = '(of_deleted_on IS NULL)';
-        $wheres[] = "(of_active = 'Y')";
-        $wheres[] = "(of_invoice = 'Y')";
-        return self::loadSimpleData($wheres, ['of_name', 'of_id']);
-    }
-
-    /**
-     * Function to get all record.
-     *
-     * @param int $relId To store the relation id.
-     * @return array
-     */
-    public static function loadOrderOffice($relId): array
-    {
-        $wheres = [];
-        $wheres[] = '(of_rel_id = ' . $relId . ')';
-        $wheres[] = '(of_deleted_on IS NULL)';
-        $wheres[] = "(of_active = 'Y')";
-        return self::loadSimpleData($wheres, ['of_name', 'of_id']);
-    }
-
     /**
      * Function to get record for single select field.
      *
      * @param string|array $textColumn To store the column name that will be show as a text.
-     * @param array $wheres To store the list condition query.
-     * @param array $orders To store the list sorting query.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return array
      */
-    public static function loadSingleSelectData($textColumn, array $wheres = [], array $orders = []): array
+    public static function loadSingleSelectData($textColumn, SqlHelper $helper): array
     {
-        $data = self::loadData($wheres, $orders, 20);
+        $helper->setLimit(20);
+        $data = self::loadData($helper);
 
         return parent::doPrepareSingleSelectData($data, $textColumn, 'of_id');
     }

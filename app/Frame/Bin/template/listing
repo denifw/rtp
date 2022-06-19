@@ -9,6 +9,7 @@
  */
 namespace App\Model\Listing\\${Name_Space};
 
+use App\Frame\Formatter\SqlHelper;
 use App\Frame\Mvc\AbstractListingModel;
 use App\Model\Dao\\${Name_Space}\\${Class_Name}Dao;
 
@@ -82,26 +83,24 @@ class ${Class_Name} extends AbstractListingModel
      */
     private function loadData(): array
     {
-        return ${Class_Name}Dao::loadData(
-                    ${DS}this->getWhereCondition(),
-                    ${DS}this->ListingSort->getOrderByFields(),
-                    ${DS}this->getLimitTable(),
-                    ${DS}this->getLimitOffsetTable());
+        return ${Class_Name}Dao::loadData(${DS}this->getWhereCondition());
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return array
+     * @return SqlHelper
      */
-    private function getWhereCondition(): array
+    private function getWhereCondition(): SqlHelper
     {
         # Set where conditions
-        ${DS}wheres = [];
+        ${DS}helper = new SqlHelper();
+        ${DS}helper->setLimit(${DS}this->getLimitTable(), ${DS}this->getLimitOffsetTable());
+        ${DS}helper->addOrderByString(${DS}this->ListingSort->getOrderByFieldsString());
 
         # TODO Check the filter value here.
 
         # return the list where condition.
-        return ${DS}wheres;
+        return ${DS}helper;
     }
 }
