@@ -33,14 +33,12 @@ class CostCodeGroup extends AbstractBaseAjaxModel
     public function loadSingleSelectData(): array
     {
         if ($this->isValidParameter('ccg_ss_id')) {
-            $wheres = [];
-            if ($this->isValidParameter('search_key') === true) {
-                $wheres[] = SqlHelper::generateOrLikeCondition(['ccg_code', 'ccg_name'], $this->getStringParameter('search_key'));
-            }
-            $wheres[] = SqlHelper::generateStringCondition('ccg_ss_id', $this->getStringParameter('ccg_ss_id'));
-            $wheres[] = SqlHelper::generateStringCondition('ccg_active', 'Y');
-            $wheres[] = SqlHelper::generateNullCondition('ccg_deleted_on');
-            return CostCodeGroupDao::loadSingleSelectData(['ccg_code', 'ccg_name'], $wheres);
+            $helper = new SqlHelper();
+            $helper->addStringWhere('ccg_ss_id', $this->getStringParameter('ccg_ss_id'));
+            $helper->addStringWhere('ccg_active', 'Y');
+            $helper->addNullWhere('ccg_deleted_on');
+            $helper->addOrLikeWhere(['ccg_code', 'ccg_name'], $this->getStringParameter('search_key'));
+            return CostCodeGroupDao::loadSingleSelectData(['ccg_code', 'ccg_name'], $helper);
         }
 
         return [];

@@ -50,7 +50,7 @@ class CostCode extends AbstractFormModel
             'cc_ccg_id' => $this->getStringParameter('cc_ccg_id'),
             'cc_code' => $this->getStringParameter('cc_code'),
             'cc_name' => $this->getStringParameter('cc_name'),
-            'cc_active' => 'Y'
+            'cc_active' => $this->getStringParameter('cc_active', 'Y')
         ];
         $costCodeDao = new CostCodeDao();
         $costCodeDao->doInsertTransaction($colVal);
@@ -102,14 +102,13 @@ class CostCode extends AbstractFormModel
      */
     public function loadValidationRole(): void
     {
-        $this->Validation->checkRequire('cc_code', 1, 50);
-        $this->Validation->checkRequire('cc_name', 2, 150);
+        $this->Validation->checkRequire('cc_code', 1, 64);
+        $this->Validation->checkRequire('cc_name', 2, 128);
         $this->Validation->checkRequire('cc_ccg_id');
         $this->Validation->checkUnique('cc_code', 'cost_code', [
             'cc_id' => $this->getDetailReferenceValue()
         ], [
             'cc_ss_id' => $this->User->getSsId(),
-            'cc_ccg_id' => $this->getStringParameter('cc_ccg_id')
         ]);
     }
 

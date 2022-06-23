@@ -55,6 +55,7 @@ class CostCode extends AbstractListingModel
 
         $this->ListingForm->addField(Trans::getWord('group'), $ccgField);
         $this->ListingForm->addField(Trans::getWord('code'), $this->Field->getText('cc_code', $this->getStringParameter('cc_code')));
+        $this->ListingForm->addField(Trans::getWord('description'), $this->Field->getText('cc_name', $this->getStringParameter('cc_name')));
         $this->ListingForm->addField(Trans::getWord('active'), $this->Field->getYesNo('cc_active', $this->getStringParameter('cc_active')));
     }
 
@@ -71,6 +72,7 @@ class CostCode extends AbstractListingModel
                 'cc_group' => Trans::getWord('group'),
                 'cc_code' => Trans::getWord('code'),
                 'cc_name' => Trans::getWord('name'),
+                'cc_type_name' => Trans::getWord('type'),
                 'cc_active' => Trans::getWord('active'),
             ]
         );
@@ -103,15 +105,11 @@ class CostCode extends AbstractListingModel
      */
     private function loadData(): array
     {
-        $data = CostCodeDao::loadData(
-            $this->getWhereCondition(),
-            $this->ListingSort->getOrderByFields(),
-            $this->getLimitTable(),
-            $this->getLimitOffsetTable()
-        );
+        $data = CostCodeDao::loadData($this->getWhereCondition());
         $results = [];
         foreach ($data as $row) {
             $row['cc_group'] = $row['cc_group_code'] . ' - ' . $row['cc_group_name'];
+            $row['cc_type_name'] = Trans::getWord($row['cc_type_name']);
             $results[] = $row;
         }
         return $results;
@@ -121,22 +119,19 @@ class CostCode extends AbstractListingModel
     /**
      * Function to get the where condition.
      *
-     * @return array
+     * @return SqlHelper
      */
-    private function getWhereCondition(): array
+    private function getWhereCondition(): SqlHelper
     {
+        $helper = new SqlHelper();
+        $helper->setLimit($this->getLimitTable(), $this->getLimitOffsetTable());
+        $helper->addOrderByString($this->ListingSort->getOrderByFieldsString());
         # Set where conditions
-        $wheres = [];
-        if ($this->isValidParameter('cc_code')) {
-            $wheres[] = SqlHelper::generateLikeCondition('cc.cc_code', $this->getStringParameter('cc_code'));
-        }
-        if ($this->isValidParameter('cc_active')) {
-            $wheres[] = SqlHelper::generateStringCondition('cc.cc_active', $this->getStringParameter('cc_active'));
-        }
-        if ($this->isValidParameter('cc_ccg_id')) {
-            $wheres[] = SqlHelper::generateStringCondition('cc.cc_ccg_id', $this->getStringParameter('cc_ccg_id'));
-        }
-        $wheres[] = SqlHelper::generateStringCondition('cc.cc_ss_id', $this->User->getSsId());
-        return $wheres;
+        $helper->addStringWhere('ccg_ss_id', $this->User->getSsId());
+        $helper->addStringWhere('cc_ccg_id', $this->getStringParameter('cc_ccg_id'));
+        $helper->addLikeWhere('cc_name', $this->getStringParameter('cc_name'));
+        $helper->addLikeWhere('cc_code', $this->getStringParameter('cc_code'));
+        $helper->addStringWhere('cc_active', $this->getStringParameter('cc_active'));
+        return $helper;
     }
 }

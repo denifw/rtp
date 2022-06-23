@@ -59,10 +59,10 @@ class CostCodeDao extends AbstractBaseDao
      */
     public static function getByReferenceAndSystem(string $referenceValue, string $systemSettingValue): array
     {
-        $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('cc.cc_ss_id', $systemSettingValue);
-        $wheres[] = SqlHelper::generateStringCondition('cc.cc_id', $referenceValue);
-        $data = self::loadData($wheres);
+        $helper = new SqlHelper();
+        $helper->addStringWhere('cc.cc_id', $referenceValue);
+        $helper->addStringWhere('cc.cc_ss_id', $systemSettingValue);
+        $data = self::loadData($helper);
         if (count($data) === 1) {
             return $data[0];
         }
@@ -78,41 +78,29 @@ class CostCodeDao extends AbstractBaseDao
      */
     public static function getByGroupId(string $ccgId): array
     {
-        $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('cc.cc_ccg_id', $ccgId);
-
-        return self::loadData($wheres);
+        $helper = new SqlHelper();
+        $helper->addStringWhere('cc.cc_ccg_id', $ccgId);
+        $helper->addNullWhere('cc.cc_deleted_on');
+        return self::loadData($helper);
     }
 
     /**
      * Function to get all record.
      *
-     * @param array $wheres To store the list condition query.
-     * @param array $orders To store the list condition query.
-     * @param int $limit To store the limit of the data.
-     * @param int $offset To store the offset of the data to apply limit.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return array
      */
-    public static function loadData(array $wheres = [], array $orders = [], int $limit = 0, int $offset = 0): array
+    public static function loadData(SqlHelper $helper): array
     {
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
+        if ($helper->hasOrderBy() === false) {
+            $helper->addOrderByString('ccg.ccg_code, cc.cc_code, cc.cc_id');
         }
         $query = "SELECT cc.cc_id, cc.cc_ss_id, cc.cc_code, cc.cc_ccg_id, cc.cc_name, cc.cc_active,
                         ccg.ccg_code as cc_group_code, ccg.ccg_name as cc_group_name, ccg.ccg_type as cc_type,
-                        (CASE WHEN ccg.ccg_type = 'S' THEN 'Sales' WHEN ccg.ccg_type = 'P' THEN 'Purchase' WHEN ccg.ccg_type = 'D' THEN 'Deposit' ELSE 'Reimburse' END) AS cc_type_name
+                        (CASE WHEN ccg.ccg_type = 'S' THEN 'sales' ELSE 'purchase' END) AS cc_type_name
                         FROM cost_code AS cc INNER JOIN
-                       cost_code_group AS ccg ON cc.cc_ccg_id = ccg.ccg_id " . $strWhere;
-        if (empty($orders) === false) {
-            $query .= ' ORDER BY ' . implode(' AND ', $orders);
-        } else {
-            $query .= ' ORDER BY ccg.ccg_code, cc.cc_code, cc.cc_id';
-        }
-        if ($limit > 0) {
-            $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-        }
+                       cost_code_group AS ccg ON cc.cc_ccg_id = ccg.ccg_id " . $helper;
         $result = DB::select($query);
 
         return DataParser::arrayObjectToArray($result);
@@ -123,20 +111,16 @@ class CostCodeDao extends AbstractBaseDao
     /**
      * Function to get total record.
      *
-     * @param array $wheres To store the list condition query.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return int
      */
-    public static function loadTotalData(array $wheres = []): int
+    public static function loadTotalData(SqlHelper $helper): int
     {
         $result = 0;
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
         $query = 'SELECT count(DISTINCT (cc.cc_id)) AS total_rows
-                       FROM cost_code AS cc INNER JOIN
-                       cost_code_group AS ccg ON cc.cc_ccg_id = ccg.ccg_id ' . $strWhere;
+                       FROM cost_code AS cc
+                           INNER JOIN cost_code_group AS ccg ON cc.cc_ccg_id = ccg.ccg_id ' . $helper->getConditionForCountData();
         $sqlResults = DB::select($query);
         if (count($sqlResults) === 1) {
             $result = (int)DataParser::objectToArray($sqlResults[0])['total_rows'];
@@ -148,17 +132,16 @@ class CostCodeDao extends AbstractBaseDao
      * Function to get record for single select field.
      *
      * @param string|array $textColumn To store the column name that will be show as a text.
-     * @param array $wheres To store the list condition query.
-     * @param array $orders To store the list sorting query.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return array
      */
-    public static function loadSingleSelectData($textColumn, array $wheres = [], array $orders = []): array
+    public static function loadSingleSelectData($textColumn, SqlHelper $helper): array
     {
-        $data = self::loadData($wheres, $orders, 20);
+        $helper->setLimit(20);
+        $data = self::loadData($helper);
 
         return parent::doPrepareSingleSelectData($data, $textColumn, 'cc_id');
     }
-
 
 }

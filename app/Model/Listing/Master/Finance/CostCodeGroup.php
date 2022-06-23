@@ -49,12 +49,11 @@ class CostCodeGroup extends AbstractListingModel
 
         #Type
         $typeField = $this->Field->getSelect('ccg_type', $this->getStringParameter('ccg_type'));
-        $typeField->addOption('Sales', 'S');
-        $typeField->addOption('Purchase', 'P');
-        $typeField->addOption('Reimburse', 'R');
+        $typeField->addOption(Trans::getWord('sales'), 'S');
+        $typeField->addOption(Trans::getWord('purchase'), 'P');
 
         $this->ListingForm->addField(Trans::getWord('code'), $this->Field->getText('ccg_code', $this->getStringParameter('ccg_code')));
-        $this->ListingForm->addField(Trans::getWord('name'), $this->Field->getText('ccg_name', $this->getStringParameter('ccg_name')));
+        $this->ListingForm->addField(Trans::getWord('description'), $this->Field->getText('ccg_name', $this->getStringParameter('ccg_name')));
         $this->ListingForm->addField(Trans::getWord('type'), $typeField);
         $this->ListingForm->addField(Trans::getWord('active'), $this->Field->getYesNo('cc_active', $this->getStringParameter('cc_active')));
     }
@@ -70,7 +69,7 @@ class CostCodeGroup extends AbstractListingModel
         $this->ListingTable->setHeaderRow(
             [
                 'ccg_code' => Trans::getWord('code'),
-                'ccg_name' => Trans::getWord('name'),
+                'ccg_name' => Trans::getWord('description'),
                 'ccg_type_name' => Trans::getWord('type'),
                 'ccg_active' => Trans::getWord('active'),
             ]
@@ -102,22 +101,13 @@ class CostCodeGroup extends AbstractListingModel
      */
     private function loadData(): array
     {
-        $data = CostCodeGroupDao::loadData(
-            $this->getWhereCondition(),
-            $this->ListingSort->getOrderByFields(),
-            $this->getLimitTable(),
-            $this->getLimitOffsetTable()
-        );
+        $data = CostCodeGroupDao::loadData($this->getWhereCondition());
         $results = [];
         foreach ($data as $row) {
             if ($row['ccg_type'] === 'S') {
                 $row['ccg_type_name'] = Trans::getWord('sales');
-            } elseif ($row['ccg_type'] === 'P') {
-                $row['ccg_type_name'] = Trans::getWord('purchase');
-            } elseif ($row['ccg_type'] === 'D') {
-                $row['ccg_type_name'] = Trans::getWord('deposit');
             } else {
-                $row['ccg_type_name'] = Trans::getWord('reimburse');
+                $row['ccg_type_name'] = Trans::getWord('purchase');
             }
             $results[] = $row;
         }
@@ -127,25 +117,19 @@ class CostCodeGroup extends AbstractListingModel
     /**
      * Function to get the where condition.
      *
-     * @return array
+     * @return SqlHelper
      */
-    private function getWhereCondition(): array
+    private function getWhereCondition(): SqlHelper
     {
+        $helper = new SqlHelper();
+        $helper->setLimit($this->getLimitTable(), $this->getLimitOffsetTable());
+        $helper->addOrderByString($this->ListingSort->getOrderByFieldsString());
         # Set where conditions
-        $wheres = [];
-        if ($this->isValidParameter('ccg_code')) {
-            $wheres[] = SqlHelper::generateLikeCondition('ccg_code', $this->getStringParameter('ccg_code'));
-        }
-        if ($this->isValidParameter('ccg_name')) {
-            $wheres[] = SqlHelper::generateLikeCondition('ccg_name', $this->getStringParameter('ccg_name'));
-        }
-        if ($this->isValidParameter('ccg_type')) {
-            $wheres[] = SqlHelper::generateStringCondition('ccg_type', $this->getStringParameter('ccg_type'));
-        }
-        if ($this->isValidParameter('ccg_active')) {
-            $wheres[] = SqlHelper::generateStringCondition('ccg_active', $this->getStringParameter('ccg_active'));
-        }
-        $wheres[] = SqlHelper::generateStringCondition('ccg_ss_id', $this->User->getSsId());
-        return $wheres;
+        $helper->addStringWhere('ccg_ss_id', $this->User->getSsId());
+        $helper->addLikeWhere('ccg_name', $this->getStringParameter('ccg_name'));
+        $helper->addLikeWhere('ccg_code', $this->getStringParameter('ccg_code'));
+        $helper->addStringWhere('ccg_type', $this->getStringParameter('ccg_type'));
+        $helper->addStringWhere('ccg_active', $this->getStringParameter('ccg_active'));
+        return $helper;
     }
 }

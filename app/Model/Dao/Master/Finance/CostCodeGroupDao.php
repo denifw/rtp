@@ -12,6 +12,7 @@
 namespace App\Model\Dao\Master\Finance;
 
 use App\Frame\Formatter\SqlHelper;
+use App\Frame\Formatter\Trans;
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
 use Illuminate\Support\Facades\DB;
@@ -59,10 +60,10 @@ class CostCodeGroupDao extends AbstractBaseDao
      */
     public static function getByReferenceAndSystem(string $referenceValue, string $systemSettingValue): array
     {
-        $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('ccg_id', $referenceValue);
-        $wheres[] = SqlHelper::generateStringCondition('ccg_ss_id', $systemSettingValue);
-        $data = self::loadData($wheres);
+        $helper = new SqlHelper();
+        $helper->addStringWhere('ccg_id', $referenceValue);
+        $helper->addStringWhere('ccg_ss_id', $systemSettingValue);
+        $data = self::loadData($helper);
         if (count($data) === 1) {
             return $data[0];
         }
@@ -72,29 +73,17 @@ class CostCodeGroupDao extends AbstractBaseDao
     /**
      * Function to get all record.
      *
-     * @param array $wheres To store the list condition query.
-     * @param array $orderBy To store the list condition query.
-     * @param int $limit To store the limit of the data.
-     * @param int $offset To store the offset of the data to apply limit.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return array
      */
-    public static function loadData(array $wheres = [], array $orderBy = [], int $limit = 0, int $offset = 0): array
+    public static function loadData(SqlHelper $helper): array
     {
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
+        if ($helper->hasOrderBy() === false) {
+            $helper->addOrderByString('ccg_code, ccg_id');
         }
         $query = "SELECT ccg_id, ccg_ss_id, ccg_code, ccg_name, ccg_active, ccg_type
-                FROM cost_code_group " . $strWhere;
-        if (empty($orderBy) === false) {
-            $query .= ' ORDER BY ' . implode(', ', $orderBy);
-        } else {
-            $query .= ' ORDER BY ccg_code, ccg_id';
-        }
-        if ($limit > 0) {
-            $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-        }
+                FROM cost_code_group " . $helper;
         $result = DB::select($query);
         return DataParser::arrayObjectToArray($result);
     }
@@ -110,34 +99,24 @@ class CostCodeGroupDao extends AbstractBaseDao
     public static function getTypeName(string $type): string
     {
         if ($type === 'S') {
-            return 'Sales';
+            return Trans::getWord('sales');
         }
-        if ($type === 'P') {
-            return 'Purchase';
-        }
-        if ($type === 'D') {
-            return 'Deposit';
-        }
-        return 'Reimburse';
+        return Trans::getWord('purchase');
     }
 
 
     /**
      * Function to get total record.
      *
-     * @param array $wheres To store the list condition query.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return int
      */
-    public static function loadTotalData(array $wheres = []): int
+    public static function loadTotalData(SqlHelper $helper): int
     {
         $result = 0;
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
         $query = 'SELECT count(DISTINCT (ccg_id)) AS total_rows
-                   FROM cost_code_group ' . $strWhere;
+                   FROM cost_code_group ' . $helper->getConditionForCountData();
         $sqlResults = DB::select($query);
         if (count($sqlResults) === 1) {
             $result = (int)DataParser::objectToArray($sqlResults[0])['total_rows'];
@@ -150,14 +129,14 @@ class CostCodeGroupDao extends AbstractBaseDao
      * Function to get record for single select field.
      *
      * @param string|array $textColumn To store the column name that will be show as a text.
-     * @param array $wheres To store the list condition query.
-     * @param array $orders To store the list sorting query.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return array
      */
-    public static function loadSingleSelectData($textColumn, array $wheres = [], array $orders = []): array
+    public static function loadSingleSelectData($textColumn, SqlHelper $helper): array
     {
-        $data = self::loadData($wheres, $orders, 20);
+        $helper->setLimit(20);
+        $data = self::loadData($helper);
 
         return parent::doPrepareSingleSelectData($data, $textColumn, 'ccg_id');
     }

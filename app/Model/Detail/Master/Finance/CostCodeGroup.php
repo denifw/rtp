@@ -52,7 +52,7 @@ class CostCodeGroup extends AbstractFormModel
             'ccg_code' => $this->getStringParameter('ccg_code'),
             'ccg_name' => $this->getStringParameter('ccg_name'),
             'ccg_type' => $this->getStringParameter('ccg_type'),
-            'ccg_active' => 'Y',
+            'ccg_active' => $this->getStringParameter('ccg_active', 'Y'),
         ];
         $ccgDao = new CostCodeGroupDao();
         $ccgDao->doInsertTransaction($colVal);
@@ -107,8 +107,8 @@ class CostCodeGroup extends AbstractFormModel
      */
     public function loadValidationRole(): void
     {
-        $this->Validation->checkRequire('ccg_code', 1, 50);
-        $this->Validation->checkRequire('ccg_name', 2, 150);
+        $this->Validation->checkRequire('ccg_code', 1, 64);
+        $this->Validation->checkRequire('ccg_name', 2, 128);
         $this->Validation->checkRequire('ccg_type');
         $this->Validation->checkUnique('ccg_code', 'cost_code_group', [
             'ccg_id' => $this->getDetailReferenceValue()
@@ -127,17 +127,15 @@ class CostCodeGroup extends AbstractFormModel
     {
         # Create a form.
         $fieldSet = new FieldSet($this->Validation);
-        $fieldSet->setGridDimension(6, 6, 12);
+        $fieldSet->setGridDimension(12, 12, 12);
         #Type
         $typeField = $this->Field->getSelect('ccg_type', $this->getStringParameter('ccg_type'));
         $typeField->addOption(Trans::getWord('sales'), 'S');
         $typeField->addOption(Trans::getWord('purchase'), 'P');
-        $typeField->addOption(Trans::getWord('reimburse'), 'R');
-        $typeField->addOption(Trans::getWord('deposit'), 'D');
 
 
         $fieldSet->addField(Trans::getWord('code'), $this->Field->getText('ccg_code', $this->getStringParameter('ccg_code')), true);
-        $fieldSet->addField(Trans::getWord('name'), $this->Field->getText('ccg_name', $this->getStringParameter('ccg_name')), true);
+        $fieldSet->addField(Trans::getWord('description'), $this->Field->getText('ccg_name', $this->getStringParameter('ccg_name')), true);
         $fieldSet->addField(Trans::getWord('type'), $typeField, true);
         if ($this->isUpdate() === true) {
             $fieldSet->addField(Trans::getWord('active'), $this->Field->getYesNo('ccg_active', $this->getStringParameter('ccg_active')));
@@ -145,7 +143,7 @@ class CostCodeGroup extends AbstractFormModel
         # Create a portlet box.
         $portlet = new Portlet('costCodeGeneralPtl', Trans::getWord('general'));
         $portlet->addFieldSet($fieldSet);
-        $portlet->setGridDimension(12);
+        $portlet->setGridDimension(6, 6);
 
         return $portlet;
     }
@@ -161,7 +159,7 @@ class CostCodeGroup extends AbstractFormModel
         $table->setHeaderRow(
             [
                 'cc_code' => Trans::getWord('code'),
-                'cc_name' => Trans::getWord('name'),
+                'cc_name' => Trans::getWord('description'),
                 'cc_active' => Trans::getWord('active'),
             ]
         );
