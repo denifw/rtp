@@ -33,14 +33,12 @@ class PaymentMethod extends AbstractBaseAjaxModel
     public function loadSingleSelectData(): array
     {
         if ($this->isValidParameter('pm_ss_id')) {
-            $wheres = [];
-            if ($this->isValidParameter('search_key') === true) {
-                $wheres[] = SqlHelper::generateLikeCondition('pm_name', $this->getStringParameter('search_key'));
-            }
-            $wheres[] = SqlHelper::generateStringCondition('pm_ss_id', $this->getStringParameter('pm_ss_id'));
-            $wheres[] = SqlHelper::generateStringCondition('pm_active', 'Y');
-            $wheres[] = SqlHelper::generateNullCondition('pm_deleted_on');
-            return PaymentMethodDao::loadSingleSelectData('pm_name', $wheres);
+            $helper = new SqlHelper();
+            $helper->addStringWhere('pm_ss_id', $this->getStringParameter('pm_ss_id'));
+            $helper->addLikeWhere('pm_name', $this->getStringParameter('search_key'));
+            $helper->addStringWhere('pm_active', 'Y');
+            $helper->addNullWhere('pm_deleted_on');
+            return PaymentMethodDao::loadSingleSelectData('pm_name', $helper);
         }
         return [];
     }

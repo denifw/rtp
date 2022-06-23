@@ -12,6 +12,7 @@ namespace App\Frame\Mvc;
 
 
 use App\Frame\Formatter\DataParser;
+use App\Frame\Formatter\NumberFormatter;
 use App\Frame\System\Session\UserSession;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -313,18 +314,21 @@ abstract class AbstractBaseDao extends Model
         return $result;
     }
 
+
     /**
      * Function to load data from database.
      *
      * @param array $data To store the query selection.
      * @param string|array $textColumn To store the column name that will be show as a text.
      * @param string $valueColumn To store the column name that will be show as a value.
+     * @param array $numericFields To store the list sorting query.
      *
      * @return array
      */
-    protected static function doPrepareSingleSelectData(array $data, $textColumn, string $valueColumn): array
+    protected static function doPrepareSingleSelectData(array $data, $textColumn, string $valueColumn, array $numericFields = []): array
     {
         $results = [];
+        $number = new NumberFormatter();
         foreach ($data as $row) {
             if (is_array($textColumn) === true) {
                 $text = [];
@@ -338,6 +342,13 @@ abstract class AbstractBaseDao extends Model
                 $row['text'] = $row[$textColumn];
             }
             $row['value'] = $row[$valueColumn];
+
+            # Add numeric value
+            foreach ($numericFields as $num) {
+                if (array_key_exists($num, $row) === true) {
+                    $row[$num . '_number'] = $number->doFormatFloat($row[$num]);
+                }
+            }
             $results[] = $row;
         }
         # return the data.

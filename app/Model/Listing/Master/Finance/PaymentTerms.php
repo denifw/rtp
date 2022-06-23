@@ -95,30 +95,23 @@ class PaymentTerms extends AbstractListingModel
      */
     private function loadData(): array
     {
-        return PaymentTermsDao::loadData(
-            $this->getWhereCondition(),
-            $this->ListingSort->getOrderByFields(),
-            $this->getLimitTable(),
-            $this->getLimitOffsetTable()
-        );
+        return PaymentTermsDao::loadData($this->getWhereCondition());
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return array
+     * @return SqlHelper
      */
-    private function getWhereCondition(): array
+    private function getWhereCondition(): SqlHelper
     {
+        $helper = new SqlHelper();
+        $helper->setLimit($this->getLimitTable(), $this->getLimitOffsetTable());
+        $helper->addOrderByString($this->ListingSort->getOrderByFieldsString());
         # Set where conditions
-        $wheres = [];
-        if ($this->isValidParameter('pt_name')) {
-            $wheres[] = SqlHelper::generateLikeCondition('pt_name', $this->getStringParameter('pt_name'));
-        }
-        if ($this->isValidParameter('pt_active')) {
-            $wheres[] = SqlHelper::generateStringCondition('pt_active', $this->getStringParameter('pt_active'));
-        }
-        $wheres[] = SqlHelper::generateStringCondition('pt_ss_id', $this->User->getSsId());
-        return $wheres;
+        $helper->addStringWhere('pt_ss_id', $this->User->getSsId());
+        $helper->addLikeWhere('pt_name', $this->getStringParameter('pt_name'));
+        $helper->addStringWhere('pt_active', $this->getStringParameter('pt_active'));
+        return $helper;
     }
 }

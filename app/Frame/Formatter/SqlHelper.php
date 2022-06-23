@@ -316,6 +316,60 @@ class SqlHelper
      * Function to load data from database.
      *
      * @param string $columnName to store the query selection.
+     * @param ?string $startDate to store the query selection.
+     * @param ?string $endDate to store the query selection.
+     * @param bool $generateTime to store the query selection.
+     * @param string $orWheresId To Trigger the or where statement.
+     *
+     * @return void
+     */
+    public function addRangeDateTimeWhere(string $columnName, ?string $startDate, ?string $endDate, bool $generateTime = false, string $orWheresId = ''): void
+    {
+        $startWhere = '';
+        $endWhere = '';
+        $startTime = '';
+        $endTime = '';
+        if ($generateTime === true) {
+            $startTime = ' 00:00:01';
+            $endTime = ' 23:59:59';
+        }
+        if ($startDate !== null) {
+            $start = $startDate . $startTime;
+            $startWhere = "(" . $columnName . " >= '" . $start . "')";
+            if ($endDate === null) {
+                $end = $startDate . $endTime;
+                $endWhere = "(" . $columnName . " <= '" . $end . "')";
+            }
+        }
+        if ($endDate !== null) {
+            if ($startDate === null) {
+                $start = $endDate . $startTime;
+                $startWhere = "(" . $columnName . " >= '" . $start . "')";
+            }
+            $end = $endDate . $endTime;
+            $endWhere = "(" . $columnName . " <= '" . $end . "')";
+        }
+        if (empty($orWheresId) === false) {
+            if (empty($startWhere) === false) {
+                $this->setOrWhere($orWheresId, $startWhere);
+            }
+            if (empty($endWhere) === false) {
+                $this->setOrWhere($orWheresId, $endWhere);
+            }
+        } else {
+            if (empty($startWhere) === false) {
+                $this->Wheres[] = $startWhere;
+            }
+            if (empty($endWhere) === false) {
+                $this->Wheres[] = $endWhere;
+            }
+        }
+    }
+
+    /**
+     * Function to load data from database.
+     *
+     * @param string $columnName to store the query selection.
      * @param ?int|?float $value to store the query selection.
      * @param string $operator to store the query selection.
      * @param string $orWheresId To Trigger the or where statement.
@@ -329,6 +383,33 @@ class SqlHelper
                 Message::throwMessage('Invalid operator (' . $operator . ') for generating sql numeric conditions.');
             }
             $where = '(' . $columnName . ' ' . $operator . ' ' . $value . ')';
+            if (empty($orWheresId) === false) {
+                $this->setOrWhere($orWheresId, $where);
+            } else {
+                $this->Wheres[] = $where;
+            }
+        }
+    }
+
+    /**
+     * Function to load data from database.
+     *
+     * @param string $columnName to store the query selection.
+     * @param array $list to store the query selection.
+     * @param bool $inArray to store the query selection.
+     * @param string $orWheresId To Trigger the or where statement.
+     *
+     * @return void
+     */
+    public function addInArrayNumericWhere(string $columnName, array $list, bool $inArray = true, string $orWheresId = ''): void
+    {
+        if (empty($list) === false) {
+            if ($inArray === true) {
+                $where = '(' . $columnName . ' IN (' . implode(', ', $list) . '))';
+
+            } else {
+                $where = '(' . $columnName . ' NOT IN (' . implode(', ', $list) . '))';
+            }
             if (empty($orWheresId) === false) {
                 $this->setOrWhere($orWheresId, $where);
             } else {

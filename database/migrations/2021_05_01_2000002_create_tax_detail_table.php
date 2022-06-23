@@ -26,7 +26,6 @@ class CreateTaxDetailTable extends Migration
             $table->uuid('td_deleted_by')->nullable();
             $table->dateTime('td_deleted_on')->nullable();
             $table->string('td_deleted_reason', 256)->nullable();
-            $table->unique(['td_tax_id', 'td_child_tax_id'], 'tbl_td_tax_child_unique');
         });
         \Illuminate\Support\Facades\Artisan::call('db:seed', [
             '--class' => TaxDetailSeeder::class,

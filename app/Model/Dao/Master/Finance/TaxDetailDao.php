@@ -64,9 +64,9 @@ class TaxDetailDao extends AbstractBaseDao
      */
     public static function getByReference(string $referenceValue): array
     {
-        $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('td_id', $referenceValue);
-        $data = self::loadData($wheres);
+        $helper = new SqlHelper();
+        $helper->addStringWhere('td.td_id', $referenceValue);
+        $data = self::loadData($helper);
         if (count($data) === 1) {
             return $data[0];
         }
@@ -82,38 +82,27 @@ class TaxDetailDao extends AbstractBaseDao
      */
     public static function getByTaxId(string $taxId): array
     {
-        $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('td_tax_id', $taxId);
-        $wheres[] = SqlHelper::generateNullCondition('td_deleted_on');
-        return self::loadData($wheres);
+        $helper = new SqlHelper();
+        $helper->addStringWhere('td.td_tax_id', $taxId);
+        $helper->addNullWhere('td.td_deleted_on');
+        return self::loadData($helper);
     }
 
     /**
      * Function to get all record.
      *
-     * @param array $wheres To store the list condition query.
-     * @param array $orders To store the list condition query.
-     * @param int $limit To store the limit of the data.
-     * @param int $offset To store the offset of the data to apply limit.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return array
      */
-    public static function loadData(array $wheres = [], array $orders = [], int $limit = 0, int $offset = 0): array
+    public static function loadData(SqlHelper $helper): array
     {
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
+        if ($helper->hasOrderBy() === false) {
+            $helper->addOrderByString('tax.tax_name, td.td_id');
         }
-        $query = 'SELECT td_id, td_name, td_percent, td_tax_id
-                        FROM tax_detail ' . $strWhere;
-        if (empty($orders) === false) {
-            $query .= ' ORDER BY ' . implode(', ', $orders);
-        } else {
-            $query .= ' ORDER BY td_name, td_id';
-        }
-        if ($limit > 0) {
-            $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-        }
+        $query = 'SELECT td.td_id, td.td_tax_id, td.td_child_tax_id, tax.tax_name as td_name, tax.tax_percent as td_percent
+                        FROM tax_detail as td
+                            INNER JOIN tax as tax ON td.td_child_tax_id = tax.tax_id' . $helper;
         $result = DB::select($query);
 
         return DataParser::arrayObjectToArray($result);
@@ -123,26 +112,23 @@ class TaxDetailDao extends AbstractBaseDao
      * Function to get all record.
      *
      * @param string $taxId To store the limit of the data.
-     * @param ?string $detailId To store the limit of the data.
      *
      * @return float
      */
-    public static function getTotalPercentageByTaxId(string $taxId, ?string $detailId): float
+    public static function getTotalPercentageByTaxId(string $taxId): float
     {
         $result = 0.0;
         $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('td_tax_id', $taxId);
-        $wheres[] = SqlHelper::generateNullCondition('td_deleted_on');
-        if (empty($detailId) === false) {
-            $wheres[] = SqlHelper::generateStringCondition('td_id', $detailId, '<>');
-        }
+        $wheres[] = SqlHelper::generateStringCondition('td.td_tax_id', $taxId);
+        $wheres[] = SqlHelper::generateNullCondition('td.td_deleted_on');
         $strWhere = '';
         if (empty($wheres) === false) {
             $strWhere = ' WHERE ' . implode(' AND ', $wheres);
         }
-        $query = 'SELECT td_tax_id, SUM(td_percent) as total_percent
-                        FROM tax_detail ' . $strWhere;
-        $query .= ' GROUP BY td_tax_id';
+        $query = 'SELECT td.td_tax_id, SUM(tax.tax_percent) as total_percent
+                        FROM tax_detail as td
+                            INNER JOIN tax as tax ON td.td_child_tax_id = tax.tax_id ' . $strWhere;
+        $query .= ' GROUP BY td.td_tax_id';
         $sqlResults = DB::select($query);
         if (count($sqlResults) === 1) {
             $result = (float)DataParser::objectToArray($sqlResults[0])['total_percent'];

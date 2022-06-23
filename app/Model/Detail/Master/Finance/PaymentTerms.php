@@ -107,7 +107,12 @@ class PaymentTerms extends AbstractFormModel
             'pt_ss_id' => $this->User->getSsId()
         ]);
         $this->Validation->checkRequire('pt_days');
-        $this->Validation->checkInt('pt_days', 0);
+        $this->Validation->checkInt('pt_days', 1);
+        $this->Validation->checkUnique('pt_days', 'payment_terms', [
+            'pt_id' => $this->getDetailReferenceValue()
+        ], [
+            'pt_ss_id' => $this->User->getSsId()
+        ]);
     }
 
 

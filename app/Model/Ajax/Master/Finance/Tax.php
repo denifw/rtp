@@ -33,14 +33,12 @@ class Tax extends AbstractBaseAjaxModel
     public function loadSingleSelectData(): array
     {
         if ($this->isValidParameter('tax_ss_id') === true) {
-            $wheres = [];
-            if ($this->isValidParameter('search_key') === true) {
-                $wheres[] = SqlHelper::generateLikeCondition('tax_name', $this->getStringParameter('search_key'));
-            }
-            $wheres[] = SqlHelper::generateNullCondition('tax_deleted_on');
-            $wheres[] = SqlHelper::generateNullCondition('tax_percent', false);
-            $wheres[] = SqlHelper::generateStringCondition('tax_active', 'Y');
-            return TaxDao::loadSingleSelectData('tax_name', $wheres);
+            $helper = new SqlHelper();
+            $helper->addStringWhere('tax_ss_id', $this->getStringParameter('tax_ss_id'));
+            $helper->addLikeWhere('tax_name', $this->getStringParameter('search_key'));
+            $helper->addStringWhere('tax_group', $this->getStringParameter('tax_group'));
+            $helper->addNullWhere('tax_deleted_on');
+            return TaxDao::loadSingleSelectData('tax_name', $helper);
         }
         return [];
     }

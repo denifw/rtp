@@ -35,7 +35,17 @@ class TaxDao extends AbstractBaseDao
         'tax_id',
         'tax_ss_id',
         'tax_name',
+        'tax_group',
+        'tax_percent',
         'tax_active',
+    ];
+    /**
+     * Property to store the numeric fields.
+     *
+     * @var array
+     */
+    protected $NumericFields = [
+        'tax_percent',
     ];
 
     /**
@@ -57,10 +67,10 @@ class TaxDao extends AbstractBaseDao
      */
     public static function getByReferenceAndSystem(string $referenceValue, string $ssId): array
     {
-        $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('tax_id', $referenceValue);
-        $wheres[] = SqlHelper::generateStringCondition('tax_ss_id', $ssId);
-        $data = self::loadData($wheres);
+        $helper = new SqlHelper();
+        $helper->addStringWhere('tax_id', $referenceValue);
+        $helper->addStringWhere('tax_ss_id', $ssId);
+        $data = self::loadData($helper);
         if (count($data) === 1) {
             return $data[0];
         }
@@ -70,29 +80,18 @@ class TaxDao extends AbstractBaseDao
     /**
      * Function to get all record.
      *
-     * @param array $wheres To store the list condition query.
-     * @param array $orders To store the list condition query.
-     * @param int $limit To store the limit of the data.
-     * @param int $offset To store the offset of the data to apply limit.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return array
      */
-    public static function loadData(array $wheres = [], array $orders = [], int $limit = 0, int $offset = 0): array
+    public static function loadData(SqlHelper $helper): array
     {
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
+        if ($helper->hasOrderBy() === false) {
+
+            $helper->addOrderBy('tax_group, tax_name, tax_id');
         }
-        $query = "SELECT tax_id, tax_name, tax_active, tax_percent
-                        FROM tax " . $strWhere;
-        if (empty($orders) === false) {
-            $query .= ' ORDER BY ' . implode(', ', $orders);
-        } else {
-            $query .= ' ORDER BY tax_name, tax_id';
-        }
-        if ($limit > 0) {
-            $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-        }
+        $query = "SELECT tax_id, tax_ss_id, tax_name, tax_active, tax_percent, tax_group
+                        FROM tax " . $helper;
         $result = DB::select($query);
 
         return DataParser::arrayObjectToArray($result);
@@ -101,19 +100,15 @@ class TaxDao extends AbstractBaseDao
     /**
      * Function to get total record.
      *
-     * @param array $wheres To store the list condition query.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return int
      */
-    public static function loadTotalData(array $wheres = []): int
+    public static function loadTotalData(SqlHelper $helper): int
     {
         $result = 0;
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
-        }
         $query = 'SELECT count(DISTINCT (tax_id)) AS total_rows
-                   FROM tax ' . $strWhere;
+                   FROM tax ' . $helper->getConditionForCountData();
         $sqlResults = DB::select($query);
         if (count($sqlResults) === 1) {
             $result = (int)DataParser::objectToArray($sqlResults[0])['total_rows'];
@@ -126,15 +121,15 @@ class TaxDao extends AbstractBaseDao
      * Function to get record for single select field.
      *
      * @param string|array $textColumn To store the column name that will be show as a text.
-     * @param array $wheres To store the list condition query.
-     * @param array $orders To store the list sorting query.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return array
      */
-    public static function loadSingleSelectData($textColumn, array $wheres = [], array $orders = []): array
+    public static function loadSingleSelectData($textColumn, SqlHelper $helper): array
     {
-        $data = self::loadData($wheres, $orders, 20);
+        $helper->setLimit(20);
+        $data = self::loadData($helper);
 
-        return parent::doPrepareSingleSelectData($data, $textColumn, 'tax_id');
+        return parent::doPrepareSingleSelectData($data, $textColumn, 'tax_id', ['tax_percent']);
     }
 }

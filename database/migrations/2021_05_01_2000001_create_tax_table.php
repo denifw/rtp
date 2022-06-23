@@ -18,7 +18,7 @@ class CreateTaxTable extends Migration
             $table->uuid('tax_ss_id')->unsigned();
             $table->foreign('tax_ss_id', 'tbl_tax_ss_id_fkey')->references('ss_id')->on('system_setting');
             $table->string('tax_name', 128);
-            $table->char('tax_group', 1)->default('Y');
+            $table->char('tax_group', 1)->default('N');
             $table->float('tax_percent')->nullable();
             $table->char('tax_active', 1)->default('Y');
             $table->uuid('tax_created_by');

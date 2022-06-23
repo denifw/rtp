@@ -46,6 +46,7 @@ class Tax extends AbstractListingModel
     public function loadSearchForm(): void
     {
         $this->ListingForm->addField(Trans::getWord('name'), $this->Field->getText('tax_name', $this->getStringParameter('tax_name')));
+        $this->ListingForm->addField(Trans::getWord('group'), $this->Field->getYesNo('tax_group', $this->getStringParameter('tax_group')));
         $this->ListingForm->addField(Trans::getWord('active'), $this->Field->getYesNo('tax_active', $this->getStringParameter('tax_active')));
     }
 
@@ -60,6 +61,7 @@ class Tax extends AbstractListingModel
         $this->ListingTable->setHeaderRow(
             [
                 'tax_name' => Trans::getWord('description'),
+                'tax_group' => Trans::getWord('group'),
                 'tax_percent' => Trans::getWord('percentage'),
                 'tax_active' => Trans::getWord('active'),
             ]
@@ -68,6 +70,7 @@ class Tax extends AbstractListingModel
         $listingData = $this->loadData();
         $this->ListingTable->addRows($listingData);
         # Add special settings to the table
+        $this->ListingTable->setColumnType('tax_group', 'yesno');
         $this->ListingTable->setColumnType('tax_active', 'yesno');
         $this->ListingTable->setColumnType('tax_percent', 'currency');
         if ($this->isAllowUpdate() === true) {
@@ -93,30 +96,24 @@ class Tax extends AbstractListingModel
      */
     private function loadData(): array
     {
-        return TaxDao::loadData(
-            $this->getWhereCondition(),
-            $this->ListingSort->getOrderByFields(),
-            $this->getLimitTable(),
-            $this->getLimitOffsetTable()
-        );
+        return TaxDao::loadData($this->getWhereCondition());
     }
 
     /**
      * Function to get the where condition.
      *
-     * @return array
+     * @return SqlHelper
      */
-    private function getWhereCondition(): array
+    private function getWhereCondition(): SqlHelper
     {
+        $helper = new SqlHelper();
+        $helper->setLimit($this->getLimitTable(), $this->getLimitOffsetTable());
+        $helper->addOrderByString($this->ListingSort->getOrderByFieldsString());
         # Set where conditions
-        $wheres = [];
-        if ($this->isValidParameter('tax_name')) {
-            $wheres[] = SqlHelper::generateLikeCondition('tax.tax_name', $this->getStringParameter('tax_name'));
-        }
-        if ($this->isValidParameter('tax_active')) {
-            $wheres[] = SqlHelper::generateStringCondition('tax.tax_active', $this->getStringParameter('tax_active'));
-        }
-        $wheres[] = SqlHelper::generateStringCondition('tax.tax_ss_id', $this->User->getSsId());
-        return $wheres;
+        $helper->addStringWhere('tax_ss_id', $this->User->getSsId());
+        $helper->addLikeWhere('tax_name', $this->getStringParameter('tax_name'));
+        $helper->addStringWhere('tax_group', $this->getStringParameter('tax_group'));
+        $helper->addStringWhere('tax_active', $this->getStringParameter('tax_active'));
+        return $helper;
     }
 }

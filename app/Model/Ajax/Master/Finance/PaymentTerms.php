@@ -33,14 +33,12 @@ class PaymentTerms extends AbstractBaseAjaxModel
     public function loadSingleSelectData(): array
     {
         if ($this->isValidParameter('pt_ss_id')) {
-            $wheres = [];
-            if ($this->isValidParameter('search_key') === true) {
-                $wheres[] = SqlHelper::generateLikeCondition('pt_name', $this->getStringParameter('search_key'));
-            }
-            $wheres[] = SqlHelper::generateStringCondition('pt_ss_id', $this->getStringParameter('pt_ss_id'));
-            $wheres[] = SqlHelper::generateStringCondition('pt_active', 'Y');
-            $wheres[] = SqlHelper::generateNullCondition('pt_deleted_on');
-            return PaymentTermsDao::loadSingleSelectData('pt_name', $wheres);
+            $helper = new SqlHelper();
+            $helper->addStringWhere('pt_ss_id', $this->getStringParameter('pt_ss_id'));
+            $helper->addLikeWhere('pt_name', $this->getStringParameter('search_key'));
+            $helper->addStringWhere('pt_active', 'Y');
+            $helper->addNullWhere('pt_deleted_on');
+            return PaymentTermsDao::loadSingleSelectData('pt_name', $helper);
         }
         return [];
     }
