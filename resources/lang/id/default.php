@@ -242,4 +242,13 @@ return [
     'deleteItemSalary' => 'Hapus Item Gaji',
     'vatNumber' => 'NPWP Number',
     'officeName' => 'Nama Kantor',
+    'owner' => 'Pemilik',
+    'initialBalance' => 'Saldo Awal',
+    'detailBank' => 'Bank Detail',
+    'investorAccount' => 'Akun Investor',
+    'investor' => 'Investor',
+    'freeze' => 'Bekukan',
+    'freezeAccount' => 'Bekukan Akun',
+    'openFreezeAccount' => 'Buka Pembekuan Akun',
+    'openFreeze' => 'Buka Pembekuan',
 ];

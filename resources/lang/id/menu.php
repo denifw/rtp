@@ -5,7 +5,7 @@ return [
     'statistic' => 'Statistik',
     'crm' => 'CRM',
     'operation' => 'Operational',
-    'administration' => 'Administrasi',
+    'cashandbank' => 'Kas & Bank',
     'master' => 'Master Data',
     'system' => 'Sistem',
     'access' => 'Akses',

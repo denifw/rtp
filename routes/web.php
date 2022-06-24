@@ -205,11 +205,6 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'Master/Finance/TaxDetail');
     });
-    # Master - Finance - Bank Account
-    Route::match(['get', 'post'], '/ba/{pc?}', static function ($pc = 'listing') {
-        $control = new PageController();
-        return $control->doControl($pc, 'Master/Finance/BankAccount');
-    });
     # Master - Employee - Job Title
     Route::match(['get', 'post'], '/jt/{pc?}', static function ($pc = 'listing') {
         $control = new PageController();
@@ -240,11 +235,17 @@ Route::group(['middleware' => ['app_auth']], static function () {
         $control = new PageController();
         return $control->doControl($pc, 'Administration/WorkingCapital');
     });
-    # Administration - Cash Transfer
-    Route::match(['get', 'post'], '/ct/{pc?}', static function ($pc = 'listing') {
+    # Cash And Bank - Bank Account
+    Route::match(['get', 'post'], '/ba/{pc?}', static function ($pc = 'listing') {
         $control = new PageController();
-        return $control->doControl($pc, 'Administration/CashTransfer');
+        return $control->doControl($pc, 'CashAndBank/BankAccount');
     });
+    # Cash And Bank - Transfer Balance
+    Route::match(['get', 'post'], '/bt/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'CashAndBank/BankTransfer');
+    });
+
     # Administration - Purchase Invoice
     Route::match(['get', 'post'], '/pi/{pc?}', static function ($pc = 'listing') {
         $control = new PageController();

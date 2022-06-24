@@ -26,6 +26,10 @@ class CreateBankAccountBalanceTable extends Migration
             $table->dateTime('bab_deleted_on')->nullable();
             $table->string('bab_deleted_reason', 256)->nullable();
         });
+        Schema::table('bank_account', function (Blueprint $table) {
+            $table->uuid('ba_bab_id')->unsigned()->nullable();
+            $table->foreign('ba_bab_id', 'tbl_ba_bab_id_fkey')->references('bab_id')->on('bank_account_balance');
+        });
     }
 
     /**
@@ -35,6 +39,10 @@ class CreateBankAccountBalanceTable extends Migration
      */
     public function down()
     {
+        Schema::table('bank_account', function (Blueprint $table) {
+            $table->dropForeign('tbl_ba_bab_id_fkey');
+            $table->dropColumn('ba_bab_id');
+        });
         Schema::dropIfExists('bank_account_balance');
     }
 }

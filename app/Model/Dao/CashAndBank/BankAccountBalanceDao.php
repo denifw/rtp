@@ -8,7 +8,7 @@
  * @copyright  2021 PT Makmur Berkat Teknologi.
  */
 
-namespace App\Model\Dao\Master\Finance;
+namespace App\Model\Dao\CashAndBank;
 
 use App\Frame\Mvc\AbstractBaseDao;
 use App\Frame\Formatter\DataParser;
@@ -62,9 +62,9 @@ class BankAccountBalanceDao extends AbstractBaseDao
      */
     public static function getByReference(string $referenceValue): array
     {
-        $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('bab_id', $referenceValue);
-        $data = self::loadData($wheres);
+        $helper = new SqlHelper();
+        $helper->addStringWhere('bab_id', $referenceValue);
+        $data = self::loadData($helper);
         if (count($data) === 1) {
             return $data[0];
         }
@@ -81,13 +81,12 @@ class BankAccountBalanceDao extends AbstractBaseDao
     public static function getTotalBalanceAccount(string $baId): float
     {
         $balance = 0.0;
-        $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('bab_ba_id', $baId);
-        $wheres[] = SqlHelper::generateNullCondition('bab_deleted_on');
-        $strWheres = ' WHERE ' . implode(' AND ', $wheres);
+        $helper = new SqlHelper();
+        $helper->addStringWhere('bab_ba_id', $baId);
+        $helper->addNullWhere('bab_deleted_on');
+        $helper->addGroupBy('bab_ba_id');
         $query = 'SELECT bab_ba_id, SUM(bab_amount) as balance
-                    FROM bank_account_balance ' . $strWheres;
-        $query .= ' GROUP BY bab_ba_id';
+                    FROM bank_account_balance ' . $helper;
         $sqlResults = DB::select($query);
         if (count($sqlResults) === 1) {
             $balance = (float)DataParser::objectToArray($sqlResults[0])['balance'];
@@ -96,58 +95,19 @@ class BankAccountBalanceDao extends AbstractBaseDao
     }
 
     /**
-     * Function to get total balance by bank account
-     *
-     * @param string $baId To store the system setting value.
-     *
-     * @return bool
-     */
-    public static function isBankAccountHasBalance(string $baId): bool
-    {
-        $result = false;
-        $wheres = [];
-        $wheres[] = SqlHelper::generateStringCondition('bab_ba_id', $baId);
-        $wheres[] = SqlHelper::generateNullCondition('bab_deleted_on');
-        $strWheres = ' WHERE ' . implode(' AND ', $wheres);
-        $query = 'SELECT bab_ba_id, count(bab_id) as total
-                    FROM bank_account_balance ' . $strWheres;
-        $query .= ' GROUP BY bab_ba_id';
-        $sqlResults = DB::select($query);
-        if (count($sqlResults) === 1) {
-            $total = (int)DataParser::objectToArray($sqlResults[0])['total'];
-            if ($total > 0) {
-                $result = true;
-            }
-        }
-        return $result;
-    }
-
-    /**
      * Function to get all record.
      *
-     * @param array $wheres To store the list condition query.
-     * @param array $orders To store the list sorting query.
-     * @param int $limit To store the limit of the data.
-     * @param int $offset To store the offset of the data to apply limit.
+     * @param SqlHelper $helper To store the list condition query.
      *
      * @return array
      */
-    public static function loadData(array $wheres = [], array $orders = [], int $limit = 0, int $offset = 0): array
+    public static function loadData(SqlHelper $helper): array
     {
-        $strWhere = '';
-        if (empty($wheres) === false) {
-            $strWhere = ' WHERE ' . implode(' AND ', $wheres);
+        if($helper->hasOrderBy() === false) {
+            $helper->addOrderByString('bab_id DESC');
         }
         $query = 'SELECT bab_id, bab_ba_id, bab_amount
-                        FROM bank_account_balance' . $strWhere;
-        if (empty($orders) === false) {
-            $query .= ' ORDER BY ' . implode(', ', $orders);
-        } else {
-            $query .= ' ORDER BY bab_ba_id, bab_id';
-        }
-        if ($limit > 0) {
-            $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-        }
+                        FROM bank_account_balance ' . $helper;
         $sqlResults = DB::select($query);
 
         return DataParser::arrayObjectToArray($sqlResults);

@@ -21,9 +21,9 @@ return [
         'title' => 'Pengeluaran',
         'description' => 'Pengeluaran'
     ],
-    'ct' => [
-        'title' => 'Transfer Tunai',
-        'description' => 'Transfer Tunai'
+    'bt' => [
+        'title' => 'Transfer Saldo',
+        'description' => 'Transfer Saldo'
     ],
     'cty' => [
         'title' => 'Kab/Kota',

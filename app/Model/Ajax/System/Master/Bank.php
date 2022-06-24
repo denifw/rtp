@@ -32,12 +32,10 @@ class Bank extends AbstractBaseAjaxModel
      */
     public function loadSingleSelectData(): array
     {
-        $wheres = [];
-        if ($this->isValidParameter('search_key') === true) {
-            $wheres[] = SqlHelper::generateLikeCondition('bn_name', $this->getStringParameter('search_key'));
-        }
-        $wheres[] = SqlHelper::generateNullCondition('bn_deleted_on');
-        $wheres[] = SqlHelper::generateStringCondition('bn_active', 'Y');
-        return BankDao::loadSingleSelectData('bn_name', $wheres);
+        $helper = new SqlHelper();
+        $helper->addOrLikeWhere(['bn_short_name', 'bn_name'], $this->getStringParameter('search_key'));
+        $helper->addStringWhere('bn_active', 'Y');
+        $helper->addNullWhere('bn_deleted_on');
+        return BankDao::loadSingleSelectData('bn_name', $helper);
     }
 }
