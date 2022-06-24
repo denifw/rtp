@@ -34,6 +34,15 @@ class ${Class_Name} extends AbstractBaseDao
     ];
 
     /**
+     * Property to store the numeric fields.
+     *
+     * @var array
+     */
+    protected ${DS}NumericFields = [
+        # TODO add list numeric fields here.
+    ];
+
+    /**
      * Base dao constructor for ${Table_Name}.
      *
      */
@@ -51,9 +60,10 @@ class ${Class_Name} extends AbstractBaseDao
      */
     public static function getByReference(string ${DS}referenceValue): array
     {
-        ${DS}wheres = [];
-        ${DS}wheres[] = SqlHelper::generateStringCondition('${Table_Prefix}_id', ${DS}referenceValue);
-        ${DS}data = self::loadData(${DS}wheres);
+        ${DS}helper = new SqlHelper();
+        ${DS}helper->addStringWhere('${Table_Prefix}_id', ${DS}referenceValue);
+
+        ${DS}data = self::loadData(${DS}helper);
         if(count(${DS}data) === 1) {
             return ${DS}data[0];
         }
@@ -70,40 +80,32 @@ class ${Class_Name} extends AbstractBaseDao
       */
      public static function getByReferenceAndSystem(string ${DS}referenceValue, string ${DS}ssId): array
      {
-        ${DS}wheres = [];
-        ${DS}wheres[] = SqlHelper::generateStringCondition('${Table_Prefix}_id', ${DS}referenceValue);
-        ${DS}wheres[] = SqlHelper::generateStringCondition('${Table_Prefix}_ss_id', ${DS}ssId);
-        ${DS}data = self::loadData(${DS}wheres);
-        if(count(${DS}data) === 1) {
+         ${DS}helper = new SqlHelper();
+         ${DS}helper->addStringWhere('${Table_Prefix}_id', ${DS}referenceValue);
+         ${DS}helper->addStringWhere('${Table_Prefix}_ss_id', ${DS}ssId);
+
+         ${DS}data = self::loadData(${DS}helper);
+         if(count(${DS}data) === 1) {
             return ${DS}data[0];
-        }
-        return [];
+         }
+         return [];
      }
 
     /**
      * Function to get all record.
      *
-     * @param array ${DS}wheres To store the list condition query.
-     * @param array ${DS}orders To store the list sorting query.
-     * @param int   ${DS}limit  To store the limit of the data.
-     * @param int   ${DS}offset To store the offset of the data to apply limit.
+     * @param SqlHelper ${DS}helper To store the list condition query.
      *
      * @return array
      */
-    public static function loadData(array ${DS}wheres = [], array ${DS}orders = [], int ${DS}limit = 0, int ${DS}offset = 0): array
+    public static function loadData(SqlHelper ${DS}helper): array
     {
-        ${DS}strWhere = '';
-        if (empty(${DS}wheres) === false) {
-            ${DS}strWhere = ' WHERE ' . implode(' AND ', ${DS}wheres);
+        if (${DS}helper->hasOrderBy() === false) {
+            ${DS}helper->addOrderBy('');
         }
+
         ${DS}query = 'SELECT ${Table_Prefix}_id
-                        FROM ${Table_Name}' . ${DS}strWhere;
-        if (empty(${DS}orders) === false) {
-            ${DS}query .= ' ORDER BY '. implode(', ', ${DS}orders);
-        }
-        if (${DS}limit > 0) {
-            ${DS}query .= ' LIMIT ' . ${DS}limit . ' OFFSET ' . ${DS}offset;
-        }
+                        FROM ${Table_Name}' . ${DS}helper;
         ${DS}sqlResults = DB::select(${DS}query);
 
         return DataParser::arrayObjectToArray(${DS}sqlResults);
@@ -113,19 +115,15 @@ class ${Class_Name} extends AbstractBaseDao
     /**
      * Function to get total record.
      *
-     * @param array ${DS}wheres To store the list condition query.
+     * @param SqlHelper ${DS}helper To store the list condition query.
      *
      * @return int
      */
-    public static function loadTotalData(array ${DS}wheres = []): int
+    public static function loadTotalData(SqlHelper ${DS}helper): int
     {
         ${DS}result = 0;
-        ${DS}strWhere = '';
-        if (empty(${DS}wheres) === false) {
-            ${DS}strWhere = ' WHERE ' . implode(' AND ', ${DS}wheres);
-        }
         ${DS}query = 'SELECT count(DISTINCT (${Table_Prefix}_id)) AS total_rows
-                        FROM ${Table_Name}' . ${DS}strWhere;
+                        FROM ${Table_Name}' . ${DS}helper->getConditionForCountData();
 
         ${DS}sqlResults = DB::select(${DS}query);
         if(count(${DS}sqlResults) === 1) {
@@ -138,16 +136,17 @@ class ${Class_Name} extends AbstractBaseDao
      * Function to get record for single select field.
      *
      * @param array|String ${DS}textColumn To store the text value of single select.
-     * @param array ${DS}wheres To store the list condition query.
-     * @param array ${DS}orders To store the list sorting query.
+     * @param SqlHelper ${DS}helper To store the list condition query.
+     * @param array ${DS}numericFields To store the list sorting query.
      *
      * @return array
      */
-    public static function loadSingleSelectData(${DS}textColumn, array ${DS}wheres = [], array ${DS}orders = []): array
+    public static function loadSingleSelectData(${DS}textColumn, SqlHelper ${DS}helper, array ${DS}numericFields = []): array
     {
-        ${DS}data = self::loadData(${DS}wheres, ${DS}orders, 20);
+        ${DS}helper->setLimit(20);
+        ${DS}data = self::loadData(${DS}helper);
 
-        return parent::doPrepareSingleSelectData(${DS}data, ${DS}textColumn, '${Table_Prefix}_id');
+        return parent::doPrepareSingleSelectData(${DS}data, ${DS}textColumn, '${Table_Prefix}_id', ${DS}numericFields);
     }
 
 

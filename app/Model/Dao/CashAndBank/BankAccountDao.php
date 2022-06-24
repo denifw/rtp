@@ -121,7 +121,7 @@ class BankAccountDao extends AbstractBaseDao
     public static function loadData(SqlHelper $helper): array
     {
         if ($helper->hasOrderBy() === false) {
-            $helper->addOrderByString('ba.ba_deleted_on DESC, ba.ba_block_on DESC, ba.ba_code, ba.ba_id');
+            $helper->addOrderByString('ba.ba_deleted_on DESC, ba.ba_code, ba.ba_id');
         }
         $query = 'SELECT ba.ba_id, ba.ba_code, ba.ba_description, ba.ba_initial_balance, ba.ba_current_balance,
                            ba.ba_bn_id, bn.bn_short_name as ba_bn_short_name, bn.bn_name as ba_bank_name, ba.ba_bank_branch, ba.ba_bab_id,

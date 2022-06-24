@@ -32,6 +32,7 @@ return [
     'unableToSentEmail' => 'Gagal mengirimkan email ke :email .',
     'successResetPassword' => 'Kata sandi anda telah di reset.',
     'paidConfirmation' => 'Apakah anda yakin melakukan pembayaran ini?',
+    'reOpenDataConfirmation' => 'Apakah anda yakin membuka kembali data ini?',
     'verifiedConfirmation' => 'Apakah anda yakin melakukan verifikasi data ini?',
     'unablePaidInvoice' => 'Detail data tidak ditemukan. Silahkan menginputkan detail data terlebih dahulu sebelum melakukan pembayaran.',
     'invoiceSubmitConfirmation' => 'Apakah anda yakin mengkonfirmasi pengiriman faktur ini?',

@@ -118,13 +118,14 @@ class BankAccount extends AbstractListingModel
         $results = [];
         foreach ($data as $row) {
             $type = [];
-            if($row['ba_main'] === 'Y') {
+            if ($row['ba_main'] === 'Y') {
                 $type[] = new LabelDanger(Trans::getWord('investor'));
+                $row['ba_current_balance'] = null;
             }
-            if($row['ba_receivable'] === 'Y') {
+            if ($row['ba_receivable'] === 'Y') {
                 $type[] = new LabelSuccess(Trans::getWord('ar'));
             }
-            if($row['ba_payable'] === 'Y') {
+            if ($row['ba_payable'] === 'Y') {
                 $type[] = new LabelPrimary(Trans::getWord('ap'));
             }
             $row['ba_type'] = StringFormatter::generateTableView($type);

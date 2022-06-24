@@ -42,7 +42,42 @@ class BankAccount extends AbstractBaseAjaxModel
             $helper->addStringWhere('ba.ba_us_id', $this->getStringParameter('ba_us_id'));
             $helper->addStringWhere('ba.ba_active', $this->getStringParameter('ba_active'));
             $helper->addNullWhere('ba.ba_deleted_on');
-            $helper->addNullWhere('ba.ba_block_on');
+            if ($this->isValidParameter('ba_blocked') === true) {
+                if ($this->getStringParameter('ba_blocked') === 'N') {
+                    $helper->addNullWhere('ba.ba_block_on');
+                } else {
+                    $helper->addNullWhere('ba.ba_block_on', false);
+                }
+            }
+            return BankAccountDao::loadSingleSelectData(['ba_code', 'ba_description'], $helper, ['ba_current_balance']);
+        }
+        return [];
+    }
+
+    /**
+     * Function to load the data for single select for BankAccount
+     *
+     * @return array
+     */
+    public function loadDataWithMainAccount(): array
+    {
+        if ($this->isValidParameter('ba_ss_id') === true) {
+            $helper = new SqlHelper();
+            $helper->addStringWhere('ba.ba_ss_id', $this->getStringParameter('ba_ss_id'));
+            $helper->addOrLikeWhere(['ba.ba_code', 'ba.ba_description'], $this->getStringParameter('search_key'));
+            $helper->addStringWhere('ba.ba_payable', $this->getStringParameter('ba_payable'));
+            $helper->addStringWhere('ba.ba_receivable', $this->getStringParameter('ba_receivable'));
+            $helper->addStringWhere('ba.ba_main', 'Y', '=', '', 'or');
+            $helper->addStringWhere('ba.ba_us_id', $this->getStringParameter('ba_us_id'), '=', '', 'or');
+            $helper->addNullWhere('ba.ba_us_id', true, 'or');
+            $helper->addNullWhere('ba.ba_deleted_on');
+            if ($this->isValidParameter('ba_blocked') === true) {
+                if ($this->getStringParameter('ba_blocked') === 'N') {
+                    $helper->addNullWhere('ba.ba_block_on');
+                } else {
+                    $helper->addNullWhere('ba.ba_block_on', false);
+                }
+            }
             return BankAccountDao::loadSingleSelectData(['ba_code', 'ba_description'], $helper, ['ba_current_balance']);
         }
         return [];

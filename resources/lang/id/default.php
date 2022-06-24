@@ -251,4 +251,10 @@ return [
     'freezeAccount' => 'Bekukan Akun',
     'openFreezeAccount' => 'Buka Pembekuan Akun',
     'openFreeze' => 'Buka Pembekuan',
+    'fromDate' => 'Dari Tanggal',
+    'untilDate' => 'Sampai Tanggal',
+    'exchangeRate' => 'Nilai Tukar',
+    'currencySender' => 'Mata Uang Pengirim',
+    'currencyReceiver' => 'Mata Uang Penerima',
+    'paidTransferBalance' => 'Bayar Transfer Saldo',
 ];

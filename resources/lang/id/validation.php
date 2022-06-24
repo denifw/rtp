@@ -154,7 +154,9 @@ return [
     */
 
     'attributes' => [
-        'jdl_first_cp_id' => 'Main Driver'
+        'jdl_first_cp_id' => 'Main Driver',
+        'bt_receiver_ba_id' => 'Penerima',
+        'bt_payer_ba_id' => 'Pengirim',
     ],
 
 ];

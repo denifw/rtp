@@ -55,11 +55,10 @@ class ${Class_Name} extends AbstractListingModel
     {
         # set header column table
         ${DS}this->ListingTable->setHeaderRow([
-            // TODO Add the header table here.
+            'column_name' => Trans::getWord('description'),
         ]);
         # Load the data for ${Class_Name}.
         ${DS}this->ListingTable->addRows(${DS}this->loadData());
-        ${DS}this->ListingTable->setViewActionByHyperlink(${DS}this->getViewRoute(), ['${Reference_Code}']);
         if (${DS}this->PageSetting->checkPageRight('AllowUpdate') === true) {
             ${DS}this->ListingTable->setUpdateActionByHyperlink(${DS}this->getUpdateRoute(), ['${Reference_Code}']);
         }
@@ -99,6 +98,7 @@ class ${Class_Name} extends AbstractListingModel
         ${DS}helper->addOrderByString(${DS}this->ListingSort->getOrderByFieldsString());
 
         # TODO Check the filter value here.
+        ${DS}helper->addStringWhere('_ss_id', ${DS}this->User->getSsId());
 
         # return the list where condition.
         return ${DS}helper;
