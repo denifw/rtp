@@ -12,6 +12,7 @@
 */
 
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\StatisticController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/login', 'Auth\LoginController@index');
@@ -34,6 +35,15 @@ Route::group(['middleware' => ['app_auth']], static function () {
     Route::get('/doSwitch', 'Auth\LoginController@doSwitch');
     Route::get('/seed', 'SeederController@index');
     Route::get('/download', 'DownloadController@doControl');
+
+    # storageOverview
+    Route::match(['get', 'post'], '/rtp', static function () {
+        $control = new StatisticController();
+        return $control->doControl('RtpOverview');
+    });
+
+
+
     # system table
     Route::match(['get', 'post'], '/st/{pc?}', static function ($pc = 'listing') {
         $control = new PageController();
@@ -285,5 +295,10 @@ Route::group(['middleware' => ['app_auth']], static function () {
     Route::match(['get', 'post'], '/eis/{pc?}', static function ($pc = 'listing') {
         $control = new PageController();
         return $control->doControl($pc, 'Master/Employee/EmployeeItemSalary');
+    });
+    # Master - Employee - Employee Item Salary
+    Route::match(['get', 'post'], '/up/{pc?}', static function ($pc = 'listing') {
+        $control = new PageController();
+        return $control->doControl($pc, 'UploadExcel');
     });
 });

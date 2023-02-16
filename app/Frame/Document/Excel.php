@@ -1,27 +1,41 @@
 <?php
 
 /**
- * Contains code written by the TIG Software.
+ * Contains code written by the MBS Software.
  * Any other use of this code is in violation of copy rights.
  *
- * @package   Lokasi
- * @author    Deni Firdaus Waruwu <deni@lokasi.co.id>
- * @copyright 2017 lokasi.co.id
+ * @package   MBS
+ * @author    Deni Firdaus Waruwu <deni.firdaus.w@gmail.com>
+ * @copyright 2018 C-Book
  */
+
 
 namespace App\Frame\Document;
 
+/**
+ * Class to manage the layout creation.
+ *
+ * @package    app
+ * @subpackage Model
+ * @author     Deni Firdaus Waruwu <deni.firdaus.w@gmail.com>
+ * @copyright  2018 C-Book
+ */
+
 use App\Frame\Exceptions\Message;
+use App\Frame\Formatter\StringFormatter;
+use Exception;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 /**
- * Class to manage the excel data.
+ * Contains code written by the MBS Software.
+ * Any other use of this code is in violation of copy rights.
  *
- * @package    app
- * @subpackage Util\Document
- * @author     Deni Firdaus Waruwu <deni@lokasi.co.id>
- * @copyright  2017 lokasi.co.id
+ * @package   MBS
+ * @author    Deni Firdaus Waruwu <deni.firdaus.w@gmail.com>
+ * @copyright 2018 C-Book
  */
 class Excel
 {
@@ -29,14 +43,14 @@ class Excel
     /**
      * Original object from PhpExcel class.
      *
-     * @var \PhpOffice\PhpSpreadsheet\Spreadsheet $PhpExcel
+     * @var Spreadsheet $PhpExcel
      */
     protected $PhpExcel;
 
     /**
      * Original object from ExcelProperties class.
      *
-     * @var \App\Frame\Document\ExcelProperties $Properties
+     * @var ExcelProperties $Properties
      */
     protected $Properties;
 
@@ -62,7 +76,7 @@ class Excel
      */
     public function __construct()
     {
-        $this->PhpExcel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $this->PhpExcel = new Spreadsheet();
         $this->Properties = new ExcelProperties();
     }
 
@@ -73,7 +87,7 @@ class Excel
      *
      * @return void
      */
-    public function setFileName($fileName): void
+    public function setFileName(string $fileName): void
     {
         $this->FileName = $fileName;
     }
@@ -87,7 +101,7 @@ class Excel
     {
         # Create a unique name for the file if not provided.
         if (empty($this->FileName) === true) {
-            $this->FileName = 'Lokasi-' . uniqid('', true) . '.xlsx';
+            $this->FileName = env('APP_NAME', 'Sys') . '-' . uniqid('', true) . '.xlsx';
         }
 
         return $this->FileName;
@@ -96,16 +110,16 @@ class Excel
     /**
      * Function to add sheet to the document.
      *
-     * @param string $id    The id for sheet.
+     * @param string $id The id for sheet.
      * @param string $title The title for sheet.
      *
      * @return void
      */
-    public function addSheet($id, $title): void
+    public function addSheet(string $id, string $title): void
     {
-        if (\in_array($id, $this->Sheets, true) === false) {
+        if (in_array($id, $this->Sheets, true) === false) {
             $this->Sheets[] = $id;
-            $countSheet = \count($this->Sheets);
+            $countSheet = count($this->Sheets);
             try {
                 if ($countSheet === 1) {
                     $this->PhpExcel->getActiveSheet()->setTitle($title);
@@ -113,18 +127,18 @@ class Excel
                     $this->PhpExcel->createSheet();
                     $this->PhpExcel->getSheet($countSheet - 1)->setTitle($title);
                 }
-            } catch (\Exception $e) {
-                Message::throwMessage($e->getMessage(), 'DEBUG');
+            } catch (Exception $e) {
+                Message::throwMessage($e->getMessage());
             }
         } else {
-            Message::throwMessage('Sheet for id ' . $id . ' already exist.', 'DEBUG');
+            Message::throwMessage('Sheet for id ' . $id . ' already exist.');
         }
     }
 
     /**
      * Get the coordinate from row and column number.
      *
-     * @param integer $row    The selected row number.
+     * @param integer $row The selected row number.
      * @param integer $column The selected column number.
      *
      * @return string
@@ -145,7 +159,7 @@ class Excel
      */
     public function getStringFromColumnIndex($column = 0): string
     {
-        return \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($column);
+        return Coordinate::stringFromColumnIndex($column);
     }
 
     /**
@@ -155,31 +169,31 @@ class Excel
      *
      * @return void
      */
-    public function setActiveSheet($id): void
+    public function setActiveSheet(string $id): void
     {
-        if (\in_array($id, $this->Sheets, true) === true) {
+        if (in_array($id, $this->Sheets, true) === true) {
             try {
                 $index = array_search($id, $this->Sheets, true);
                 $this->PhpExcel->setActiveSheetIndex($index);
-            } catch (\Exception $e) {
-                Message::throwMessage($e->getMessage(), 'DEBUG');
+            } catch (Exception $e) {
+                Message::throwMessage($e->getMessage());
             }
         } else {
-            Message::throwMessage('Sheet not found for id ' . $id . '.', 'DEBUG');
+            Message::throwMessage('Sheet not found for id ' . $id . '.');
         }
     }
 
     /**
      * Function to get the active sheet
      *
-     * @return \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet
+     * @return ?Worksheet
      */
-    public function getActiveSheet(): Worksheet
+    public function getActiveSheet(): ?Worksheet
     {
         try {
             return $this->PhpExcel->getActiveSheet();
-        } catch (\Exception $e) {
-            Message::throwMessage($e->getMessage(), 'DEBUG');
+        } catch (Exception $e) {
+            Message::throwMessage($e->getMessage());
         }
 
         return null;
@@ -188,20 +202,20 @@ class Excel
     /**
      * Function to move pointer to nex column
      *
-     * @param  string $sheetId      To store the sheet id.
+     * @param string $sheetId To store the sheet id.
      * @param integer $numberOfRows To store the space for the next column.
      *
      * @return void
      */
-    public function doRowMovePointer($sheetId, $numberOfRows = 2): void
+    public function doRowMovePointer(string $sheetId, $numberOfRows = 2): void
     {
         $sheet = $this->getSheet($sheetId, true);
         $nextRow = $sheet->getHighestRow() + $numberOfRows;
         # get Column from string
         try {
-            list($column, $row) = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::coordinateFromString($sheet->getActiveCell());
+            list($column, $row) = Coordinate::coordinateFromString($sheet->getActiveCell());
             $sheet->setSelectedCell($column . $nextRow);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Message::throwMessage($e->getMessage());
         }
     }
@@ -210,15 +224,15 @@ class Excel
     /**
      * Function to get the sheet
      *
-     * @param string $id       To set the id of the sheet.
-     * @param bool   $activate To set the trigger to activate the sheet.
+     * @param string $id To set the id of the sheet.
+     * @param bool $activate To set the trigger to activate the sheet.
      *
-     * @return \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet
+     * @return Worksheet
      */
-    public function getSheet($id, $activate = false): Worksheet
+    public function getSheet(string $id, $activate = false): Worksheet
     {
         $result = null;
-        if (\in_array($id, $this->Sheets, true) === true) {
+        if (in_array($id, $this->Sheets, true) === true) {
             try {
                 $index = array_search($id, $this->Sheets, true);
                 if ($activate === true) {
@@ -227,11 +241,11 @@ class Excel
                 } else {
                     $result = $this->PhpExcel->getSheet($index);
                 }
-            } catch (\Exception $e) {
-                Message::throwMessage($e->getMessage(), 'DEBUG');
+            } catch (Exception $e) {
+                Message::throwMessage($e->getMessage());
             }
         } else {
-            Message::throwMessage('Sheet not found for id ' . $id . '.', 'DEBUG');
+            Message::throwMessage('Sheet not found for id ' . $id . '.');
         }
 
         return $result;
@@ -240,7 +254,7 @@ class Excel
     /**
      * Function to set the properties of the file.
      *
-     * @param \App\Frame\Document\ExcelProperties $properties To store the file properties.
+     * @param ExcelProperties $properties To store the file properties.
      *
      * @return void
      */
@@ -281,7 +295,7 @@ class Excel
      *
      * @return void
      */
-    private function doDownload($writerType): void
+    private function doDownload(string $writerType): void
     {
         # Redirect output to a client’s web browser (Excel2007)
         header('Content-Type: application/openxmlformats-officedocument.spreadsheetml.sheet');
@@ -310,7 +324,7 @@ class Excel
             $objWriter = IOFactory::createWriter($this->PhpExcel, $writerType);
             $objWriter->save('php://output');
             exit;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Message::throwMessage($e->getMessage(), 'ERROR');
         }
     }
@@ -322,16 +336,37 @@ class Excel
      * @param string $fileName The writer type to create the specified document.
      * @param string $sheetName The writer type to create the specified document.
      *
-     * @return null|\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet
+     * @return null|Worksheet
      */
-    public function readSheetFile($fileName, $sheetName): ?Worksheet
+    public function readSheetFileByName(string $fileName, string $sheetName): ?Worksheet
     {
         $sheet = null;
         try {
             $reader = IOFactory::createReaderForFile($fileName);
             $spreadsheet = $reader->load($fileName);
-            $sheet =  $spreadsheet->getSheetByName($sheetName);
-        } catch (\Exception $e) {
+            $sheet = $spreadsheet->getSheetByName($sheetName);
+        } catch (Exception $e) {
+            Message::throwMessage($e->getMessage(), 'ERROR');
+        }
+        return $sheet;
+    }
+
+    /**
+     * Create writer from PHP Excel IO Factory.
+     *
+     * @param string $fileName The writer type to create the specified document.
+     * @param int $sheetIndex The writer type to create the specified document.
+     *
+     * @return null|Worksheet
+     */
+    public function readSheetFileByIndex(string $fileName, int $sheetIndex): ?Worksheet
+    {
+        $sheet = null;
+        try {
+            $reader = IOFactory::createReaderForFile($fileName);
+            $spreadsheet = $reader->load($fileName);
+            $sheet = $spreadsheet->getSheet($sheetIndex);
+        } catch (Exception $e) {
             Message::throwMessage($e->getMessage(), 'ERROR');
         }
         return $sheet;
@@ -341,13 +376,13 @@ class Excel
     /**
      * Create writer from PHP Excel IO Factory.
      *
-     * @param \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet The writer type to create the specified document.
+     * @param Worksheet $sheet The writer type to create the specified document.
      * @param string $indexRow The writer type to create the specified document.
      * @param array $columns The writer type to create the specified document.
      *
      * @return array
      */
-    public function readSheetHeader(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet, $indexRow, array $columns): array
+    public function readSheetHeader(Worksheet $sheet, string $indexRow, array $columns): array
     {
         $results = [];
         if ($sheet !== null && empty($columns) === false) {
@@ -361,7 +396,7 @@ class Excel
                     }
                     $results[] = $val;
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Message::throwMessage($e->getMessage(), 'ERROR');
             }
         }
@@ -371,13 +406,46 @@ class Excel
     /**
      * Create writer from PHP Excel IO Factory.
      *
-     * @param \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet The writer type to create the specified document.
-     * @param string $startingRow The writer type to create the specified document.
+     * @param Worksheet $sheet The writer type to create the specified document.
+     * @param int $indexRow The writer type to create the specified document.
+     * @param string $indexColumn The writer type to create the specified document.
+     *
+     * @return array
+     */
+    public function readAllHeader(Worksheet $sheet, int $indexRow, string $indexColumn): array
+    {
+        $results = [];
+        if ($sheet !== null) {
+            try {
+                $lastColumn = $sheet->getHighestColumn($indexRow);
+                $lastColumn++;
+                for ($column = $indexColumn; $column !== $lastColumn; $column++) {
+                    $val = '';
+                    $cellName = $column . $indexRow;
+                    $cell = $sheet->getCell($cellName, false);
+                    if ($cell !== null) {
+                        $val = $cell->getValue();
+                        $val = mb_strtolower(StringFormatter::replaceSpecialCharacter($val));
+                    }
+                    $results[$column] = $val;
+                }
+            } catch (Exception $e) {
+                Message::throwMessage($e->getMessage(), 'ERROR');
+            }
+        }
+        return $results;
+    }
+
+    /**
+     * Create writer from PHP Excel IO Factory.
+     *
+     * @param Worksheet $sheet The writer type to create the specified document.
+     * @param int $startingRow The writer type to create the specified document.
      * @param array $columns The writer type to create the specified document.
      *
      * @return array
      */
-    public function readAllSheetCells(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet, $startingRow, array $columns): array
+    public function readAllSheetCells(Worksheet $sheet, int $startingRow, array $columns): array
     {
         $results = [];
         if ($sheet !== null && empty($columns) === false) {
@@ -386,18 +454,18 @@ class Excel
                 do {
                     $row = [];
                     $isAllEmpty = true;
-                    foreach ($columns as $key => $col) {
+                    foreach ($columns as $col => $header) {
                         $val = '';
 
                         $cellName = $col . $startingRow;
                         $cell = $sheet->getCell($cellName, false);
-                        if($cell !== null) {
+                        if ($cell !== null) {
                             $val = $cell->getValue();
                         }
                         if (empty($val) === false || trim($val) !== '') {
                             $isAllEmpty = false;
                         }
-                        $row[$key] = $val;
+                        $row[$header] = $val;
                     }
                     $row['line_number'] = $startingRow;
                     if ($isAllEmpty === false) {
@@ -407,7 +475,7 @@ class Excel
                         $next = false;
                     }
                 } while ($next === true);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Message::throwMessage($e->getMessage(), 'ERROR');
             }
         }

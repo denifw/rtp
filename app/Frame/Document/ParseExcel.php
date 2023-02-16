@@ -12,6 +12,7 @@ namespace App\Frame\Document;
 
 use App\Frame\Exceptions\Message;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class to controll import excel to system
@@ -33,7 +34,7 @@ class ParseExcel
     /**
      * Original object from Uploaded File class.
      *
-     * @var \Illuminate\Http\UploadedFile $File
+     * @var UploadedFile $File
      */
     private $File;
 
@@ -47,7 +48,7 @@ class ParseExcel
     /**
      * The complete Excel object.
      *
-     * @var \App\Frame\Document\Excel $Excel
+     * @var Excel $Excel
      */
     private $Excel;
 
@@ -59,18 +60,11 @@ class ParseExcel
     private $Header = [];
 
     /**
-     * Property to store excel sheet name.
+     * List of all the header name column.
      *
-     * @var string $SheetName
+     * @var array $Data
      */
-    private $SheetName;
-
-    /**
-     * Property to store Worksheet.
-     *
-     * @var \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $WorkSheet
-     */
-    private $WorkSheet;
+    private $Data = [];
 
     /**
      * Property to store the result after store file.
@@ -80,97 +74,106 @@ class ParseExcel
     public $IsSuccessStored;
 
     /**
-     * Basic constructor to start up the object that generates new parse excel.
+     * Property to store the upload template data.
      *
-     * @param \Illuminate\Http\UploadedFile $file      To store the file.
-     * @param string                        $fileName  To store the name of file.
-     * @param string                        $sheetName To store excel sheet name.
+     * @var array $UptData
      */
-    public function __construct(UploadedFile $file, string $fileName, string $sheetName)
-    {
-        $this->File = $file;
-        $this->FileName = $fileName;
-        $this->Excel = new Excel();
-        $this->SheetName = $sheetName;
-        $this->storeFile();
-        $this->readSheetFile();
-    }
-
+    public $UptData = [];
     /**
-     * List of all the headers from excel.
+     * Property to store the upload template data.
      *
-     * @param array $headerData Array of values with the names of the headers.
-     *
+     * @var array $MappingColumns
+     */
+    public $MappingColumns = [];
+    /**
+     * Function to parse data.
+     * @param string $sheetName To store the index of the worksheet.
+     * @param int $startRowHeader To store the index of the worksheet.
+     * @param string $startColumnHeader To store the index of the worksheet.
      * @return void
      */
-    public function setHeaderRow(array $headerData): void
+    public function doParseData(string $sheetName, int $startRowHeader = 1, string $startColumnHeader = 'A'): void
     {
-        if (empty($headerData) === false) {
-            foreach ($headerData as $key => $value) {
-                $this->Header[$key] = $value;
+        if ($this->IsSuccessStored === true) {
+            $storagePath = storage_path('app/' . $this->BasePath . '/' . $this->FileName);
+            $workSheet = $this->Excel->readSheetFileByName($storagePath, $sheetName);
+            if ($workSheet !== null) {
+                $this->Header = $this->Excel->readAllHeader($workSheet, $startRowHeader, $startColumnHeader);
+                $startRowData = $startRowHeader + 1;
+                $this->Data = $this->Excel->readAllSheetCells($workSheet, $startRowData, $this->Header);
+                $this->deleteFile();
+            } else {
+                $this->deleteFile();
+                Message::throwMessage('No data found for sheet name ' . $this->UptData['upt_sheet_name'] . '.');
             }
         }
     }
 
+
     /**
-     * Function to set excel sheet name to read.
+     * Basic constructor to start up the object that generates new parse excel.
      *
-     * @param string $sheetName
-     *
-     * @return void
+     * @param UploadedFile $file To store the file.
      */
-    public function setSheetName(string $sheetName): void
+    public function __construct(UploadedFile $file)
     {
-        if (empty($sheetName) === false) {
-            $this->SheetName = $sheetName;
-        } else {
-            Message::throwMessage('Sheet name not set.', 'ERROR');
-        }
+        $this->File = $file;
+        $this->FileName = 'upload_' . microtime() . '.' . $file->getClientOriginalExtension();
+        $this->Excel = new Excel();
+        $this->storeFile();
     }
 
     /**
      * Function to get sheet header excel.
      *
-     * @param string $indexRow .
-     *
      * @return array
      */
-    public function getSheetHeader(string $indexRow): array
+    public function getSheetHeader(): array
     {
-        return $this->Excel->readSheetHeader($this->WorkSheet, $indexRow, $this->Header);
+        return $this->Header;
     }
 
     /**
-     * Function to read work sheet.
-     *
-     * @return void
-     */
-    public function readSheetFile(): void
-    {
-        if (empty($this->SheetName) === false) {
-            $storagePath = storage_path('app/' . $this->BasePath . '/' . $this->FileName);
-            $result = $this->Excel->readSheetFile($storagePath, $this->SheetName);
-            if ($result !== null) {
-                $this->WorkSheet = $result;
-            } else {
-                Message::throwMessage('Work sheet not exist', 'ERROR');
-            }
-        } else {
-            Message::throwMessage('Sheet name is mandatory.', 'ERROR');
-        }
-    }
-
-    /**
-     * Function to get all cells excel.
-     *
-     * @param string $startingRow .
+     * Function to get sheet header excel.
      *
      * @return array
      */
-    public function getAllSheetCells(string $startingRow): array
+    public function getData(): array
     {
-        return $this->Excel->readAllSheetCells($this->WorkSheet, $startingRow, $this->Header);
+        return $this->Data;
     }
+
+//    /**
+//     * Function to read work sheet.
+//     *
+//     * @return void
+//     */
+//    public function readSheetFile(): void
+//    {
+//        if (empty($this->SheetName) === false) {
+//            $storagePath = storage_path('app / ' . $this->BasePath . ' / ' . $this->FileName);
+//            $result = $this->Excel->readSheetFile($storagePath, $this->SheetName);
+//            if ($result !== null) {
+//                $this->WorkSheet = $result;
+//            } else {
+//                Message::throwMessage('Work sheet not exist', 'ERROR');
+//            }
+//        } else {
+//            Message::throwMessage('Sheet name is mandatory . ', 'ERROR');
+//        }
+//    }
+//
+//    /**
+//     * Function to get all cells excel.
+//     *
+//     * @param string $startingRow .
+//     *
+//     * @return array
+//     */
+//    public function getAllSheetCells(string $startingRow): array
+//    {
+//        return $this->Excel->readAllSheetCells($this->WorkSheet, $startingRow, $this->Header);
+//    }
 
     /**
      * Function to store file.
@@ -189,6 +192,17 @@ class ParseExcel
         } else {
             Message::throwMessage('File and FileName are mandatory', 'ERROR');
         }
+    }
+
+    /**
+     * Function to store file.
+     *
+     * @return void
+     */
+    private function deleteFile(): void
+    {
+        $storagePath = 'temp/' . $this->FileName;
+        Storage::disk('public')->delete($storagePath);
     }
 
 }
