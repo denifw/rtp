@@ -42,15 +42,11 @@ class UploadExcel extends AbstractFormModel
         'Desember' => 12,
     ];
 
-    private $unit = [
-        'H10-H10-22' => [
-            'block' => 'H',
-            'unit' => 'H10-22'
-        ],
-        'BlokH9-H9-10' => [
-            'block' => 'H',
-            'unit' => 'H09-10'
-        ]
+    private $Unit = [
+        'Blok H 9 - H9-10' => 'H09 - 10',
+        'H10 - H10-21' => 'H10 - 21',
+        'H10 - H10 - 22' => 'H10 - 22',
+        'H10 - H10 -10' => 'H10 - 10',
     ];
 
     /**
@@ -80,25 +76,27 @@ class UploadExcel extends AbstractFormModel
             $rtpDao = new RtPintarDao();
             $rtpDao->clearData();
             foreach ($data as $row) {
-                $unit = $this->getUnit($row);
-                $date = $this->getMonthYear($row['keterangan']);
-                $colVal = [];
-                $colVal['rtp_code'] = $row['kodepembayaran'];
-                $colVal['rtp_description'] = $row['keterangan'];
-                $colVal['rtp_amount'] = $row['jumlah'];
-                if (empty($date) === false) {
-                    $colVal['rtp_month'] = $date['m'];
-                    $colVal['rtp_year'] = (int)$date['y'];
+                $status = $this->getStatus($row['statuspembayaran']);
+                if ($status !== 'D') {
+                    $noBlock = $row['blok'] . ' - ' . $row['norumah'];
+                    $unit = $row['norumah'];
+                    if (array_key_exists($noBlock, $this->Unit) === true) {
+                        $unit = $this->Unit[$noBlock];
+                    }
+                    $date = $this->getMonthYear($row['keterangan']);
+                    $colVal = [];
+                    $colVal['rtp_unit'] = $unit;
+                    $colVal['rtp_code'] = $row['kodepembayaran'];
+                    $colVal['rtp_description'] = $row['keterangan'];
+                    $colVal['rtp_amount'] = $row['jumlah'];
+                    if (empty($date) === false) {
+                        $colVal['rtp_month'] = $date['m'];
+                        $colVal['rtp_year'] = (int)$date['y'];
+                    }
+                    $colVal['rtp_status'] = $status;
+                    $colVal['rtp_type'] = $this->getType($row['pembayaranvia']);
+                    $rtpDao->doInsertTransaction($colVal);
                 }
-                $colVal['rtp_status_text'] = $row['statuspembayaran'];
-                $colVal['rtp_status'] = $this->getStatus($row['statuspembayaran']);
-                $colVal['rtp_payment_time'] = $row['tanggalbayar'];
-                $colVal['rtp_contact'] = $row['iuranuntuk'];
-                if (empty($unit) === false) {
-                    $colVal['rtp_block'] = $unit['block'];
-                    $colVal['rtp_number'] = $unit['unit'];
-                }
-                $rtpDao->doInsertTransaction($colVal);
             }
         }
         return '';
@@ -124,6 +122,24 @@ class UploadExcel extends AbstractFormModel
     /**
      * Function to do the update of the transaction.;
      *
+     * @param string $status
+     * @return string
+     */
+    private function getType(string $status): string
+    {
+        if (empty($status) === true) {
+            return 'E';
+        }
+        if ($status === 'Manual') {
+            return 'M';
+        } else {
+            return 'A';
+        }
+    }
+
+    /**
+     * Function to do the update of the transaction.;
+     *
      * @param string $data
      * @return array
      */
@@ -141,24 +157,6 @@ class UploadExcel extends AbstractFormModel
         return [];
     }
 
-    /**
-     * Function to do the update of the transaction.;
-     *
-     * @param array $row
-     * @return array
-     */
-    private function getUnit(array $row): array
-    {
-        $keyUnit = $row['blok'] . '-' . $row['norumah'];
-        $keyUnit = str_replace(' ', '', $keyUnit);
-        if (array_key_exists($keyUnit, $this->unit) === true) {
-            return $this->unit[$keyUnit];
-        }
-        return [
-            'block' => $row['blok'],
-            'unit' => str_replace(' ', '', $row['norumah'])
-        ];
-    }
 
     /**
      * Function to do the update of the transaction.;

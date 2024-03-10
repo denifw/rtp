@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRtPintarTable extends Migration
+class AlterRtpTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,6 +13,7 @@ class CreateRtPintarTable extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('rt_pintar');
         Schema::create('rt_pintar', function (Blueprint $table) {
             $table->uuid('rtp_id')->primary();
             $table->string('rtp_unit', 128);
@@ -41,6 +42,6 @@ class CreateRtPintarTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('rt_pintar');
+        //
     }
 }

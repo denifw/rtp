@@ -31,17 +31,14 @@ class RtPintarDao extends AbstractBaseDao
      * @var array
      */
     private static $Fields = [
+        'rtp_unit',
         'rtp_code',
         'rtp_description',
         'rtp_amount',
         'rtp_month',
         'rtp_year',
         'rtp_status',
-        'rtp_status_text',
-        'rtp_payment_time',
-        'rtp_contact',
-        'rtp_block',
-        'rtp_number',
+        'rtp_type',
     ];
 
     /**
@@ -114,11 +111,12 @@ class RtPintarDao extends AbstractBaseDao
     public static function loadData(SqlHelper $helper): array
     {
         if ($helper->hasOrderBy() === false) {
-            $helper->addOrderBy('rtp_number, rtp_year, rtp_month, rtp_code');
+            $helper->addOrderBy('rtp_unit, rtp_year, rtp_month, rtp_id');
         }
 
-        $query = 'SELECT rtp_code, rtp_description, rtp_amount, rtp_month, rtp_year, rtp_status_text,
-                        rtp_status, rtp_payment_time, rtp_contact, rtp_block, rtp_number
+        $query = 'SELECT rtp_id, rtp_unit, rtp_code, rtp_description, rtp_amount, rtp_month, rtp_year, rtp_status, 
+                            rtp_type, rtp_created_by, rtp_created_on, rtp_updated_by, rtp_updated_on, rtp_deleted_by, 
+                            rtp_deleted_on, rtp_deleted_reason
                         FROM rt_pintar ' . $helper;
         $sqlResults = DB::select($query);
 

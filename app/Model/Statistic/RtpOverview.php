@@ -28,33 +28,38 @@ use App\Model\Dao\RtPintarDao;
  */
 class RtpOverview extends AbstractStatisticModel
 {
+    /**
+     * Property to store date time object
+     *
+     * @param array $Index
+     */
+    private $Index = [];
+
+    /**
+     * Property to store date time object
+     *
+     * @param array $ColVal
+     */
+    private $ColVal = [];
 
     /**
      * Property to store date time object
      *
      * @param DateTimeParser $DtParser
      */
-    private $DtParser;
-
-    /**
-     * Property to store date time object
-     *
-     * @param DateTimeParser $DtParser
-     */
-    private $Index = [
-        '9-2022',
-        '10-2022',
-        '11-2022',
-        '12-2022',
-        '1-2023',
-        '2-2023',
-        '3-2023',
-        '4-2023',
-        '5-2023',
-        '6-2023',
-        '7-2023',
-        '8-2023',
-        '9-2023',
+    private $Month = [
+        1 => 'Jan',
+        2 => 'Feb',
+        3 => 'Mar',
+        4 => 'Apr',
+        5 => 'Mei',
+        6 => 'Jun',
+        7 => 'Jul',
+        8 => 'Agu',
+        9 => 'Sep',
+        10 => 'Okt',
+        11 => 'Nov',
+        12 => 'Des',
     ];
     /**
      * Property to store date time object
@@ -62,9 +67,14 @@ class RtpOverview extends AbstractStatisticModel
      * @param DateTimeParser $DtParser
      */
     private $Exceptions = [
-        'H-H09-10',
-        'H-H09-16',
-        'H-H10-06',
+        '12739311135686203309' => '12-2022',
+        '12739324735686229640' => '1-2023',
+        '12739282633274163948' => '9-2022',
+        '12739282633265203314' => '9-2022',
+        '12739282633274166330' => '10-2022',
+        '12739282633274172178' => '11-2022',
+        '12739311133274203310' => '12-2022',
+        '12739324633274229639' => '1-2023',
     ];
 
     /**
@@ -77,7 +87,37 @@ class RtpOverview extends AbstractStatisticModel
         # Call parent construct.
         parent::__construct(get_class($this), 'rtp');
         $this->setParameters($parameters);
-        $this->DtParser = new DateTimeParser();
+        $this->setIndexColumn();
+    }
+
+    /**
+     * Abstract function to load search form.
+     *
+     * @return void
+     */
+    private function setIndexColumn(): void
+    {
+        $startYear = 2022;
+        $startMonth = 9;
+        $currentYear = (int)date('Y');
+        $currentMonth = (int)date('m') -1;
+        for ($i = $startYear; $i <= $currentYear; $i++) {
+            if ($i === $startYear) {
+                $start = $startMonth;
+                $end = 12;
+            } else if ($i === $currentYear) {
+                $start = 1;
+                $end = $currentMonth;
+            } else {
+                $start = 1;
+                $end = 12;
+            }
+            for ($m = $start; $m <= $end; $m++) {
+                $key = $m . '-' . $i;
+                $this->Index[] = $key;
+                $this->ColVal[$key] = $this->Month[$m] . ' ' . $i;
+            }
+        }
     }
 
     /**
@@ -118,28 +158,15 @@ class RtpOverview extends AbstractStatisticModel
     {
         $table = new Table('ResTbl');
         $table->setHeaderRow([
-            'rtp_number' => 'Unit',
-            'rtp_contact' => 'PIC',
-            '9-2022' => 'Sep 2022',
-            '10-2022' => 'Okt 2022',
-            '11-2022' => 'Nov 2022',
-            '12-2022' => 'Des 2022',
-            '1-2023' => 'Jan 2023',
-            '2-2023' => 'Feb 2023',
-            '3-2023' => 'Mar 2023',
-            '4-2023' => 'Apr 2023',
-            '5-2023' => 'Mei 2023',
-            '6-2023' => 'Jun 2023',
-            '7-2023' => 'Jul 2023',
-            '8-2023' => 'Agu 2023',
-            '9-2023' => 'Sep 2023',
+            'rtp_unit' => 'Unit',
         ]);
+        foreach ($this->Index as $key) {
+            $table->addColumnAtTheEnd($key, $this->ColVal[$key]);
+            $table->setColumnType($key, 'float');
+            $table->setFooterType($key, 'SUM');
+        }
 
         $table->addRows($this->doPrepareData($table));
-        foreach ($this->Index as $in) {
-            $table->setColumnType($in, 'float');
-            $table->setFooterType($in, 'SUM');
-        }
         $portlet = new Portlet('ResPtl', 'Results');
         $portlet->addTable($table);
         $this->addDatas('ResPtl', $portlet);
@@ -156,34 +183,76 @@ class RtpOverview extends AbstractStatisticModel
      */
     private function doPrepareData(Table $table): array
     {
+        $data = $this->loadData();
+        $results = [];
+        $i = 0;
+        foreach ($data as $row) {
+            $rtp = [
+                'rtp_unit' => $row['rtp_unit'],
+            ];
+
+            foreach ($this->Index as $key) {
+                if (array_key_exists($key, $row) === true) {
+                    $val = $row[$key];
+                    $rtp[$key] = $val['amount'];
+                    if($val['status'] === 'N') {
+                        $table->addCellAttribute($key, $i, 'style', 'background-color: #FF0000;');
+//                    } else if($val['type'] === 'A') {
+//                        $table->addCellAttribute($key, $i, 'style', 'background-color: #00FF00;');
+                    }
+                } else {
+                    $rtp[$key] = null;
+                    $table->addCellAttribute($key, $i, 'style', 'background-color: #000000;');
+                }
+            }
+            $results[] = $rtp;
+            $i++;
+        }
+        return $results;
+
+    }
+
+    /**
+     * Get query to get the quotation data.
+     *
+     *
+     * @return array
+     */
+    private function loadData(): array
+    {
         $helper = new SqlHelper();
-        $helper->addStringWhere('rtp_status', 'Y');
+//        $helper->addStringWhere('rtp_status', 'Y');
+//        $helper->addStringWhere('rtp_type', 'M');
         $data = RtPintarDao::loadData($helper);
         $results = [];
         $tempUnit = [];
         foreach ($data as $row) {
+            $code = $row['rtp_code'];
             $keyColumn = $row['rtp_month'] . '-' . $row['rtp_year'];
-            $unit = $row['rtp_block'] . '-' . $row['rtp_number'];
-            if (in_array($unit, $this->Exceptions, true) === true) {
-                $keyColumnIndex = array_search($keyColumn, $this->Index, true);
-                $keyColumn = $this->Index[$keyColumnIndex - 1];
+            if (array_key_exists($code, $this->Exceptions) === true) {
+                $keyColumn = $this->Exceptions[$code];
             }
+            $unit = $row['rtp_unit'];
             if (in_array($unit, $tempUnit, true) === false) {
-                $temp = [
-                    'rtp_number' => $row['rtp_number'],
-                    'rtp_contact' => $row['rtp_contact'],
-                    $keyColumn => (float)$row['rtp_amount'],
-                ];
                 $tempUnit[] = $unit;
-                $results[] = $temp;
-            } else {
-                $index = array_search($unit, $tempUnit, true);
-                if(array_key_exists($keyColumn, $results[$index]) === false) {
-                    $results[$index][$keyColumn] = (float)$row['rtp_amount'];
-                } else {
-                    $results[$index][$keyColumn] += (float)$row['rtp_amount'];
-                }
+                $results[] = [
+                    'rtp_unit' => $unit,
+                ];
             }
+            $index = array_search($unit, $tempUnit, true);
+            $temp = $results[$index];
+//            if (array_key_exists($keyColumn, $temp) === false) {
+//                $temp[$keyColumn] = [];
+//            }
+            $temp[$keyColumn] = [
+                'code' => $row['rtp_code'],
+                'amount' => (float)$row['rtp_amount'],
+                'status' => $row['rtp_status'],
+                'type' => $row['rtp_type'],
+            ];
+            $results[$index] = $temp;
+
+
         }
         return $results;
 
