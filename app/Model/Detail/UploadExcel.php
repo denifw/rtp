@@ -41,14 +41,6 @@ class UploadExcel extends AbstractFormModel
         'November' => 11,
         'Desember' => 12,
     ];
-
-    private $Unit = [
-        'Blok H 9 - H9-10' => 'H09 - 10',
-        'H10 - H10-21' => 'H10 - 21',
-        'H10 - H10 - 22' => 'H10 - 22',
-        'H10 - H10 -10' => 'H10 - 10',
-    ];
-
     /**
      * Constructor to load when there is a new instance created.
      *
@@ -76,27 +68,47 @@ class UploadExcel extends AbstractFormModel
             $rtpDao = new RtPintarDao();
             $rtpDao->clearData();
             foreach ($data as $row) {
-                $status = $this->getStatus($row['statuspembayaran']);
-                if ($status !== 'D') {
-                    $noBlock = $row['blok'] . ' - ' . $row['norumah'];
-                    $unit = $row['norumah'];
-                    if (array_key_exists($noBlock, $this->Unit) === true) {
-                        $unit = $this->Unit[$noBlock];
-                    }
-                    $date = $this->getMonthYear($row['keterangan']);
-                    $colVal = [];
-                    $colVal['rtp_unit'] = $unit;
-                    $colVal['rtp_code'] = $row['kodepembayaran'];
-                    $colVal['rtp_description'] = $row['keterangan'];
-                    $colVal['rtp_amount'] = $row['jumlah'];
-                    if (empty($date) === false) {
-                        $colVal['rtp_month'] = $date['m'];
-                        $colVal['rtp_year'] = (int)$date['y'];
-                    }
-                    $colVal['rtp_status'] = $status;
-                    $colVal['rtp_type'] = $this->getType($row['pembayaranvia']);
-                    $rtpDao->doInsertTransaction($colVal);
+                $noBlock = str_replace(' ', '', mb_strtolower($row['blok'] . '-' . $row['norumah']));
+                $numberList = explode('-', $noBlock);
+                $number = '';
+                $count = count($numberList);
+                if ($count > 0) {
+                    $number = $numberList[($count - 1)];
                 }
+                $order = 0;
+                $numberUnit = '';
+                if (strpos($noBlock, 'h9') !== false || strpos($noBlock, 'h09') !== false){
+                    $numberUnit = 'H09-'.mb_strtoupper($number);
+                    $order = 1;
+                } else if(strpos($noBlock, 'h10') !== false) {
+                    $numberUnit = 'H10-'.mb_strtoupper($number);
+                    $order = 2;
+                } else if(strpos($noBlock, 'h11') !== false) {
+                    $numberUnit = 'H11-'.mb_strtoupper($number);
+                    $order = 3;
+                }
+
+                $period = $this->getMonthYear($row['keterangan']);
+                $month = null;
+                $year = null;
+                if(empty($period) === false) {
+                    $month = $period['m'];
+                    $year = (int)$period['y'];
+                }
+                $colVal = [
+                    'rtp_code'=>$row['kodepembayaran'],
+                    'rtp_system_unit' => mb_strtoupper($noBlock),
+                    'rtp_unit' => $numberUnit,
+                    'rtp_order' => $order,
+                    'rtp_month' => $month,
+                    'rtp_year' => $year,
+                    'rtp_pic' => $row['iuranuntuk'],
+                    'rtp_amount' => (float)$row['jumlah'],
+                    'rtp_paid' => $this->getPaid($row['statuspembayaran']),
+                    'rtp_canceled' => $this->getCanceled($row['statuspembayaran']),
+                    'rtp_payment_type' => $this->getType($row['pembayaranvia']),
+                ];
+                $rtpDao->doInsertTransaction($colVal);
             }
         }
         return '';
@@ -108,15 +120,12 @@ class UploadExcel extends AbstractFormModel
      * @param string $status
      * @return string
      */
-    private function getStatus(string $status): string
+    private function getCanceled(string $status): string
     {
-        if ($status === 'Sudah Dibayar') {
+        if ($status === 'Dibatalkan') {
             return 'Y';
         }
-        if ($status === 'Belum Dibayar') {
-            return 'N';
-        }
-        return 'D';
+        return 'N';
     }
 
     /**
@@ -125,10 +134,24 @@ class UploadExcel extends AbstractFormModel
      * @param string $status
      * @return string
      */
-    private function getType(string $status): string
+    private function getPaid(string $status): string
+    {
+        if ($status === 'Sudah Dibayar') {
+            return 'Y';
+        }
+        return 'N';
+    }
+
+    /**
+     * Function to do the update of the transaction.;
+     *
+     * @param ?string $status
+     * @return string
+     */
+    private function getType(string $status): ?string
     {
         if (empty($status) === true) {
-            return 'E';
+            return null;
         }
         if ($status === 'Manual') {
             return 'M';

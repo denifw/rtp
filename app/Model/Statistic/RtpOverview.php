@@ -12,6 +12,7 @@
 namespace App\Model\Statistic;
 
 use App\Frame\Formatter\DateTimeParser;
+use App\Frame\Formatter\NumberFormatter;
 use App\Frame\Formatter\SqlHelper;
 use App\Frame\Gui\Portlet;
 use App\Frame\Gui\Table;
@@ -38,9 +39,30 @@ class RtpOverview extends AbstractStatisticModel
     /**
      * Property to store date time object
      *
+     * @param array $ColumnIndex
+     */
+    private $ColumnIndex = [];
+
+    /**
+     * Property to store date time object
+     *
      * @param array $ColVal
      */
     private $ColVal = [];
+
+    /**
+     * Property to store date time object
+     *
+     * @param int $StartYear
+     */
+    private static $StartYear = 2022;
+
+    /**
+     * Property to store date time object
+     *
+     * @param int $StartMonth
+     */
+    private static $StartMonth = 9;
 
     /**
      * Property to store date time object
@@ -87,7 +109,6 @@ class RtpOverview extends AbstractStatisticModel
         # Call parent construct.
         parent::__construct(get_class($this), 'rtp');
         $this->setParameters($parameters);
-        $this->setIndexColumn();
     }
 
     /**
@@ -97,25 +118,33 @@ class RtpOverview extends AbstractStatisticModel
      */
     private function setIndexColumn(): void
     {
-        $startYear = 2022;
-        $startMonth = 9;
-        $currentYear = (int)date('Y');
-        $currentMonth = (int)date('m') -1;
-        for ($i = $startYear; $i <= $currentYear; $i++) {
-            if ($i === $startYear) {
-                $start = $startMonth;
-                $end = 12;
-            } else if ($i === $currentYear) {
-                $start = 1;
-                $end = $currentMonth;
+        if ($this->isValidParameter('year') === true) {
+            $currentYear = $this->getIntParameter('year');
+            if ($currentYear === self::$StartYear) {
+                $start = self::$StartMonth;
             } else {
                 $start = 1;
-                $end = 12;
             }
+            $end = 12;
             for ($m = $start; $m <= $end; $m++) {
-                $key = $m . '-' . $i;
-                $this->Index[] = $key;
-                $this->ColVal[$key] = $this->Month[$m] . ' ' . $i;
+                $key = $m . '-' . $currentYear;
+                $this->ColumnIndex[] = $key;
+                $this->ColVal[$key] = $this->Month[$m] . ' ' . $currentYear;
+            }
+        } else {
+            $currentYear = (int)date('Y');
+            for ($i = self::$StartYear; $i <= $currentYear; $i++) {
+                if ($i === self::$StartYear) {
+                    $start = self::$StartMonth;
+                } else {
+                    $start = 1;
+                }
+                $end = 12;
+                for ($m = $start; $m <= $end; $m++) {
+                    $key = $m . '-' . $i;
+                    $this->ColumnIndex[] = $key;
+                    $this->ColVal[$key] = $this->Month[$m] . ' ' . $i;
+                }
             }
         }
     }
@@ -127,6 +156,24 @@ class RtpOverview extends AbstractStatisticModel
      */
     public function loadSearchForm(): void
     {
+        $block = $this->Field->getSelect('block', $this->getIntParameter('block'));
+        $block->addOption('H09', 1);
+        $block->addOption('H10', 2);
+        $block->addOption('H11', 3);
+
+        $year = $this->Field->getSelect('year', $this->getIntParameter('year'));
+        $today = (int)date('Y');
+        for ($i = self::$StartYear; $i <= $today; $i++) {
+            $year->addOption($i, $i);
+        }
+
+        $paid = $this->Field->getSelect('paid', $this->getStringParameter('paid'));
+        $paid->addOption('Yes', 'Y');
+        $paid->addOption('No', 'N');
+
+        $this->StatisticForm->addField('Block', $block);
+        $this->StatisticForm->addField('Year', $year);
+        $this->StatisticForm->addField('Paid', $paid);
     }
 
     /**
@@ -136,6 +183,8 @@ class RtpOverview extends AbstractStatisticModel
      */
     public function loadViews(): void
     {
+        $this->Index = [];
+        $this->setIndexColumn();
         $this->addContent('result', $this->getResultPortlet());
     }
 
@@ -159,14 +208,47 @@ class RtpOverview extends AbstractStatisticModel
         $table = new Table('ResTbl');
         $table->setHeaderRow([
             'rtp_unit' => 'Unit',
+            'rtp_system_unit' => 'RTP Unit',
+            'rtp_pic' => 'Name',
         ]);
-        foreach ($this->Index as $key) {
-            $table->addColumnAtTheEnd($key, $this->ColVal[$key]);
-            $table->setColumnType($key, 'float');
-            $table->setFooterType($key, 'SUM');
-        }
 
-        $table->addRows($this->doPrepareData($table));
+        $data = $this->loadData();
+        $rows = [];
+        $i = 0;
+        foreach ($data as $row) {
+            foreach ($this->Index as $key) {
+                if (array_key_exists($key, $row) === true) {
+                    $amount = (float)$row[$key];
+                    if ($amount < 100.0) {
+                        $table->addCellAttribute('rtp_system_unit', $i, 'style', 'background-color: #FF0000; color: #000;');
+                        if ($amount === 0.0) {
+                            $table->addCellAttribute($key, $i, 'style', 'background-color: #FFFF00; color: #000;');
+                        } else {
+                            $table->addCellAttribute($key, $i, 'style', 'background-color: #FF0000; color: #000;');
+                        }
+//                        $row[$key] = null;
+                    }
+                } else {
+                    $row[$key] = null;
+                    $table->addCellAttribute($key, $i, 'style', 'background-color: #000000;');
+                }
+            }
+            $rows[] = $row;
+            $i++;
+        }
+        $table->addRows($rows);
+        foreach ($this->ColumnIndex as $key) {
+            if (in_array($key, $this->Index, true) === true) {
+                $table->addColumnAtTheEnd($key, $this->ColVal[$key]);
+                $table->setColumnType($key, 'float');
+                $table->setFooterType($key, 'SUM');
+            }
+        }
+        $table->addColumnAtTheEnd('rtp_total', 'Total');
+        $table->setColumnType('rtp_total', 'float');
+        $table->setFooterType('rtp_total', 'SUM');
+
+
         $portlet = new Portlet('ResPtl', 'Results');
         $portlet->addTable($table);
         $this->addDatas('ResPtl', $portlet);
@@ -178,81 +260,52 @@ class RtpOverview extends AbstractStatisticModel
      * Get query to get the quotation data.
      *
      *
-     * @param Table $table
-     * @return array
-     */
-    private function doPrepareData(Table $table): array
-    {
-        $data = $this->loadData();
-        $results = [];
-        $i = 0;
-        foreach ($data as $row) {
-            $rtp = [
-                'rtp_unit' => $row['rtp_unit'],
-            ];
-
-            foreach ($this->Index as $key) {
-                if (array_key_exists($key, $row) === true) {
-                    $val = $row[$key];
-                    $rtp[$key] = $val['amount'];
-                    if($val['status'] === 'N') {
-                        $table->addCellAttribute($key, $i, 'style', 'background-color: #FF0000;');
-//                    } else if($val['type'] === 'A') {
-//                        $table->addCellAttribute($key, $i, 'style', 'background-color: #00FF00;');
-                    }
-                } else {
-                    $rtp[$key] = null;
-                    $table->addCellAttribute($key, $i, 'style', 'background-color: #000000;');
-                }
-            }
-            $results[] = $rtp;
-            $i++;
-        }
-        return $results;
-
-    }
-
-    /**
-     * Get query to get the quotation data.
-     *
-     *
      * @return array
      */
     private function loadData(): array
     {
         $helper = new SqlHelper();
-//        $helper->addStringWhere('rtp_status', 'Y');
-//        $helper->addStringWhere('rtp_type', 'M');
+        $helper->addStringWhere('rtp_canceled', 'N');
+        $helper->addStringWhere('rtp_paid', $this->getStringParameter('paid'));
+        $helper->addNumericWhere('rtp_order', $this->getIntParameter('block'));
+        $helper->addNumericWhere('rtp_year', $this->getIntParameter('year'));
         $data = RtPintarDao::loadData($helper);
         $results = [];
         $tempUnit = [];
         foreach ($data as $row) {
-            $code = $row['rtp_code'];
+            $tempKey = $row['rtp_system_unit'];
             $keyColumn = $row['rtp_month'] . '-' . $row['rtp_year'];
-            if (array_key_exists($code, $this->Exceptions) === true) {
-                $keyColumn = $this->Exceptions[$code];
+            if (in_array($keyColumn, $this->Index, true) === false) {
+                $this->Index[] = $keyColumn;
             }
-            $unit = $row['rtp_unit'];
-            if (in_array($unit, $tempUnit, true) === false) {
-                $tempUnit[] = $unit;
-                $results[] = [
-                    'rtp_unit' => $unit,
+            $amount = (float)$row['rtp_amount'];
+            if ($row['rtp_paid'] === 'N') {
+                if ($amount > 50000) {
+                    $amount = 1.0;
+                } else {
+                    $amount = 0.0;
+                }
+            }
+            if (in_array($tempKey, $tempUnit, true) === false) {
+                $tempUnit[] = $tempKey;
+                $temp = [
+                    'rtp_unit' => $row['rtp_unit'],
+                    'rtp_system_unit' => $row['rtp_system_unit'],
+                    'rtp_pic' => $row['rtp_pic'],
+                    'rtp_paid' => $row['rtp_paid'],
+                    'rtp_total' => $amount,
                 ];
+                $temp[$keyColumn] = $amount;
+                $results[] = $temp;
+            } else {
+                $index = array_search($tempKey, $tempUnit, true);
+                $results[$index]['rtp_total'] += $amount;
+                if (array_key_exists($keyColumn, $results[$index]) === false) {
+                    $results[$index][$keyColumn] = $amount;
+                } else {
+                    $results[$index][$keyColumn] += $amount;
+                }
             }
-            $index = array_search($unit, $tempUnit, true);
-            $temp = $results[$index];
-//            if (array_key_exists($keyColumn, $temp) === false) {
-//                $temp[$keyColumn] = [];
-//            }
-            $temp[$keyColumn] = [
-                'code' => $row['rtp_code'],
-                'amount' => (float)$row['rtp_amount'],
-                'status' => $row['rtp_status'],
-                'type' => $row['rtp_type'],
-            ];
-            $results[$index] = $temp;
-
-
         }
         return $results;
 
